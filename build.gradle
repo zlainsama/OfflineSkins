@@ -13,10 +13,25 @@ buildscript {
 
 apply plugin: 'forge'
 
-version = "0.0.1"
+version = "1.6.x-v1"
 group= "lain.mods.skins"
 archivesBaseName = "OfflineSkins"
 
 minecraft {
 	version = "1.6.4-9.11.1.964"
+}
+
+processResources
+{
+    from(sourceSets.main.resources.srcDirs)
+    {
+        include 'mcmod.info'
+
+        expand 'version':project.version, 'mcversion':project.minecraft.version
+    }
+
+    from(sourceSets.main.resources.srcDirs)
+    {
+        exclude 'mcmod.info'
+    }
 }
