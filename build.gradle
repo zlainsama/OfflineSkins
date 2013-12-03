@@ -1,0 +1,22 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            name = "forge"
+            url = "http://files.minecraftforge.net/maven"
+        }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:1.0-SNAPSHOT'
+    }
+}
+
+apply plugin: 'forge'
+
+version = "0.0.1"
+group= "lain.mods.skins"
+archivesBaseName = "OfflineSkins"
+
+minecraft {
+	version = "1.6.4-9.11.1.964"
+}
