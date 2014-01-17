@@ -10,67 +10,71 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.renderer.ThreadDownloadImageData;
 import net.minecraft.client.renderer.texture.TextureUtil;
-import net.minecraft.client.resources.ReloadableResourceManager;
-import net.minecraft.client.resources.ResourceManager;
-import net.minecraft.client.resources.ResourceManagerReloadListener;
+import net.minecraft.client.resources.IReloadableResourceManager;
+import net.minecraft.client.resources.IResourceManager;
+import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.StringUtils;
 import net.minecraft.world.IWorldAccess;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.world.WorldEvent;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 @Mod(modid = "OfflineSkins", useMetadata = true)
 public class OfflineSkins
 {
 
-    public class Handler implements IWorldAccess, ResourceManagerReloadListener
+    public class Handler implements IWorldAccess, IResourceManagerReloadListener
     {
         @Override
-        public void broadcastSound(int i, int j, int k, int l, int i1)
+        public void broadcastSound(int var1, int var2, int var3, int var4, int var5)
         {
         }
 
         @Override
-        public void destroyBlockPartially(int i, int j, int k, int l, int i1)
+        public void func_147584_b()
         {
         }
 
         @Override
-        public void markBlockForRenderUpdate(int i, int j, int k)
+        public void func_147585_a(int var1, int var2, int var3, int var4, int var5, int var6)
         {
         }
 
         @Override
-        public void markBlockForUpdate(int i, int j, int k)
+        public void func_147586_a(int var1, int var2, int var3)
         {
         }
 
         @Override
-        public void markBlockRangeForRenderUpdate(int i, int j, int k, int l, int i1, int j1)
+        public void func_147587_b(int var1, int var2, int var3, int var4, int var5)
         {
         }
 
         @Override
-        public void onEntityCreate(Entity entity)
-        {
-            loadSkin(entity, false);
-        }
-
-        @Override
-        public void onEntityDestroy(Entity entity)
+        public void func_147588_b(int var1, int var2, int var3)
         {
         }
 
         @Override
-        public void onResourceManagerReload(ResourceManager resourcemanager)
+        public void onEntityCreate(Entity var1)
+        {
+            loadSkin(var1, false);
+        }
+
+        @Override
+        public void onEntityDestroy(Entity var1)
+        {
+        }
+
+        @Override
+        public void onResourceManagerReload(IResourceManager var1)
         {
             Minecraft mc = Minecraft.getMinecraft();
             if (mc.theWorld != null)
@@ -78,35 +82,35 @@ public class OfflineSkins
                     loadSkin(obj, false);
         }
 
-        @ForgeSubscribe
+        @SubscribeEvent
         public void onWorldLoad(WorldEvent.Load event)
         {
             event.world.addWorldAccess(this);
         }
 
-        @ForgeSubscribe
+        @SubscribeEvent
         public void onWorldUnload(WorldEvent.Unload event)
         {
             event.world.removeWorldAccess(this);
         }
 
         @Override
-        public void playAuxSFX(EntityPlayer entityplayer, int i, int j, int k, int l, int i1)
+        public void playAuxSFX(EntityPlayer var1, int var2, int var3, int var4, int var5, int var6)
         {
         }
 
         @Override
-        public void playRecord(String s, int i, int j, int k)
+        public void playRecord(String var1, int var2, int var3, int var4)
         {
         }
 
         @Override
-        public void playSound(String s, double d0, double d1, double d2, float f, float f1)
+        public void playSound(String var1, double var2, double var4, double var6, float var8, float var9)
         {
         }
 
         @Override
-        public void playSoundToNearExcept(EntityPlayer entityplayer, String s, double d0, double d1, double d2, float f, float f1)
+        public void playSoundToNearExcept(EntityPlayer var1, String var2, double var3, double var5, double var7, float var9, float var10)
         {
         }
 
@@ -114,12 +118,12 @@ public class OfflineSkins
         {
             MinecraftForge.EVENT_BUS.register(this);
             Object obj = Minecraft.getMinecraft().getResourceManager();
-            if (obj instanceof ReloadableResourceManager)
-                ((ReloadableResourceManager) obj).registerReloadListener(this);
+            if (obj instanceof IReloadableResourceManager)
+                ((IReloadableResourceManager) obj).registerReloadListener(this);
         }
 
         @Override
-        public void spawnParticle(String s, double d0, double d1, double d2, double d3, double d4, double d5)
+        public void spawnParticle(String var1, double var2, double var4, double var6, double var8, double var10, double var12)
         {
         }
     }
@@ -170,7 +174,7 @@ public class OfflineSkins
                 @Override
                 public BufferedImage loadImage(String name)
                 {
-                    ResourceManager resman = Minecraft.getMinecraft().getResourceManager();
+                    IResourceManager resman = Minecraft.getMinecraft().getResourceManager();
                     ResourceLocation location = new ResourceLocation(name);
                     try
                     {
@@ -221,14 +225,14 @@ public class OfflineSkins
             ThreadDownloadImageData skin = player.getTextureSkin();
             if (skin != null && (flag || !skin.isTextureUploaded()))
             {
-                BufferedImage image = cachedImages.getCachedImage(String.format("skins/%s.png", StringUtils.stripControlCodes(player.username)));
+                BufferedImage image = cachedImages.getCachedImage(String.format("skins/%s.png", player.getCommandSenderName()));
                 if (image != null)
                     TextureUtil.uploadTextureImage(skin.getGlTextureId(), image);
             }
             ThreadDownloadImageData cape = player.getTextureCape();
             if (cape != null && (flag || !cape.isTextureUploaded()))
             {
-                BufferedImage image = cachedImages.getCachedImage(String.format("capes/%s.png", StringUtils.stripControlCodes(player.username)));
+                BufferedImage image = cachedImages.getCachedImage(String.format("capes/%s.png", player.getCommandSenderName()));
                 if (image != null)
                     TextureUtil.uploadTextureImage(cape.getGlTextureId(), image);
             }
