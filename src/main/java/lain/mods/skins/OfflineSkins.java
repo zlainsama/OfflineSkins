@@ -190,10 +190,10 @@ public class OfflineSkins
                     File file3 = new File(file1, "capes");
                     if (!file3.exists())
                         file3.mkdirs();
-                    File file4 = new File(file1, "skins_uuid");
+                    File file4 = new File(file2, "uuid");
                     if (!file4.exists())
                         file4.mkdirs();
-                    File file5 = new File(file1, "capes_uuid");
+                    File file5 = new File(file3, "uuid");
                     if (!file5.exists())
                         file5.mkdirs();
                 }
@@ -223,7 +223,7 @@ public class OfflineSkins
             ThreadDownloadImageData skin = player.getTextureSkin();
             if (skin != null && (flag || !skin.isTextureUploaded()))
             {
-                BufferedImage image = getCachedImage("skins_uuid/%s.png", player.getUniqueID().toString().replaceAll("-", ""));
+                BufferedImage image = getCachedImage("skins/uuid/%s.png", player.getUniqueID().toString().replaceAll("-", ""));
                 if (image != null)
                     TextureUtil.uploadTextureImage(skin.getGlTextureId(), image);
                 else
@@ -236,7 +236,7 @@ public class OfflineSkins
             ThreadDownloadImageData cape = player.getTextureCape();
             if (cape != null && (flag || !cape.isTextureUploaded()))
             {
-                BufferedImage image = getCachedImage("capes_uuid/%s.png", player.getUniqueID().toString().replaceAll("-", ""));
+                BufferedImage image = getCachedImage("capes/uuid/%s.png", player.getUniqueID().toString().replaceAll("-", ""));
                 if (image != null)
                     TextureUtil.uploadTextureImage(skin.getGlTextureId(), image);
                 else
