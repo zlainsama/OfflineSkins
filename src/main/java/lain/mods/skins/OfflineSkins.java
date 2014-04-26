@@ -38,27 +38,22 @@ public class OfflineSkins
         }
 
         @Override
-        public void func_147584_b()
+        public void destroyBlockPartially(int var1, int var2, int var3, int var4, int var5)
         {
         }
 
         @Override
-        public void func_147585_a(int var1, int var2, int var3, int var4, int var5, int var6)
+        public void markBlockForRenderUpdate(int var1, int var2, int var3)
         {
         }
 
         @Override
-        public void func_147586_a(int var1, int var2, int var3)
+        public void markBlockForUpdate(int var1, int var2, int var3)
         {
         }
 
         @Override
-        public void func_147587_b(int var1, int var2, int var3, int var4, int var5)
-        {
-        }
-
-        @Override
-        public void func_147588_b(int var1, int var2, int var3)
+        public void markBlockRangeForRenderUpdate(int var1, int var2, int var3, int var4, int var5, int var6)
         {
         }
 
@@ -80,6 +75,11 @@ public class OfflineSkins
             if (mc.theWorld != null)
                 for (Object obj : mc.theWorld.loadedEntityList)
                     loadSkin(obj, false);
+        }
+
+        @Override
+        public void onStaticEntitiesChanged()
+        {
         }
 
         @SubscribeEvent
