@@ -15,7 +15,6 @@ import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IWorldAccess;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.WorldEvent;
@@ -156,6 +155,16 @@ public class OfflineSkins
     public Handler handler;
     public ImageCache cachedImages;
 
+    public BufferedImage getCachedImage(String name)
+    {
+        return cachedImages.getCachedImage(name);
+    }
+
+    public BufferedImage getCachedImage(String format, Object... params)
+    {
+        return getCachedImage(String.format(format, params));
+    }
+
     @Mod.EventHandler
     public void init(FMLPreInitializationEvent event)
     {
@@ -171,23 +180,6 @@ public class OfflineSkins
             cachedImages = new ImageCache();
             cachedImages.suppliers.add(new ImageSupplier()
             {
-                @Override
-                public BufferedImage loadImage(String name)
-                {
-                    IResourceManager resman = Minecraft.getMinecraft().getResourceManager();
-                    ResourceLocation location = new ResourceLocation(name);
-                    try
-                    {
-                        return ImageIO.read(resman.getResource(location).getInputStream());
-                    }
-                    catch (IOException ignored)
-                    {
-                        return null;
-                    }
-                }
-            });
-            cachedImages.suppliers.add(new ImageSupplier()
-            {
                 {
                     File file1 = new File(Minecraft.getMinecraft().mcDataDir, "cachedImages");
                     if (!file1.exists())
@@ -198,6 +190,12 @@ public class OfflineSkins
                     File file3 = new File(file1, "capes");
                     if (!file3.exists())
                         file3.mkdirs();
+                    File file4 = new File(file1, "skins_uuid");
+                    if (!file4.exists())
+                        file4.mkdirs();
+                    File file5 = new File(file1, "capes_uuid");
+                    if (!file5.exists())
+                        file5.mkdirs();
                 }
 
                 @Override
@@ -225,16 +223,28 @@ public class OfflineSkins
             ThreadDownloadImageData skin = player.getTextureSkin();
             if (skin != null && (flag || !skin.isTextureUploaded()))
             {
-                BufferedImage image = cachedImages.getCachedImage(String.format("skins/%s.png", player.getCommandSenderName()));
+                BufferedImage image = getCachedImage("skins_uuid/%s.png", player.getUniqueID().toString().replaceAll("-", ""));
                 if (image != null)
                     TextureUtil.uploadTextureImage(skin.getGlTextureId(), image);
+                else
+                {
+                    image = getCachedImage("skins/%s.png", player.getCommandSenderName());
+                    if (image != null)
+                        TextureUtil.uploadTextureImage(skin.getGlTextureId(), image);
+                }
             }
             ThreadDownloadImageData cape = player.getTextureCape();
             if (cape != null && (flag || !cape.isTextureUploaded()))
             {
-                BufferedImage image = cachedImages.getCachedImage(String.format("capes/%s.png", player.getCommandSenderName()));
+                BufferedImage image = getCachedImage("capes_uuid/%s.png", player.getUniqueID().toString().replaceAll("-", ""));
                 if (image != null)
-                    TextureUtil.uploadTextureImage(cape.getGlTextureId(), image);
+                    TextureUtil.uploadTextureImage(skin.getGlTextureId(), image);
+                else
+                {
+                    image = getCachedImage("capes/%s.png", player.getCommandSenderName());
+                    if (image != null)
+                        TextureUtil.uploadTextureImage(skin.getGlTextureId(), image);
+                }
             }
         }
     }
