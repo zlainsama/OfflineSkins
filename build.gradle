@@ -17,12 +17,12 @@ buildscript {
 
 apply plugin: 'forge'
 
-version = "1.7.x-v2"
+version = "1.7.10-v1"
 group= "lain.mods.skins"
 archivesBaseName = "OfflineSkins"
 
 minecraft {
-    version = "1.7.2-10.12.1.1061"
+    version = "1.7.10-10.13.0.1180"
     assetDir = "eclipse/assets"
 }
 
