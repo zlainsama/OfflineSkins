@@ -8,18 +8,20 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
-import net.minecraft.client.renderer.ThreadDownloadImageData;
+import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IWorldAccess;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.WorldEvent;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
@@ -152,7 +154,58 @@ public class OfflineSkins
         public BufferedImage loadImage(String name);
     }
 
+    public class OfflineTextureObject extends AbstractTexture
+    {
+        private BufferedImage image;
+
+        public OfflineTextureObject(BufferedImage image)
+        {
+            this.image = image;
+        }
+
+        @Override
+        public void loadTexture(IResourceManager arg0)
+        {
+            deleteGlTexture();
+
+            TextureUtil.uploadTextureImageAllocate(getGlTextureId(), image, false, false);
+        }
+    }
+
+    public static ResourceLocation getFakeLocation(AbstractClientPlayer player, MinecraftProfileTexture.Type type)
+    {
+        switch (type)
+        {
+            case CAPE:
+                return new ResourceLocation("offlineskins", String.format("capes/%s", player.getUniqueID()));
+            case SKIN:
+                return new ResourceLocation("offlineskins", String.format("skins/%s", player.getUniqueID()));
+        }
+        return null;
+    }
+
+    public static boolean hasCape(AbstractClientPlayer player)
+    {
+        return player.func_152122_n();
+    }
+
+    public static boolean hasSkin(AbstractClientPlayer player)
+    {
+        return player.func_152123_o();
+    }
+
+    public static void setCape(AbstractClientPlayer player, ResourceLocation locRes)
+    {
+        player.func_152121_a(MinecraftProfileTexture.Type.CAPE, locRes);
+    }
+
+    public static void setSkin(AbstractClientPlayer player, ResourceLocation locRes)
+    {
+        player.func_152121_a(MinecraftProfileTexture.Type.SKIN, locRes);
+    }
+
     public Handler handler;
+
     public ImageCache cachedImages;
 
     public BufferedImage getCachedImage(String name)
@@ -220,30 +273,34 @@ public class OfflineSkins
         if (obj instanceof AbstractClientPlayer)
         {
             AbstractClientPlayer player = (AbstractClientPlayer) obj;
-            ThreadDownloadImageData skin = player.getTextureSkin();
-            if (skin != null && (flag || !skin.isTextureUploaded()))
+            if (flag | !hasSkin(player))
             {
-                BufferedImage image = getCachedImage("skins/uuid/%s.png", player.getUniqueID().toString().replaceAll("-", ""));
-                if (image != null)
-                    TextureUtil.uploadTextureImage(skin.getGlTextureId(), image);
-                else
+                ResourceLocation locRes = getFakeLocation(player, MinecraftProfileTexture.Type.SKIN);
+                if (locRes != null)
                 {
-                    image = getCachedImage("skins/%s.png", player.getCommandSenderName());
+                    BufferedImage image = getCachedImage("skins/uuid/%s.png", player.getUniqueID().toString().replaceAll("-", ""));
+                    if (image == null)
+                        image = getCachedImage("skins/%s.png", player.getCommandSenderName());
                     if (image != null)
-                        TextureUtil.uploadTextureImage(skin.getGlTextureId(), image);
+                    {
+                        Minecraft.getMinecraft().getTextureManager().loadTexture(locRes, new OfflineTextureObject(image));
+                        setSkin(player, locRes);
+                    }
                 }
             }
-            ThreadDownloadImageData cape = player.getTextureCape();
-            if (cape != null && (flag || !cape.isTextureUploaded()))
+            if (flag | !hasCape(player))
             {
-                BufferedImage image = getCachedImage("capes/uuid/%s.png", player.getUniqueID().toString().replaceAll("-", ""));
-                if (image != null)
-                    TextureUtil.uploadTextureImage(skin.getGlTextureId(), image);
-                else
+                ResourceLocation locRes = getFakeLocation(player, MinecraftProfileTexture.Type.CAPE);
+                if (locRes != null)
                 {
-                    image = getCachedImage("capes/%s.png", player.getCommandSenderName());
+                    BufferedImage image = getCachedImage("capes/uuid/%s.png", player.getUniqueID().toString().replaceAll("-", ""));
+                    if (image == null)
+                        image = getCachedImage("capes/%s.png", player.getCommandSenderName());
                     if (image != null)
-                        TextureUtil.uploadTextureImage(skin.getGlTextureId(), image);
+                    {
+                        Minecraft.getMinecraft().getTextureManager().loadTexture(locRes, new OfflineTextureObject(image));
+                        setCape(player, locRes);
+                    }
                 }
             }
         }
