@@ -7,7 +7,7 @@
   "mcversion": "${mcversion}",
   "url": "https://github.com/zlainsama/offlineskins",
   "updateUrl": "https://github.com/zlainsama/offlineskins/releases",
-  "authors": ["zlainsama"],
+  "authorList": ["zlainsama"],
   "credits": "",
   "logoFile": "",
   "screenshots": [],
