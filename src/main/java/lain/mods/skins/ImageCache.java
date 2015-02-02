@@ -17,25 +17,32 @@ public class ImageCache
         suppliers.add(supplier);
     }
 
+    public void clear()
+    {
+        map.clear();
+    }
+
+    public void clear(String name)
+    {
+        map.remove(name);
+    }
+
     public BufferedImage get(String name)
     {
         return get(name, false);
     }
 
-    public BufferedImage get(String name, boolean loadImage)
+    public BufferedImage get(String name, boolean force)
     {
-        BufferedImage image = map.get(name);
-        if (image == null)
+        if (!map.containsKey(name) || force)
         {
-            if (!loadImage)
-                return null;
+            BufferedImage image = null;
             for (ImageSupplier supplier : suppliers)
                 if ((image = supplier.loadImage(name)) != null)
                     break;
-            if (image != null)
-                map.put(name, image);
+            map.put(name, image);
         }
-        return image;
+        return map.get(name);
     }
 
 }
