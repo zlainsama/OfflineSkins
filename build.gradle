@@ -28,6 +28,13 @@ minecraft {
     mappings = "snapshot_nodoc_20141130"
 }
 
+jar
+{
+    manifest {
+        attributes 'FMLCorePlugin': 'lain.mods.skins.asm.Plugin'
+    }
+}
+
 processResources
 {
     inputs.property "version", project.version

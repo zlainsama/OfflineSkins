@@ -4,7 +4,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import javax.imageio.ImageIO;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
@@ -15,72 +14,77 @@ import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IWorldAccess;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.WorldEvent;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 @Mod(modid = "OfflineSkins", useMetadata = true)
 public class OfflineSkins
 {
 
-    public class Handler implements IWorldAccess, IResourceManagerReloadListener
+    @SideOnly(Side.CLIENT)
+    public static class Handler implements IWorldAccess, IResourceManagerReloadListener
     {
+
         @Override
-        public void broadcastSound(int var1, int var2, int var3, int var4, int var5)
+        public void broadcastSound(int arg0, BlockPos arg1, int arg2)
         {
         }
 
         @Override
-        public void destroyBlockPartially(int var1, int var2, int var3, int var4, int var5)
+        public void markBlockForUpdate(BlockPos arg0)
         {
         }
 
         @Override
-        public void markBlockForRenderUpdate(int var1, int var2, int var3)
+        public void markBlockRangeForRenderUpdate(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5)
         {
         }
 
         @Override
-        public void markBlockForUpdate(int var1, int var2, int var3)
+        public void notifyLightSet(BlockPos arg0)
         {
         }
 
         @Override
-        public void markBlockRangeForRenderUpdate(int var1, int var2, int var3, int var4, int var5, int var6)
+        public void onEntityAdded(Entity ent)
+        {
+            if (ent instanceof AbstractClientPlayer)
+            {
+                OfflineSkins.instance.getOfflineSkin((AbstractClientPlayer) ent, true);
+                OfflineSkins.instance.getOfflineCape((AbstractClientPlayer) ent, true);
+            }
+        }
+
+        @Override
+        public void onEntityRemoved(Entity arg0)
         {
         }
 
         @Override
-        public void onEntityCreate(Entity var1)
-        {
-            loadSkin(var1, false);
-        }
-
-        @Override
-        public void onEntityDestroy(Entity var1)
-        {
-        }
-
-        @Override
-        public void onResourceManagerReload(IResourceManager var1)
+        @SuppressWarnings("unchecked")
+        public void onResourceManagerReload(IResourceManager arg0)
         {
             Minecraft mc = Minecraft.getMinecraft();
             if (mc.theWorld != null)
-                for (Object obj : mc.theWorld.loadedEntityList)
-                    loadSkin(obj, false);
-        }
-
-        @Override
-        public void onStaticEntitiesChanged()
-        {
+            {
+                for (Entity ent : (List<Entity>) mc.theWorld.playerEntities)
+                {
+                    if (ent instanceof AbstractClientPlayer)
+                    {
+                        OfflineSkins.instance.getOfflineSkin((AbstractClientPlayer) ent, true);
+                        OfflineSkins.instance.getOfflineCape((AbstractClientPlayer) ent, true);
+                    }
+                }
+            }
         }
 
         @SubscribeEvent
@@ -96,26 +100,31 @@ public class OfflineSkins
         }
 
         @Override
-        public void playAuxSFX(EntityPlayer var1, int var2, int var3, int var4, int var5, int var6)
+        public void playAusSFX(EntityPlayer arg0, int arg1, BlockPos arg2, int arg3)
         {
         }
 
         @Override
-        public void playRecord(String var1, int var2, int var3, int var4)
+        public void playRecord(String arg0, BlockPos arg1)
         {
         }
 
         @Override
-        public void playSound(String var1, double var2, double var4, double var6, float var8, float var9)
+        public void playSound(String arg0, double arg1, double arg2, double arg3, float arg4, float arg5)
         {
         }
 
         @Override
-        public void playSoundToNearExcept(EntityPlayer var1, String var2, double var3, double var5, double var7, float var9, float var10)
+        public void playSoundToNearExcept(EntityPlayer arg0, String arg1, double arg2, double arg3, double arg4, float arg5, float arg6)
         {
         }
 
-        public void setEnabled()
+        @Override
+        public void sendBlockBreakProgress(int arg0, BlockPos arg1, int arg2)
+        {
+        }
+
+        public void setup()
         {
             MinecraftForge.EVENT_BUS.register(this);
             Object obj = Minecraft.getMinecraft().getResourceManager();
@@ -124,38 +133,16 @@ public class OfflineSkins
         }
 
         @Override
-        public void spawnParticle(String var1, double var2, double var4, double var6, double var8, double var10, double var12)
+        public void spawnParticle(int arg0, boolean arg1, double arg2, double arg3, double arg4, double arg5, double arg6, double arg7, int... arg8)
         {
         }
+
     }
 
-    public class ImageCache
+    @SideOnly(Side.CLIENT)
+    public static class OfflineTextureObject extends AbstractTexture
     {
-        private Map<String, BufferedImage> map = Maps.newHashMap();
-        public List<ImageSupplier> suppliers = Lists.newArrayList();
 
-        public BufferedImage getCachedImage(String name)
-        {
-            BufferedImage image = map.get(name);
-            if (image == null)
-            {
-                for (ImageSupplier supplier : suppliers)
-                    if ((image = supplier.loadImage(name)) != null)
-                        break;
-                if (image != null)
-                    map.put(name, image);
-            }
-            return image;
-        }
-    }
-
-    public interface ImageSupplier
-    {
-        public BufferedImage loadImage(String name);
-    }
-
-    public class OfflineTextureObject extends AbstractTexture
-    {
         private BufferedImage image;
 
         public OfflineTextureObject(BufferedImage image)
@@ -170,8 +157,10 @@ public class OfflineSkins
 
             TextureUtil.uploadTextureImageAllocate(getGlTextureId(), image, false, false);
         }
+
     }
 
+    @SideOnly(Side.CLIENT)
     public static ResourceLocation getFakeLocation(AbstractClientPlayer player, MinecraftProfileTexture.Type type)
     {
         switch (type)
@@ -184,55 +173,67 @@ public class OfflineSkins
         return null;
     }
 
-    public static boolean hasCape(AbstractClientPlayer player)
+    @SideOnly(Side.CLIENT)
+    public static ResourceLocation getLocationCape(AbstractClientPlayer player, ResourceLocation result)
     {
-        return player.func_152122_n();
+        if (result == null)
+            result = OfflineSkins.instance.getOfflineCape(player, false);
+        return result;
     }
 
-    public static boolean hasSkin(AbstractClientPlayer player)
+    @SideOnly(Side.CLIENT)
+    public static ResourceLocation getLocationSkin(AbstractClientPlayer player, ResourceLocation result)
     {
-        return player.func_152123_o();
+        if (!player.hasSkin())
+            result = OfflineSkins.instance.getOfflineSkin(player, false);
+        return result;
     }
 
-    public static void setCape(AbstractClientPlayer player, ResourceLocation locRes)
+    @SideOnly(Side.CLIENT)
+    public ImageCache images;
+
+    @Mod.Instance("OfflineSkins")
+    public static OfflineSkins instance;
+
+    @SideOnly(Side.CLIENT)
+    public ResourceLocation getOfflineCape(AbstractClientPlayer player, boolean load)
     {
-        player.func_152121_a(MinecraftProfileTexture.Type.CAPE, locRes);
+        ResourceLocation locRes = getFakeLocation(player, MinecraftProfileTexture.Type.CAPE);
+        if (locRes != null)
+        {
+            BufferedImage image = images.get(String.format("capes/uuid/%s.png", player.getUniqueID().toString().replaceAll("-", "")), load);
+            if (image == null)
+                image = images.get(String.format("capes/%s.png", player.getName()), load);
+            if (image != null)
+                Minecraft.getMinecraft().getTextureManager().loadTexture(locRes, new OfflineTextureObject(image));
+        }
+        return locRes;
     }
 
-    public static void setSkin(AbstractClientPlayer player, ResourceLocation locRes)
+    @SideOnly(Side.CLIENT)
+    public ResourceLocation getOfflineSkin(AbstractClientPlayer player, boolean load)
     {
-        player.func_152121_a(MinecraftProfileTexture.Type.SKIN, locRes);
-    }
-
-    public Handler handler;
-
-    public ImageCache cachedImages;
-
-    public BufferedImage getCachedImage(String name)
-    {
-        return cachedImages.getCachedImage(name);
-    }
-
-    public BufferedImage getCachedImage(String format, Object... params)
-    {
-        return getCachedImage(String.format(format, params));
+        ResourceLocation locRes = getFakeLocation(player, MinecraftProfileTexture.Type.SKIN);
+        if (locRes != null)
+        {
+            BufferedImage image = images.get(String.format("skins/uuid/%s.png", player.getUniqueID().toString().replaceAll("-", "")), load);
+            if (image == null)
+                image = images.get(String.format("skins/%s.png", player.getName()), load);
+            if (image != null)
+                Minecraft.getMinecraft().getTextureManager().loadTexture(locRes, new OfflineTextureObject(image));
+        }
+        return locRes;
     }
 
     @Mod.EventHandler
     public void init(FMLPreInitializationEvent event)
     {
         if (event.getSide().isClient())
-            handler = new Handler();
-    }
-
-    @Mod.EventHandler
-    public void load(FMLInitializationEvent event)
-    {
-        if (handler != null)
         {
-            cachedImages = new ImageCache();
-            cachedImages.suppliers.add(new ImageSupplier()
+            images = new ImageCache();
+            images.addSupplier(new ImageSupplier()
             {
+
                 {
                     File file1 = new File(Minecraft.getMinecraft().mcDataDir, "cachedImages");
                     if (!file1.exists())
@@ -263,46 +264,9 @@ public class OfflineSkins
                         return null;
                     }
                 }
-            });
-            handler.setEnabled();
-        }
-    }
 
-    public void loadSkin(Object obj, boolean flag)
-    {
-        if (obj instanceof AbstractClientPlayer)
-        {
-            AbstractClientPlayer player = (AbstractClientPlayer) obj;
-            if (flag | !hasSkin(player))
-            {
-                ResourceLocation locRes = getFakeLocation(player, MinecraftProfileTexture.Type.SKIN);
-                if (locRes != null)
-                {
-                    BufferedImage image = getCachedImage("skins/uuid/%s.png", player.getUniqueID().toString().replaceAll("-", ""));
-                    if (image == null)
-                        image = getCachedImage("skins/%s.png", player.getCommandSenderName());
-                    if (image != null)
-                    {
-                        Minecraft.getMinecraft().getTextureManager().loadTexture(locRes, new OfflineTextureObject(image));
-                        setSkin(player, locRes);
-                    }
-                }
-            }
-            if (flag | !hasCape(player))
-            {
-                ResourceLocation locRes = getFakeLocation(player, MinecraftProfileTexture.Type.CAPE);
-                if (locRes != null)
-                {
-                    BufferedImage image = getCachedImage("capes/uuid/%s.png", player.getUniqueID().toString().replaceAll("-", ""));
-                    if (image == null)
-                        image = getCachedImage("capes/%s.png", player.getCommandSenderName());
-                    if (image != null)
-                    {
-                        Minecraft.getMinecraft().getTextureManager().loadTexture(locRes, new OfflineTextureObject(image));
-                        setCape(player, locRes);
-                    }
-                }
-            }
+            });
+            new Handler().setup();
         }
     }
 
