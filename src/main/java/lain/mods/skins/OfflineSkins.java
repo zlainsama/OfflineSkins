@@ -189,7 +189,11 @@ public class OfflineSkins extends DummyModContainer
     public static ResourceLocation getLocationSkin(AbstractClientPlayer player, ResourceLocation result)
     {
         if (!player.hasSkin())
-            result = getOfflineSkin(player, false);
+        {
+            ResourceLocation tmp = getOfflineSkin(player, false);
+            if (tmp != null)
+                result = tmp;
+        }
         return result;
     }
 
@@ -204,6 +208,8 @@ public class OfflineSkins extends DummyModContainer
                 image = images.get(String.format("capes/%s.png", player.getName()), load);
             if (image != null)
                 Minecraft.getMinecraft().getTextureManager().loadTexture(locRes, new OfflineTextureObject(image));
+            if (image == null)
+                return null;
         }
         return locRes;
     }
@@ -219,6 +225,8 @@ public class OfflineSkins extends DummyModContainer
                 image = images.get(String.format("skins/%s.png", player.getName()), load);
             if (image != null)
                 Minecraft.getMinecraft().getTextureManager().loadTexture(locRes, new OfflineTextureObject(image));
+            if (image == null)
+                return null;
         }
         return locRes;
     }
