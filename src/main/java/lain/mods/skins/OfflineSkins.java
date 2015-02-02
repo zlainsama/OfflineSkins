@@ -116,6 +116,14 @@ public class OfflineSkins extends DummyModContainer
     }
 
     @SideOnly(Side.CLIENT)
+    public static String getSkinType(AbstractClientPlayer player, String result)
+    {
+        if ("offlineskins".equals(player.getLocationSkin().getResourceDomain()))
+            return "default";
+        return result;
+    }
+
+    @SideOnly(Side.CLIENT)
     public static ImageCache images;
 
     public OfflineSkins()
@@ -164,7 +172,12 @@ public class OfflineSkins extends DummyModContainer
                 {
                     try
                     {
-                        return ImageIO.read(new File(new File(Minecraft.getMinecraft().mcDataDir, "cachedImages"), name));
+                        BufferedImage result = ImageIO.read(new File(new File(Minecraft.getMinecraft().mcDataDir, "cachedImages"), name));
+                        if (result.getWidth() != 64 || (result.getHeight() != 64 && result.getHeight() != 32))
+                            return null;
+                        if (result.getHeight() == 32)
+                            result = new LegacyConversion().convert(result);
+                        return result;
                     }
                     catch (IOException ignored)
                     {
