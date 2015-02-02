@@ -3,6 +3,7 @@ package lain.mods.skins;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import javax.imageio.ImageIO;
 import net.minecraft.client.Minecraft;
@@ -19,15 +20,18 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IWorldAccess;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.DummyModContainer;
+import net.minecraftforge.fml.common.LoadController;
+import net.minecraftforge.fml.common.ModMetadata;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 
-@Mod(modid = "OfflineSkins", useMetadata = true)
-public class OfflineSkins
+public class OfflineSkins extends DummyModContainer
 {
 
     @SideOnly(Side.CLIENT)
@@ -59,8 +63,8 @@ public class OfflineSkins
         {
             if (ent instanceof AbstractClientPlayer)
             {
-                OfflineSkins.instance.getOfflineSkin((AbstractClientPlayer) ent, true);
-                OfflineSkins.instance.getOfflineCape((AbstractClientPlayer) ent, true);
+                getOfflineSkin((AbstractClientPlayer) ent, true);
+                getOfflineCape((AbstractClientPlayer) ent, true);
             }
         }
 
@@ -80,8 +84,8 @@ public class OfflineSkins
                 {
                     if (ent instanceof AbstractClientPlayer)
                     {
-                        OfflineSkins.instance.getOfflineSkin((AbstractClientPlayer) ent, true);
-                        OfflineSkins.instance.getOfflineCape((AbstractClientPlayer) ent, true);
+                        getOfflineSkin((AbstractClientPlayer) ent, true);
+                        getOfflineCape((AbstractClientPlayer) ent, true);
                     }
                 }
             }
@@ -177,7 +181,7 @@ public class OfflineSkins
     public static ResourceLocation getLocationCape(AbstractClientPlayer player, ResourceLocation result)
     {
         if (result == null)
-            result = OfflineSkins.instance.getOfflineCape(player, false);
+            result = getOfflineCape(player, false);
         return result;
     }
 
@@ -185,18 +189,12 @@ public class OfflineSkins
     public static ResourceLocation getLocationSkin(AbstractClientPlayer player, ResourceLocation result)
     {
         if (!player.hasSkin())
-            result = OfflineSkins.instance.getOfflineSkin(player, false);
+            result = getOfflineSkin(player, false);
         return result;
     }
 
     @SideOnly(Side.CLIENT)
-    public ImageCache images;
-
-    @Mod.Instance("OfflineSkins")
-    public static OfflineSkins instance;
-
-    @SideOnly(Side.CLIENT)
-    public ResourceLocation getOfflineCape(AbstractClientPlayer player, boolean load)
+    public static ResourceLocation getOfflineCape(AbstractClientPlayer player, boolean load)
     {
         ResourceLocation locRes = getFakeLocation(player, MinecraftProfileTexture.Type.CAPE);
         if (locRes != null)
@@ -211,7 +209,7 @@ public class OfflineSkins
     }
 
     @SideOnly(Side.CLIENT)
-    public ResourceLocation getOfflineSkin(AbstractClientPlayer player, boolean load)
+    public static ResourceLocation getOfflineSkin(AbstractClientPlayer player, boolean load)
     {
         ResourceLocation locRes = getFakeLocation(player, MinecraftProfileTexture.Type.SKIN);
         if (locRes != null)
@@ -225,7 +223,24 @@ public class OfflineSkins
         return locRes;
     }
 
-    @Mod.EventHandler
+    @SideOnly(Side.CLIENT)
+    public static ImageCache images;
+
+    public OfflineSkins()
+    {
+        super(new ModMetadata());
+        ModMetadata meta = getMetadata();
+        meta.modId = "OfflineSkins";
+        meta.name = "OfflineSkins";
+        meta.version = "1.8-v1";
+        meta.authorList = Arrays.asList("zlainsama");
+        meta.description = "made it possible to cache your skins/capes for offline use";
+        meta.credits = "";
+        meta.url = "https://github.com/zlainsama/offlineskins";
+        meta.updateUrl = "https://github.com/zlainsama/offlineskins/releases";
+    }
+
+    @Subscribe
     public void init(FMLPreInitializationEvent event)
     {
         if (event.getSide().isClient())
@@ -268,6 +283,13 @@ public class OfflineSkins
             });
             new Handler().setup();
         }
+    }
+
+    @Override
+    public boolean registerBus(EventBus bus, LoadController controller)
+    {
+        bus.register(this);
+        return true;
     }
 
 }

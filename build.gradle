@@ -35,20 +35,11 @@ jar
     }
 }
 
-processResources
-{
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
-    
-    from(sourceSets.main.resources.srcDirs)
-    {
-        include 'mcmod.info'
+sourceCompatibility = '1.6'
+targetCompatibility = '1.6'
 
-        expand 'version':project.version, 'mcversion':project.minecraft.version
-    }
-
-    from(sourceSets.main.resources.srcDirs)
-    {
-        exclude 'mcmod.info'
-    }
+tasks.withType(JavaCompile) {
+    options.compilerArgs += [ '-Xlint:all', '-Xlint:-path' ]
+    options.deprecation = true
+    options.encoding = 'utf8'
 }
