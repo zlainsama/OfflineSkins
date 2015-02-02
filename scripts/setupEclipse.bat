@@ -1,3 +1,3 @@
 @echo off
 cd ..
-gradlew.bat eclipse
+start gradle eclipse

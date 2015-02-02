@@ -1,3 +1,3 @@
 @echo off
 cd ..
-gradlew.bat clean setupDevWorkspace build
+start gradle clean setupDevWorkspace build

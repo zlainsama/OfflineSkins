@@ -1,3 +1,3 @@
 @echo off
 cd ..
-cmd
+start cmd
