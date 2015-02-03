@@ -146,7 +146,7 @@ public class OfflineSkins extends DummyModContainer
         ModMetadata meta = getMetadata();
         meta.modId = "OfflineSkins";
         meta.name = "OfflineSkins";
-        meta.version = "1.8-v2";
+        meta.version = "1.8-v3";
         meta.authorList = Arrays.asList("zlainsama");
         meta.description = "made it possible to cache your skins/capes for offline use";
         meta.credits = "";
