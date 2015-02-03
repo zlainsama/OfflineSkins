@@ -192,6 +192,8 @@ public class OfflineSkins extends DummyModContainer
                             result = new LegacyConversion().convert(result);
                         if (new File(new File(Minecraft.getMinecraft().mcDataDir, "cachedImages"), name + ".slim").exists())
                             imagesType.put(result, "slim");
+                        else
+                            imagesType.remove(result);
                         return result;
                     }
                     catch (IOException ignored)
