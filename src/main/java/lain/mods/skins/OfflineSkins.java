@@ -4,10 +4,12 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Map;
 import javax.imageio.ImageIO;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.renderer.texture.AbstractTexture;
+import net.minecraft.client.renderer.texture.ITextureObject;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.resources.IResourceManager;
@@ -18,6 +20,7 @@ import net.minecraftforge.fml.common.ModMetadata;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import com.google.common.collect.MapMaker;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
@@ -29,11 +32,16 @@ public class OfflineSkins extends DummyModContainer
     public static class OfflineTextureObject extends AbstractTexture
     {
 
-        private BufferedImage image;
+        private final BufferedImage image;
 
         public OfflineTextureObject(BufferedImage image)
         {
             this.image = image;
+        }
+
+        public BufferedImage getImage()
+        {
+            return image;
         }
 
         @Override
@@ -91,7 +99,7 @@ public class OfflineSkins extends DummyModContainer
             if (image == null)
                 return null;
             TextureManager man = Minecraft.getMinecraft().getTextureManager();
-            if (!(man.getTexture(locRes) instanceof OfflineTextureObject))
+            if (!(man.getTexture(locRes) instanceof OfflineTextureObject) || ((OfflineTextureObject) man.getTexture(locRes)).getImage() != image)
                 man.loadTexture(locRes, new OfflineTextureObject(image));
         }
         return locRes;
@@ -109,7 +117,7 @@ public class OfflineSkins extends DummyModContainer
             if (image == null)
                 return null;
             TextureManager man = Minecraft.getMinecraft().getTextureManager();
-            if (!(man.getTexture(locRes) instanceof OfflineTextureObject))
+            if (!(man.getTexture(locRes) instanceof OfflineTextureObject) || ((OfflineTextureObject) man.getTexture(locRes)).getImage() != image)
                 man.loadTexture(locRes, new OfflineTextureObject(image));
         }
         return locRes;
@@ -118,13 +126,19 @@ public class OfflineSkins extends DummyModContainer
     @SideOnly(Side.CLIENT)
     public static String getSkinType(AbstractClientPlayer player, String result)
     {
-        if ("offlineskins".equals(player.getLocationSkin().getResourceDomain()))
-            return "default";
+        ITextureObject textureObj = Minecraft.getMinecraft().getTextureManager().getTexture(player.getLocationSkin());
+        if (textureObj instanceof OfflineTextureObject)
+        {
+            String type = imagesType.get(((OfflineTextureObject) textureObj).getImage());
+            return type != null ? type : "default";
+        }
         return result;
     }
 
     @SideOnly(Side.CLIENT)
-    public static ImageCache images;
+    public static final ImageCache images = new ImageCache();
+    @SideOnly(Side.CLIENT)
+    public static final Map<BufferedImage, String> imagesType = new MapMaker().weakKeys().makeMap();
 
     public OfflineSkins()
     {
@@ -132,7 +146,7 @@ public class OfflineSkins extends DummyModContainer
         ModMetadata meta = getMetadata();
         meta.modId = "OfflineSkins";
         meta.name = "OfflineSkins";
-        meta.version = "1.8-v1";
+        meta.version = "1.8-v2";
         meta.authorList = Arrays.asList("zlainsama");
         meta.description = "made it possible to cache your skins/capes for offline use";
         meta.credits = "";
@@ -145,7 +159,6 @@ public class OfflineSkins extends DummyModContainer
     {
         if (event.getSide().isClient())
         {
-            images = new ImageCache();
             images.addSupplier(new ImageSupplier()
             {
 
@@ -177,6 +190,8 @@ public class OfflineSkins extends DummyModContainer
                             return null;
                         if (result.getHeight() == 32)
                             result = new LegacyConversion().convert(result);
+                        if (new File(new File(Minecraft.getMinecraft().mcDataDir, "cachedImages"), name + ".slim").exists())
+                            imagesType.put(result, "slim");
                         return result;
                     }
                     catch (IOException ignored)
