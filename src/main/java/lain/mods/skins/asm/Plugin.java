@@ -1,7 +1,7 @@
 package lain.mods.skins.asm;
 
 import java.util.Map;
-import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
+import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 
 @IFMLLoadingPlugin.Name("OfflineSkins")
 @IFMLLoadingPlugin.MCVersion("")

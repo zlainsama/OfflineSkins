@@ -5,26 +5,24 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Map;
 import javax.imageio.ImageIO;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.renderer.texture.AbstractTexture;
-import net.minecraft.client.renderer.texture.ITextureObject;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.DummyModContainer;
-import net.minecraftforge.fml.common.LoadController;
-import net.minecraftforge.fml.common.ModMetadata;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import com.google.common.collect.MapMaker;
+import net.minecraft.util.StringUtils;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
+import cpw.mods.fml.common.DummyModContainer;
+import cpw.mods.fml.common.LoadController;
+import cpw.mods.fml.common.ModMetadata;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class OfflineSkins extends DummyModContainer
 {
@@ -79,7 +77,7 @@ public class OfflineSkins extends DummyModContainer
     @SideOnly(Side.CLIENT)
     public static ResourceLocation getLocationSkin(AbstractClientPlayer player, ResourceLocation result)
     {
-        if (!player.hasSkin())
+        if (!player.func_152123_o())
         {
             ResourceLocation tmp = getOfflineSkin(player);
             if (tmp != null)
@@ -96,7 +94,7 @@ public class OfflineSkins extends DummyModContainer
         {
             BufferedImage image = images.get(String.format("capes/uuid/%s.png", player.getUniqueID().toString().replaceAll("-", "")));
             if (image == null)
-                image = images.get(String.format("capes/%s.png", player.getName()));
+                image = images.get(String.format("capes/%s.png", StringUtils.stripControlCodes(player.getCommandSenderName())));
             if (image == null)
                 return null;
             TextureManager man = Minecraft.getMinecraft().getTextureManager();
@@ -114,7 +112,7 @@ public class OfflineSkins extends DummyModContainer
         {
             BufferedImage image = images.get(String.format("skins/uuid/%s.png", player.getUniqueID().toString().replaceAll("-", "")));
             if (image == null)
-                image = images.get(String.format("skins/%s.png", player.getName()));
+                image = images.get(String.format("skins/%s.png", StringUtils.stripControlCodes(player.getCommandSenderName())));
             if (image == null)
                 return null;
             TextureManager man = Minecraft.getMinecraft().getTextureManager();
@@ -125,21 +123,7 @@ public class OfflineSkins extends DummyModContainer
     }
 
     @SideOnly(Side.CLIENT)
-    public static String getSkinType(AbstractClientPlayer player, String result)
-    {
-        ITextureObject textureObj = Minecraft.getMinecraft().getTextureManager().getTexture(player.getLocationSkin());
-        if (textureObj instanceof OfflineTextureObject)
-        {
-            String type = imagesType.get(((OfflineTextureObject) textureObj).getImage());
-            return type != null ? type : "default";
-        }
-        return result;
-    }
-
-    @SideOnly(Side.CLIENT)
     public static final ImageCache images = new ImageCache();
-    @SideOnly(Side.CLIENT)
-    public static final Map<BufferedImage, String> imagesType = new MapMaker().weakKeys().makeMap();
 
     public OfflineSkins()
     {
@@ -187,14 +171,8 @@ public class OfflineSkins extends DummyModContainer
                     try
                     {
                         BufferedImage result = ImageIO.read(new File(new File(Minecraft.getMinecraft().mcDataDir, "cachedImages"), name));
-                        if (result.getWidth() != 64 || (result.getHeight() != 64 && result.getHeight() != 32))
+                        if (result.getWidth() != 64 || result.getHeight() != 32)
                             return null;
-                        if (result.getHeight() == 32)
-                            result = new LegacyConversion().convert(result);
-                        if (((result.getRGB(55, 20) & 0xFF000000) >>> 24) == 0)
-                            imagesType.put(result, "slim");
-                        else
-                            imagesType.put(result, "default");
                         return result;
                     }
                     catch (IOException ignored)
@@ -218,14 +196,8 @@ public class OfflineSkins extends DummyModContainer
                             if (name.startsWith("uuid/"))
                                 name = name.substring(5);
                             BufferedImage result = ImageIO.read(new URL("https://crafatar.com/skins/" + name));
-                            if (result.getWidth() != 64 || (result.getHeight() != 64 && result.getHeight() != 32))
+                            if (result.getWidth() != 64 || result.getHeight() != 32)
                                 return null;
-                            if (result.getHeight() == 32)
-                                result = new LegacyConversion().convert(result);
-                            if (((result.getRGB(55, 20) & 0xFF000000) >>> 24) == 0)
-                                imagesType.put(result, "slim");
-                            else
-                                imagesType.put(result, "default");
                             return result;
                         }
                         return null;

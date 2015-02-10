@@ -82,12 +82,10 @@ public class ASMTransformer implements IClassTransformer
 
         }
 
-        String mN001 = "i"; // getLocationSkin
-        String mD001 = "()Loa;"; // ()Lnet/minecraft/util/ResourceLocation;
-        String mN002 = "k"; // getLocationCape
-        String mD002 = "()Loa;"; // ()Lnet/minecraft/util/ResourceLocation;
-        String mN003 = "l"; // getSkinType
-        String mD003 = "()Ljava/lang/String;"; // ()Ljava/lang/String;
+        String mN001 = "r"; // getLocationSkin
+        String mD001 = "()Lbqx;"; // ()Lnet/minecraft/util/ResourceLocation;
+        String mN002 = "s"; // getLocationCape
+        String mD002 = "()Lbqx;"; // ()Lnet/minecraft/util/ResourceLocation;
 
         public transformer001(ClassVisitor cv)
         {
@@ -101,8 +99,6 @@ public class ASMTransformer implements IClassTransformer
                 return new method001(super.visitMethod(access, name, desc, signature, exceptions));
             if (mN002.equals(name) && mD002.equals(desc))
                 return new method002(super.visitMethod(access, name, desc, signature, exceptions));
-            if (mN003.equals(name) && mD003.equals(desc))
-                return new method003(super.visitMethod(access, name, desc, signature, exceptions));
             return super.visitMethod(access, name, desc, signature, exceptions);
         }
 
