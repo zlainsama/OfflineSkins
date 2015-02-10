@@ -171,8 +171,10 @@ public class OfflineSkins extends DummyModContainer
                     try
                     {
                         BufferedImage result = ImageIO.read(new File(new File(Minecraft.getMinecraft().mcDataDir, "cachedImages"), name));
-                        if (result.getWidth() != 64 || result.getHeight() != 32)
+                        if (result.getWidth() != 64 || (result.getHeight() != 64 && result.getHeight() != 32))
                             return null;
+                        if (result.getHeight() == 64)
+                            result = new LegacyConversion().convert(result);
                         return result;
                     }
                     catch (IOException ignored)
@@ -196,8 +198,10 @@ public class OfflineSkins extends DummyModContainer
                             if (name.startsWith("uuid/"))
                                 name = name.substring(5);
                             BufferedImage result = ImageIO.read(new URL("https://crafatar.com/skins/" + name));
-                            if (result.getWidth() != 64 || result.getHeight() != 32)
+                            if (result.getWidth() != 64 || (result.getHeight() != 64 && result.getHeight() != 32))
                                 return null;
+                            if (result.getHeight() == 64)
+                                result = new LegacyConversion().convert(result);
                             return result;
                         }
                         return null;
