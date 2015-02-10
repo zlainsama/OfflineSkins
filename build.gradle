@@ -17,7 +17,7 @@ buildscript {
 
 apply plugin: 'forge'
 
-version = "1.8-v3"
+version = "1.8-v4"
 group= "lain.mods.skins"
 archivesBaseName = "OfflineSkins"
 
@@ -32,6 +32,26 @@ jar
 {
     manifest {
         attributes 'FMLCorePlugin': 'lain.mods.skins.asm.Plugin'
+    }
+}
+
+processResources
+{
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+
+    from 'LICENSE.txt'
+
+    from(sourceSets.main.resources.srcDirs)
+    {
+        include 'mcmod.info'
+
+        expand 'version':project.version, 'mcversion':project.minecraft.version
+    }
+
+    from(sourceSets.main.resources.srcDirs)
+    {
+        exclude 'mcmod.info'
     }
 }
 

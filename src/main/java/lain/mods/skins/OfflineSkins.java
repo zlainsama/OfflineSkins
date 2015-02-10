@@ -3,6 +3,7 @@ package lain.mods.skins;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Map;
 import javax.imageio.ImageIO;
@@ -146,12 +147,12 @@ public class OfflineSkins extends DummyModContainer
         ModMetadata meta = getMetadata();
         meta.modId = "OfflineSkins";
         meta.name = "OfflineSkins";
-        meta.version = "1.8-v3";
+        meta.version = "1.8-v4";
         meta.authorList = Arrays.asList("zlainsama");
         meta.description = "made it possible to cache your skins/capes for offline use";
         meta.credits = "";
         meta.url = "https://github.com/zlainsama/offlineskins";
-        meta.updateUrl = "https://github.com/zlainsama/offlineskins/releases";
+        meta.updateUrl = "";
     }
 
     @Subscribe
@@ -190,11 +191,44 @@ public class OfflineSkins extends DummyModContainer
                             return null;
                         if (result.getHeight() == 32)
                             result = new LegacyConversion().convert(result);
-                        if (new File(new File(Minecraft.getMinecraft().mcDataDir, "cachedImages"), name + ".slim").exists())
+                        if (((result.getRGB(55, 20) & 0xFF000000) >>> 24) == 0)
                             imagesType.put(result, "slim");
                         else
-                            imagesType.remove(result);
+                            imagesType.put(result, "default");
                         return result;
+                    }
+                    catch (IOException ignored)
+                    {
+                        return null;
+                    }
+                }
+
+            });
+            images.addSupplier(new ImageSupplier()
+            {
+
+                @Override
+                public BufferedImage loadImage(String name)
+                {
+                    try
+                    {
+                        if (name.startsWith("skins/") && name.endsWith(".png"))
+                        {
+                            name = name.substring(6, name.length() - 4);
+                            if (name.startsWith("uuid/"))
+                                name = name.substring(5);
+                            BufferedImage result = ImageIO.read(new URL("https://crafatar.com/skins/" + name));
+                            if (result.getWidth() != 64 || (result.getHeight() != 64 && result.getHeight() != 32))
+                                return null;
+                            if (result.getHeight() == 32)
+                                result = new LegacyConversion().convert(result);
+                            if (((result.getRGB(55, 20) & 0xFF000000) >>> 24) == 0)
+                                imagesType.put(result, "slim");
+                            else
+                                imagesType.put(result, "default");
+                            return result;
+                        }
+                        return null;
                     }
                     catch (IOException ignored)
                     {

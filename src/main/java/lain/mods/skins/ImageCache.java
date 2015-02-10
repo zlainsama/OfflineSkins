@@ -2,6 +2,8 @@ package lain.mods.skins;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import com.google.common.base.Optional;
 import com.google.common.cache.CacheBuilder;
@@ -13,18 +15,29 @@ public class ImageCache
 {
 
     private final List<ImageSupplier> suppliers = Lists.newArrayList();
-    private final LoadingCache<String, Optional<BufferedImage>> cache = CacheBuilder.newBuilder().maximumSize(512).expireAfterWrite(20, TimeUnit.MINUTES).build(new CacheLoader<String, Optional<BufferedImage>>()
+    private final ExecutorService pool = Executors.newCachedThreadPool();
+    private final LoadingCache<String, Optional<BufferedImage>> cache = CacheBuilder.newBuilder().maximumSize(512).expireAfterAccess(15, TimeUnit.SECONDS).build(new CacheLoader<String, Optional<BufferedImage>>()
     {
 
         @Override
         public Optional<BufferedImage> load(String key) throws Exception
         {
-            BufferedImage image = null;
-            for (ImageSupplier supplier : suppliers)
-                if ((image = supplier.loadImage(key)) != null)
-                    break;
-            if (image != null)
-                return Optional.of(image);
+            final String target = key;
+            pool.execute(new Runnable()
+            {
+
+                @Override
+                public void run()
+                {
+                    BufferedImage image = null;
+                    for (ImageSupplier supplier : suppliers)
+                        if ((image = supplier.loadImage(target)) != null)
+                            break;
+                    if (image != null)
+                        cache.put(target, Optional.of(image));
+                }
+
+            });
             return Optional.absent();
         }
 
