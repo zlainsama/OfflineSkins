@@ -132,7 +132,7 @@ public class OfflineSkins extends DummyModContainer
         ModMetadata meta = getMetadata();
         meta.modId = "OfflineSkins";
         meta.name = "OfflineSkins";
-        meta.version = "1.7.10-v3";
+        meta.version = "1.7.10-v4";
         meta.authorList = Arrays.asList("zlainsama");
         meta.description = "made it possible to cache your skins/capes for offline use";
         meta.credits = "";
@@ -145,6 +145,7 @@ public class OfflineSkins extends DummyModContainer
     {
         if (event.getSide().isClient())
         {
+            Configuration config = new Configuration(event.getSuggestedConfigurationFile());
             images.addSupplier(new ImageSupplier()
             {
 
@@ -185,7 +186,6 @@ public class OfflineSkins extends DummyModContainer
                 }
 
             });
-            Configuration config = new Configuration(event.getSuggestedConfigurationFile());
             if (config.get(Configuration.CATEGORY_GENERAL, "useCrafatar", true).getBoolean(true))
                 images.addSupplier(new ImageSupplier()
                 {
@@ -216,6 +216,8 @@ public class OfflineSkins extends DummyModContainer
                     }
 
                 });
+            if (config.hasChanged())
+                config.save();
         }
     }
 
