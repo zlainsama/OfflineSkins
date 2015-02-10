@@ -3,7 +3,8 @@ package lain.mods.skins;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import com.google.common.base.Optional;
 import com.google.common.cache.CacheBuilder;
@@ -15,7 +16,7 @@ public class ImageCache
 {
 
     private final List<ImageSupplier> suppliers = Lists.newArrayList();
-    private final ExecutorService pool = Executors.newCachedThreadPool();
+    private final ExecutorService pool = new ThreadPoolExecutor(0, 2, 1, TimeUnit.MINUTES, new LinkedBlockingQueue<Runnable>());
     private final LoadingCache<String, Optional<BufferedImage>> cache = CacheBuilder.newBuilder().maximumSize(512).expireAfterAccess(15, TimeUnit.SECONDS).build(new CacheLoader<String, Optional<BufferedImage>>()
     {
 

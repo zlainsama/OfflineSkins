@@ -15,6 +15,7 @@ import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.DummyModContainer;
 import net.minecraftforge.fml.common.LoadController;
 import net.minecraftforge.fml.common.ModMetadata;
@@ -147,7 +148,7 @@ public class OfflineSkins extends DummyModContainer
         ModMetadata meta = getMetadata();
         meta.modId = "OfflineSkins";
         meta.name = "OfflineSkins";
-        meta.version = "1.8-v4";
+        meta.version = "1.8-v5";
         meta.authorList = Arrays.asList("zlainsama");
         meta.description = "made it possible to cache your skins/capes for offline use";
         meta.credits = "";
@@ -204,39 +205,41 @@ public class OfflineSkins extends DummyModContainer
                 }
 
             });
-            images.addSupplier(new ImageSupplier()
-            {
-
-                @Override
-                public BufferedImage loadImage(String name)
+            Configuration config = new Configuration(event.getSuggestedConfigurationFile());
+            if (config.get("general", "useCrafatar", true).getBoolean(true))
+                images.addSupplier(new ImageSupplier()
                 {
-                    try
-                    {
-                        if (name.startsWith("skins/") && name.endsWith(".png"))
-                        {
-                            name = name.substring(6, name.length() - 4);
-                            if (name.startsWith("uuid/"))
-                                name = name.substring(5);
-                            BufferedImage result = ImageIO.read(new URL("https://crafatar.com/skins/" + name));
-                            if (result.getWidth() != 64 || (result.getHeight() != 64 && result.getHeight() != 32))
-                                return null;
-                            if (result.getHeight() == 32)
-                                result = new LegacyConversion().convert(result);
-                            if (((result.getRGB(55, 20) & 0xFF000000) >>> 24) == 0)
-                                imagesType.put(result, "slim");
-                            else
-                                imagesType.put(result, "default");
-                            return result;
-                        }
-                        return null;
-                    }
-                    catch (IOException ignored)
-                    {
-                        return null;
-                    }
-                }
 
-            });
+                    @Override
+                    public BufferedImage loadImage(String name)
+                    {
+                        try
+                        {
+                            if (name.startsWith("skins/") && name.endsWith(".png"))
+                            {
+                                name = name.substring(6, name.length() - 4);
+                                if (name.startsWith("uuid/"))
+                                    name = name.substring(5);
+                                BufferedImage result = ImageIO.read(new URL("https://crafatar.com/skins/" + name));
+                                if (result.getWidth() != 64 || (result.getHeight() != 64 && result.getHeight() != 32))
+                                    return null;
+                                if (result.getHeight() == 32)
+                                    result = new LegacyConversion().convert(result);
+                                if (((result.getRGB(55, 20) & 0xFF000000) >>> 24) == 0)
+                                    imagesType.put(result, "slim");
+                                else
+                                    imagesType.put(result, "default");
+                                return result;
+                            }
+                            return null;
+                        }
+                        catch (IOException ignored)
+                        {
+                            return null;
+                        }
+                    }
+
+                });
         }
     }
 
