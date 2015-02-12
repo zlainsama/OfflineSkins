@@ -17,7 +17,7 @@ public class ImageCache
 
     private final List<ImageSupplier> suppliers = Lists.newArrayList();
     private final ExecutorService pool = new ThreadPoolExecutor(0, 2, 1, TimeUnit.MINUTES, new LinkedBlockingQueue<Runnable>());
-    private final LoadingCache<String, Optional<BufferedImage>> cache = CacheBuilder.newBuilder().maximumSize(512).expireAfterAccess(15, TimeUnit.SECONDS).build(new CacheLoader<String, Optional<BufferedImage>>()
+    private final LoadingCache<String, Optional<BufferedImage>> cache = CacheBuilder.newBuilder().expireAfterAccess(15, TimeUnit.SECONDS).build(new CacheLoader<String, Optional<BufferedImage>>()
     {
 
         @Override
