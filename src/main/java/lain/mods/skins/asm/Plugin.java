@@ -3,11 +3,14 @@ package lain.mods.skins.asm;
 import java.util.Map;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 
-@IFMLLoadingPlugin.Name("OfflineSkins")
+@IFMLLoadingPlugin.Name("offlineskins")
 @IFMLLoadingPlugin.MCVersion("")
 @IFMLLoadingPlugin.TransformerExclusions("lain.mods.skins.asm.")
 public class Plugin implements IFMLLoadingPlugin
 {
+
+    public static boolean runtimeDeobfuscationEnabled = false;
+    public static boolean isDevelopmentEnvironment = false;
 
     @Override
     public String getAccessTransformerClass()
@@ -24,18 +27,20 @@ public class Plugin implements IFMLLoadingPlugin
     @Override
     public String getModContainerClass()
     {
-        return "lain.mods.skins.OfflineSkins";
+        return null;
     }
 
     @Override
     public String getSetupClass()
     {
-        return null;
+        return "lain.mods.skins.asm.Setup";
     }
 
     @Override
-    public void injectData(Map<String, Object> arg0)
+    public void injectData(Map<String, Object> data)
     {
+        runtimeDeobfuscationEnabled = (Boolean) data.get("runtimeDeobfuscationEnabled");
+        isDevelopmentEnvironment = (getClass().getResource("/binpatches.pack.lzma") == null);
     }
 
 }

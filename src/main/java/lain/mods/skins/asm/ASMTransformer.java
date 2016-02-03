@@ -29,7 +29,7 @@ public class ASMTransformer implements IClassTransformer
                     this.visitVarInsn(Opcodes.ASTORE, 1);
                     this.visitVarInsn(Opcodes.ALOAD, 0);
                     this.visitVarInsn(Opcodes.ALOAD, 1);
-                    this.visitMethodInsn(Opcodes.INVOKESTATIC, "lain/mods/skins/OfflineSkins", "getLocationSkin", "(Lnet/minecraft/client/entity/AbstractClientPlayer;Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/util/ResourceLocation;", false);
+                    this.visitMethodInsn(Opcodes.INVOKESTATIC, "lain/mods/skins/asm/Hooks", "getLocationSkin", "(Lnet/minecraft/client/entity/AbstractClientPlayer;Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/util/ResourceLocation;", false);
                 }
                 super.visitInsn(opcode);
             }
@@ -52,42 +52,15 @@ public class ASMTransformer implements IClassTransformer
                     this.visitVarInsn(Opcodes.ASTORE, 1);
                     this.visitVarInsn(Opcodes.ALOAD, 0);
                     this.visitVarInsn(Opcodes.ALOAD, 1);
-                    this.visitMethodInsn(Opcodes.INVOKESTATIC, "lain/mods/skins/OfflineSkins", "getLocationCape", "(Lnet/minecraft/client/entity/AbstractClientPlayer;Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/util/ResourceLocation;", false);
+                    this.visitMethodInsn(Opcodes.INVOKESTATIC, "lain/mods/skins/asm/Hooks", "getSkinType", "(Lnet/minecraft/client/entity/AbstractClientPlayer;Ljava/lang/String;)Ljava/lang/String;", false);
                 }
                 super.visitInsn(opcode);
             }
 
         }
 
-        class method003 extends MethodVisitor
-        {
-
-            public method003(MethodVisitor mv)
-            {
-                super(Opcodes.ASM5, mv);
-            }
-
-            @Override
-            public void visitInsn(int opcode)
-            {
-                if (opcode == Opcodes.ARETURN)
-                {
-                    this.visitVarInsn(Opcodes.ASTORE, 1);
-                    this.visitVarInsn(Opcodes.ALOAD, 0);
-                    this.visitVarInsn(Opcodes.ALOAD, 1);
-                    this.visitMethodInsn(Opcodes.INVOKESTATIC, "lain/mods/skins/OfflineSkins", "getSkinType", "(Lnet/minecraft/client/entity/AbstractClientPlayer;Ljava/lang/String;)Ljava/lang/String;", false);
-                }
-                super.visitInsn(opcode);
-            }
-
-        }
-
-        String mN001 = "i"; // getLocationSkin
-        String mD001 = "()Loa;"; // ()Lnet/minecraft/util/ResourceLocation;
-        String mN002 = "k"; // getLocationCape
-        String mD002 = "()Loa;"; // ()Lnet/minecraft/util/ResourceLocation;
-        String mN003 = "l"; // getSkinType
-        String mD003 = "()Ljava/lang/String;"; // ()Ljava/lang/String;
+        ObfHelper m001 = ObfHelper.newMethod("func_110306_p", "net/minecraft/client/entity/AbstractClientPlayer", "()Lnet/minecraft/util/ResourceLocation;").setDevName("getLocationSkin");
+        ObfHelper m002 = ObfHelper.newMethod("func_175154_l", "net/minecraft/client/entity/AbstractClientPlayer", "()Ljava/lang/String;").setDevName("getSkinType");
 
         public transformer001(ClassVisitor cv)
         {
@@ -97,12 +70,10 @@ public class ASMTransformer implements IClassTransformer
         @Override
         public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions)
         {
-            if (mN001.equals(name) && mD001.equals(desc))
+            if (m001.match(name, desc))
                 return new method001(super.visitMethod(access, name, desc, signature, exceptions));
-            if (mN002.equals(name) && mD002.equals(desc))
+            if (m002.match(name, desc))
                 return new method002(super.visitMethod(access, name, desc, signature, exceptions));
-            if (mN003.equals(name) && mD003.equals(desc))
-                return new method003(super.visitMethod(access, name, desc, signature, exceptions));
             return super.visitMethod(access, name, desc, signature, exceptions);
         }
 
