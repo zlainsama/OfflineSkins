@@ -4,3 +4,5 @@
 /.project
 /.gradle/
 /gradle.properties
+/build/
+/*.launch
