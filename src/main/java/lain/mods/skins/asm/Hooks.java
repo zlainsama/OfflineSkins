@@ -7,6 +7,11 @@ import net.minecraft.util.ResourceLocation;
 public class Hooks
 {
 
+    public static ResourceLocation getLocationCape(AbstractClientPlayer player, ResourceLocation result)
+    {
+        return OfflineSkins.getLocationCape(player, result);
+    }
+
     public static ResourceLocation getLocationSkin(AbstractClientPlayer player, ResourceLocation result)
     {
         return OfflineSkins.getLocationSkin(player, result);

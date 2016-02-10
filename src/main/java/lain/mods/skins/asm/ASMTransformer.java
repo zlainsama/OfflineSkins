@@ -29,7 +29,7 @@ public class ASMTransformer implements IClassTransformer
                     this.visitVarInsn(Opcodes.ASTORE, 1);
                     this.visitVarInsn(Opcodes.ALOAD, 0);
                     this.visitVarInsn(Opcodes.ALOAD, 1);
-                    this.visitMethodInsn(Opcodes.INVOKESTATIC, "lain/mods/skins/asm/Hooks", "getLocationSkin", "(Lnet/minecraft/client/entity/AbstractClientPlayer;Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/util/ResourceLocation;", false);
+                    this.visitMethodInsn(Opcodes.INVOKESTATIC, "lain/mods/skins/asm/Hooks", "getLocationCape", "(Lnet/minecraft/client/entity/AbstractClientPlayer;Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/util/ResourceLocation;", false);
                 }
                 super.visitInsn(opcode);
             }
@@ -52,6 +52,29 @@ public class ASMTransformer implements IClassTransformer
                     this.visitVarInsn(Opcodes.ASTORE, 1);
                     this.visitVarInsn(Opcodes.ALOAD, 0);
                     this.visitVarInsn(Opcodes.ALOAD, 1);
+                    this.visitMethodInsn(Opcodes.INVOKESTATIC, "lain/mods/skins/asm/Hooks", "getLocationSkin", "(Lnet/minecraft/client/entity/AbstractClientPlayer;Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/util/ResourceLocation;", false);
+                }
+                super.visitInsn(opcode);
+            }
+
+        }
+
+        class method003 extends MethodVisitor
+        {
+
+            public method003(MethodVisitor mv)
+            {
+                super(Opcodes.ASM5, mv);
+            }
+
+            @Override
+            public void visitInsn(int opcode)
+            {
+                if (opcode == Opcodes.ARETURN)
+                {
+                    this.visitVarInsn(Opcodes.ASTORE, 1);
+                    this.visitVarInsn(Opcodes.ALOAD, 0);
+                    this.visitVarInsn(Opcodes.ALOAD, 1);
                     this.visitMethodInsn(Opcodes.INVOKESTATIC, "lain/mods/skins/asm/Hooks", "getSkinType", "(Lnet/minecraft/client/entity/AbstractClientPlayer;Ljava/lang/String;)Ljava/lang/String;", false);
                 }
                 super.visitInsn(opcode);
@@ -59,8 +82,9 @@ public class ASMTransformer implements IClassTransformer
 
         }
 
-        ObfHelper m001 = ObfHelper.newMethod("func_110306_p", "net/minecraft/client/entity/AbstractClientPlayer", "()Lnet/minecraft/util/ResourceLocation;").setDevName("getLocationSkin");
-        ObfHelper m002 = ObfHelper.newMethod("func_175154_l", "net/minecraft/client/entity/AbstractClientPlayer", "()Ljava/lang/String;").setDevName("getSkinType");
+        ObfHelper m001 = ObfHelper.newMethod("func_110303_q", "net/minecraft/client/entity/AbstractClientPlayer", "()Lnet/minecraft/util/ResourceLocation;").setDevName("getLocationCape");
+        ObfHelper m002 = ObfHelper.newMethod("func_110306_p", "net/minecraft/client/entity/AbstractClientPlayer", "()Lnet/minecraft/util/ResourceLocation;").setDevName("getLocationSkin");
+        ObfHelper m003 = ObfHelper.newMethod("func_175154_l", "net/minecraft/client/entity/AbstractClientPlayer", "()Ljava/lang/String;").setDevName("getSkinType");
 
         public transformer001(ClassVisitor cv)
         {
@@ -74,6 +98,8 @@ public class ASMTransformer implements IClassTransformer
                 return new method001(super.visitMethod(access, name, desc, signature, exceptions));
             if (m002.match(name, desc))
                 return new method002(super.visitMethod(access, name, desc, signature, exceptions));
+            if (m003.match(name, desc))
+                return new method003(super.visitMethod(access, name, desc, signature, exceptions));
             return super.visitMethod(access, name, desc, signature, exceptions);
         }
 
