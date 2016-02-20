@@ -7,11 +7,11 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.Proxy;
 import java.net.URL;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.imageio.ImageIO;
-import lain.mods.skins.LegacyConversion;
 import lain.mods.skins.PlayerUtils;
 import lain.mods.skins.SkinData;
 import lain.mods.skins.api.ISkin;
@@ -20,8 +20,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import org.apache.commons.io.FileUtils;
 import com.google.common.base.Strings;
+import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 
-public class CrafatarCachedSkinProvider implements ISkinProvider
+public class MojangCachedCapeProvider implements ISkinProvider
 {
 
     private static final ExecutorService pool = Executors.newCachedThreadPool();
@@ -29,15 +30,15 @@ public class CrafatarCachedSkinProvider implements ISkinProvider
 
     private File _workDir;
 
-    public CrafatarCachedSkinProvider()
+    public MojangCachedCapeProvider()
     {
         File file1 = new File(Minecraft.getMinecraft().mcDataDir, "cachedImages");
         if (!file1.exists())
             file1.mkdirs();
-        File file2 = new File(file1, "crafatar");
+        File file2 = new File(file1, "mojang");
         if (!file2.exists())
             file2.mkdirs();
-        prepareWorkDir(_workDir = new File(file2, "skins"));
+        prepareWorkDir(_workDir = new File(file2, "capes"));
     }
 
     @Override
@@ -45,35 +46,27 @@ public class CrafatarCachedSkinProvider implements ISkinProvider
     {
         final SkinData data = new SkinData();
         data.profile = player.getGameProfile();
-        final boolean skipUUID = PlayerUtils.isOfflinePlayer(player);
+        final boolean flag = PlayerUtils.isOfflinePlayer(player);
         pool.execute(new Runnable()
         {
 
             @Override
             public void run()
             {
+                if (flag)
+                    data.profile = MojangService.getProfile(data.profile.getName(), data.profile);
+
                 BufferedImage image = null;
                 UUID uuid = data.profile.getId();
-                String name = data.profile.getName();
 
-                if (!skipUUID)
+                Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> textures = Minecraft.getMinecraft().getSkinManager().loadSkinFromCache(data.profile);
+                if (textures.containsKey(MinecraftProfileTexture.Type.CAPE))
                 {
+                    String url = textures.get(MinecraftProfileTexture.Type.CAPE).getUrl();
                     for (int n = 0; n < 5; n++)
                         try
                         {
-                            if ((image = readImageCached(_workDir, uuid.toString(), new URL(String.format("https://crafatar.com/skins/%s", uuid)), Minecraft.getMinecraft().getProxy())) != null)
-                                break;
-                        }
-                        catch (IOException e)
-                        {
-                        }
-                }
-                if (image == null)
-                {
-                    for (int n = 0; n < 5; n++)
-                        try
-                        {
-                            if ((image = readImageCached(_workDir, name, new URL(String.format("https://crafatar.com/skins/%s", name)), Minecraft.getMinecraft().getProxy())) != null)
+                            if ((image = readImageCached(_workDir, uuid.toString(), new URL(url), Minecraft.getMinecraft().getProxy())) != null)
                                 break;
                         }
                         catch (IOException e)
@@ -83,11 +76,7 @@ public class CrafatarCachedSkinProvider implements ISkinProvider
 
                 if (image != null && image != dummy)
                 {
-                    String type = SkinData.judgeSkinType(image);
-                    if ("legacy".equals(type))
-                        type = "default";
-                    image = new LegacyConversion().convert(image);
-                    data.put(image, type);
+                    data.put(image, "cape");
                 }
             }
 

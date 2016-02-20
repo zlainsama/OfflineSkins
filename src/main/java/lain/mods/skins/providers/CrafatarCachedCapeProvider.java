@@ -4,13 +4,13 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.Proxy;
 import java.net.URL;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.imageio.ImageIO;
-import javax.net.ssl.HttpsURLConnection;
 import lain.mods.skins.PlayerUtils;
 import lain.mods.skins.SkinData;
 import lain.mods.skins.api.ISkin;
@@ -190,7 +190,7 @@ public class CrafatarCachedCapeProvider implements ISkinProvider
             t = -1;
         }
 
-        HttpsURLConnection conn = (HttpsURLConnection) remote.openConnection(proxy);
+        HttpURLConnection conn = (HttpURLConnection) remote.openConnection(proxy);
         conn.setConnectTimeout(30000);
         conn.setReadTimeout(10000);
         if (etag != null && System.currentTimeMillis() < t)
@@ -206,7 +206,7 @@ public class CrafatarCachedCapeProvider implements ISkinProvider
                 FileUtils.copyInputStreamToFile(conn.getInputStream(), file1);
                 if (etag != null)
                     FileUtils.writeStringToFile(file2, etag, "UTF-8");
-                if (t > -1)
+                if (t > 0)
                     FileUtils.writeStringToFile(file3, Long.toString(t), "UTF-8");
             }
             catch (IOException e)

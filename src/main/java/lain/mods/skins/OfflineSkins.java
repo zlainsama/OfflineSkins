@@ -5,6 +5,8 @@ import lain.mods.skins.api.ISkinProviderService;
 import lain.mods.skins.api.SkinProviderAPI;
 import lain.mods.skins.providers.CrafatarCachedCapeProvider;
 import lain.mods.skins.providers.CrafatarCachedSkinProvider;
+import lain.mods.skins.providers.MojangCachedCapeProvider;
+import lain.mods.skins.providers.MojangCachedSkinProvider;
 import lain.mods.skins.providers.UserManagedCapeProvider;
 import lain.mods.skins.providers.UserManagedSkinProvider;
 import net.minecraft.client.Minecraft;
@@ -105,9 +107,11 @@ public class OfflineSkins
             skinService = SkinProviderAPI.createService();
             capeService = SkinProviderAPI.createService();
 
+            skinService.register(new MojangCachedSkinProvider());
             skinService.register(new UserManagedSkinProvider());
             if (useCrafatar)
                 skinService.register(new CrafatarCachedSkinProvider());
+            capeService.register(new MojangCachedCapeProvider());
             capeService.register(new UserManagedCapeProvider());
             if (useCrafatar)
                 capeService.register(new CrafatarCachedCapeProvider());
