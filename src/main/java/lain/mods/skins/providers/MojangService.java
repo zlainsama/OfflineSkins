@@ -68,7 +68,10 @@ public class MojangService
             try
             {
                 if (in != null)
-                    return Optional.of(Minecraft.getMinecraft().getSessionService().fillProfileProperties(gson.fromJson(IOUtils.toString(in, Charsets.UTF_8), GameProfile.class), false));
+                {
+                    GameProfile parsed = gson.fromJson(IOUtils.toString(in, Charsets.UTF_8), GameProfile.class);
+                    return Optional.of(Minecraft.getMinecraft().getSessionService().fillProfileProperties(new GameProfile(parsed.getId(), parsed.getName()), false));
+                }
             }
             catch (JsonSyntaxException ignored)
             {
