@@ -9,6 +9,7 @@ import lain.mods.skins.api.ISkin;
 import lain.mods.skins.api.ISkinProvider;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
+import org.apache.commons.lang3.ObjectUtils;
 
 public class UserManagedSkinProvider implements ISkinProvider
 {
@@ -29,9 +30,9 @@ public class UserManagedSkinProvider implements ISkinProvider
     @Override
     public ISkin getSkin(AbstractClientPlayer player)
     {
-        BufferedImage image = readImage(String.format("skins/uuid/%s.png", player.getGameProfile().getId().toString().replaceAll("-", "")));
+        BufferedImage image = readImage(String.format("skins/uuid/%s.png", ObjectUtils.defaultIfNull(player.getGameProfile().getId(), player.getUniqueID()).toString().replaceAll("-", "")));
         if (image == null)
-            image = readImage(String.format("skins/%s.png", player.getGameProfile().getName()));
+            image = readImage(String.format("skins/%s.png", ObjectUtils.defaultIfNull(player.getGameProfile().getName(), "")));
         if (image == null)
             return null;
         SkinData data = new SkinData();

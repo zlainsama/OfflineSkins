@@ -20,6 +20,7 @@ import lain.mods.skins.api.ISkinProvider;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import com.google.common.base.Strings;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 
@@ -48,6 +49,7 @@ public class MojangCachedSkinProvider implements ISkinProvider
         final SkinData data = new SkinData();
         data.profile = player.getGameProfile();
         final boolean flag = PlayerUtils.isOfflinePlayer(player);
+        final UUID fbID = player.getUniqueID();
         pool.execute(new Runnable()
         {
 
@@ -58,7 +60,7 @@ public class MojangCachedSkinProvider implements ISkinProvider
                     data.profile = MojangService.getProfile(data.profile.getName(), data.profile);
 
                 BufferedImage image = null;
-                UUID uuid = data.profile.getId();
+                UUID uuid = ObjectUtils.defaultIfNull(data.profile.getId(), fbID);
 
                 Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> textures = Minecraft.getMinecraft().getSkinManager().loadSkinFromCache(data.profile);
                 if (textures.containsKey(MinecraftProfileTexture.Type.SKIN))
@@ -199,14 +201,13 @@ public class MojangCachedSkinProvider implements ISkinProvider
         if (code / 100 == 2)
         {
             etag = Strings.emptyToNull(conn.getHeaderField("Etag"));
-            t = conn.getExpiration();
+            t = Math.max(conn.getExpiration(), System.currentTimeMillis() + 60000);
             try
             {
                 FileUtils.copyInputStreamToFile(conn.getInputStream(), file1);
                 if (etag != null)
                     FileUtils.writeStringToFile(file2, etag, "UTF-8");
-                if (t > 0)
-                    FileUtils.writeStringToFile(file3, Long.toString(t), "UTF-8");
+                FileUtils.writeStringToFile(file3, Long.toString(t), "UTF-8");
             }
             catch (IOException e)
             {
