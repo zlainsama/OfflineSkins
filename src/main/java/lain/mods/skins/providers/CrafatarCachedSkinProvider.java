@@ -8,8 +8,6 @@ import java.net.HttpURLConnection;
 import java.net.Proxy;
 import java.net.URL;
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import javax.imageio.ImageIO;
 import lain.mods.skins.LegacyConversion;
 import lain.mods.skins.PlayerUtils;
@@ -24,9 +22,6 @@ import com.google.common.base.Strings;
 
 public class CrafatarCachedSkinProvider implements ISkinProvider
 {
-
-    private static final ExecutorService pool = Executors.newCachedThreadPool();
-    private static final BufferedImage dummy = new BufferedImage(1, 1, 2);
 
     private File _workDir;
 
@@ -48,7 +43,7 @@ public class CrafatarCachedSkinProvider implements ISkinProvider
         data.profile = player.getGameProfile();
         final boolean skipUUID = PlayerUtils.isOfflinePlayer(player);
         final UUID fbID = player.getUniqueID();
-        pool.execute(new Runnable()
+        Shared.pool.execute(new Runnable()
         {
 
             @Override
@@ -83,7 +78,7 @@ public class CrafatarCachedSkinProvider implements ISkinProvider
                         }
                 }
 
-                if (image != null && image != dummy)
+                if (image != null && image != Shared.dummy)
                 {
                     String type = SkinData.judgeSkinType(image);
                     if ("legacy".equals(type))
@@ -227,7 +222,7 @@ public class CrafatarCachedSkinProvider implements ISkinProvider
         }
         else if (code == 404)
         {
-            return dummy;
+            return Shared.dummy;
         }
 
         if (!file1.exists())

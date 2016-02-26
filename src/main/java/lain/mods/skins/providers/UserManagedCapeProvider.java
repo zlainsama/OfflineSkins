@@ -29,9 +29,9 @@ public class UserManagedCapeProvider implements ISkinProvider
     @Override
     public ISkin getSkin(AbstractClientPlayer player)
     {
-        BufferedImage image = readImage(String.format("skins/uuid/%s.png", ObjectUtils.defaultIfNull(player.getGameProfile().getId(), player.getUniqueID()).toString().replaceAll("-", "")));
+        BufferedImage image = readImage(String.format("capes/uuid/%s.png", ObjectUtils.defaultIfNull(player.getGameProfile().getId(), player.getUniqueID()).toString().replaceAll("-", "")));
         if (image == null)
-            image = readImage(String.format("skins/%s.png", ObjectUtils.defaultIfNull(player.getGameProfile().getName(), "")));
+            image = readImage(String.format("capes/%s.png", ObjectUtils.defaultIfNull(player.getGameProfile().getName(), "")));
         if (image == null)
             return null;
         SkinData data = new SkinData();
