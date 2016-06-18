@@ -22,7 +22,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-@Mod(modid = "offlineskins", useMetadata = true, acceptedMinecraftVersions = "[1.8],[1.8.8],[1.8.9]")
+@Mod(modid = "offlineskins", useMetadata = true, acceptedMinecraftVersions = "[1.9],[1.9.4]")
 public class OfflineSkins
 {
 
