@@ -41,7 +41,10 @@ public class OfflineSkins
     @SideOnly(Side.CLIENT)
     public static ResourceLocation getLocationSkin(AbstractClientPlayer player, ResourceLocation result)
     {
-        if (!player.hasSkin() && skinService != null)
+        if (SkinPass)
+            return result;
+
+        if (isDefaultSkin(player) && skinService != null)
         {
             ISkin skin = skinService.getSkin(player);
             if (skin != null && skin.isSkinReady())
@@ -53,7 +56,7 @@ public class OfflineSkins
     @SideOnly(Side.CLIENT)
     public static String getSkinType(AbstractClientPlayer player, String result)
     {
-        if (!player.hasSkin() && skinService != null)
+        if (isDefaultSkin(player) && skinService != null)
         {
             ISkin skin = skinService.getSkin(player);
             if (skin != null && skin.isSkinReady())
@@ -61,6 +64,21 @@ public class OfflineSkins
         }
         return result;
     }
+
+    public static boolean isDefaultSkin(AbstractClientPlayer player)
+    {
+        try
+        {
+            SkinPass = true;
+            return SkinData.isDefaultSkin(player.getLocationSkin());
+        }
+        finally
+        {
+            SkinPass = false;
+        }
+    }
+
+    private static boolean SkinPass = false;
 
     @SideOnly(Side.CLIENT)
     public static ISkinProviderService skinService;

@@ -2,6 +2,7 @@ package lain.mods.skins;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.Set;
 import java.util.UUID;
 import lain.mods.skins.api.ISkin;
 import net.minecraft.client.Minecraft;
@@ -9,6 +10,7 @@ import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
+import com.google.common.collect.Sets;
 import com.mojang.authlib.GameProfile;
 
 public class SkinData implements ISkin
@@ -34,6 +36,13 @@ public class SkinData implements ISkin
 
     }
 
+    public static boolean isDefaultSkin(ResourceLocation location)
+    {
+        if (location == null || !"minecraft".equals(location.getResourceDomain()))
+            return false;
+        return DefaultSkins.contains(location.getResourcePath());
+    }
+
     public static String judgeSkinType(BufferedImage image)
     {
         if (image.getWidth() == 64)
@@ -50,6 +59,8 @@ public class SkinData implements ISkin
         }
         return "unknown";
     }
+
+    private static Set<String> DefaultSkins = Sets.newHashSet("textures/entity/steve.png", "textures/entity/alex.png");
 
     public GameProfile profile;
 

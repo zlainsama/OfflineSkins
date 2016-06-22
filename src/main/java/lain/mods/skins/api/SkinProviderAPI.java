@@ -42,9 +42,16 @@ public class SkinProviderAPI
                     List<ISkin> list = Lists.newArrayList();
                     for (ISkinProvider p : providers)
                     {
-                        ISkin s = p.getSkin(key);
-                        if (s != null)
-                            list.add(s);
+                        try
+                        {
+                            ISkin s = p.getSkin(key);
+                            if (s != null)
+                                list.add(s);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
                     }
                     return list;
                 }

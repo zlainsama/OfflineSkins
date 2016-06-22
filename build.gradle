@@ -12,7 +12,7 @@ buildscript {
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "1.9.4-v1"
+version = "1.9.4-v1a"
 group= "lain.mods.skins"
 archivesBaseName = "OfflineSkins"
 
