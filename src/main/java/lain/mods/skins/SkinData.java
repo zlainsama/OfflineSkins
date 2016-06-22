@@ -10,7 +10,7 @@ import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableSet;
 import com.mojang.authlib.GameProfile;
 
 public class SkinData implements ISkin
@@ -60,7 +60,7 @@ public class SkinData implements ISkin
         return "unknown";
     }
 
-    private static Set<String> DefaultSkins = Sets.newHashSet("textures/entity/steve.png", "textures/entity/alex.png");
+    private static Set<String> DefaultSkins = ImmutableSet.of("textures/entity/steve.png", "textures/entity/alex.png");
 
     public GameProfile profile;
 
