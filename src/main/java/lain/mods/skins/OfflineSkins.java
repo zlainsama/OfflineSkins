@@ -65,6 +65,7 @@ public class OfflineSkins
         return result;
     }
 
+    @SideOnly(Side.CLIENT)
     public static boolean isDefaultSkin(AbstractClientPlayer player)
     {
         try
