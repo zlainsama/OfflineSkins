@@ -12,15 +12,20 @@ buildscript {
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "1.10.2-v1a"
+version = "1.11-v1-test"
 group= "lain.mods.skins"
 archivesBaseName = "OfflineSkins"
 
+sourceCompatibility = targetCompatibility = "1.6" // Need this here so eclipse task generates correctly.
+compileJava {
+    sourceCompatibility = targetCompatibility = "1.6"
+}
+
 minecraft {
-    version = "1.10.2-12.18.0.2006-1.10.0"
+    version = "1.11-13.19.0.2138"
     runDir = "run"
 
-    mappings = "snapshot_20160518"
+    mappings = "snapshot_20161111"
 }
 
 jar
@@ -49,13 +54,4 @@ processResources
     {
         exclude 'mcmod.info'
     }
-}
-
-sourceCompatibility = '1.7'
-targetCompatibility = '1.7'
-
-tasks.withType(JavaCompile) {
-    options.compilerArgs += [ '-Xlint:all', '-Xlint:-path' ]
-    options.deprecation = true
-    options.encoding = 'utf8'
 }
