@@ -13,7 +13,7 @@
     "logoFile": "",
     "screenshots": [],
     "parent": "",
-    "requiredMods": ["Forge"],
+    "requiredMods": ["forge"],
     "dependencies": [],
     "dependants": [],
     "useDependencyInformation": true
