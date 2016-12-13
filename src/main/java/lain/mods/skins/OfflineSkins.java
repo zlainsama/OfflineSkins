@@ -67,9 +67,9 @@ public class OfflineSkins
     }
 
     @SideOnly(Side.CLIENT)
-    public static ResourceLocation TileEntitySkull_bindTexture(int skulltype, GameProfile profile, ResourceLocation result)
+    public static ResourceLocation TileEntitySkull_bindTexture(GameProfile profile, ResourceLocation result)
     {
-        if (skulltype == 3 && profile != null && SkinData.isDefaultSkin(result))
+        if (profile != null && SkinData.isDefaultSkin(result))
         {
             ISkin skin = skinService.getSkin(profile);
             if (skin != null && skin.isSkinReady())

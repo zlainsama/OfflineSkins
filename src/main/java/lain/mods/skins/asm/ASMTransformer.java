@@ -113,6 +113,8 @@ public class ASMTransformer implements IClassTransformer
 
             ObfHelper target = ObfHelper.newMethod("func_147499_a", "net/minecraft/client/renderer/tileentity/TileEntitySpecialRenderer", "(Lnet/minecraft/util/ResourceLocation;)V").setDevName("bindTexture");
 
+            int lastALOAD = -1;
+
             public method001(MethodVisitor mv)
             {
                 super(Opcodes.ASM5, mv);
@@ -121,19 +123,26 @@ public class ASMTransformer implements IClassTransformer
             @Override
             public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf)
             {
-                if (opcode == Opcodes.INVOKEVIRTUAL && target.match(owner, name, desc))
+                if (opcode == Opcodes.INVOKEVIRTUAL && target.match(name, desc) && lastALOAD == 11)
                 {
                     this.visitInsn(Opcodes.POP);
                     this.visitInsn(Opcodes.POP);
-                    this.visitVarInsn(Opcodes.ILOAD, 6);
                     this.visitVarInsn(Opcodes.ALOAD, 7);
                     this.visitVarInsn(Opcodes.ALOAD, 11);
-                    this.visitMethodInsn(Opcodes.INVOKESTATIC, "lain/mods/skins/asm/Hooks", "TileEntitySkull_bindTexture", "(ILcom/mojang/authlib/GameProfile;Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/util/ResourceLocation;", false);
+                    this.visitMethodInsn(Opcodes.INVOKESTATIC, "lain/mods/skins/asm/Hooks", "TileEntitySkull_bindTexture", "(Lcom/mojang/authlib/GameProfile;Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/util/ResourceLocation;", false);
                     this.visitVarInsn(Opcodes.ASTORE, 11);
                     this.visitVarInsn(Opcodes.ALOAD, 0);
                     this.visitVarInsn(Opcodes.ALOAD, 11);
                 }
                 super.visitMethodInsn(opcode, owner, name, desc, itf);
+            }
+
+            @Override
+            public void visitVarInsn(int opcode, int var)
+            {
+                if (opcode == Opcodes.ALOAD)
+                    lastALOAD = var;
+                super.visitVarInsn(opcode, var);
             }
 
         }
