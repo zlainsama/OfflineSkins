@@ -105,11 +105,63 @@ public class ASMTransformer implements IClassTransformer
 
     }
 
+    class transformer002 extends ClassVisitor
+    {
+
+        class method001 extends MethodVisitor
+        {
+
+            ObfHelper target = ObfHelper.newMethod("func_147499_a", "net/minecraft/client/renderer/tileentity/TileEntitySpecialRenderer", "(Lnet/minecraft/util/ResourceLocation;)V").setDevName("bindTexture");
+
+            public method001(MethodVisitor mv)
+            {
+                super(Opcodes.ASM5, mv);
+            }
+
+            @Override
+            public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf)
+            {
+                if (opcode == Opcodes.INVOKEVIRTUAL && target.match(owner, name, desc))
+                {
+                    this.visitInsn(Opcodes.POP);
+                    this.visitInsn(Opcodes.POP);
+                    this.visitVarInsn(Opcodes.ILOAD, 6);
+                    this.visitVarInsn(Opcodes.ALOAD, 7);
+                    this.visitVarInsn(Opcodes.ALOAD, 11);
+                    this.visitMethodInsn(Opcodes.INVOKESTATIC, "lain/mods/skins/asm/Hooks", "TileEntitySkull_bindTexture", "(ILcom/mojang/authlib/GameProfile;Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/util/ResourceLocation;", false);
+                    this.visitVarInsn(Opcodes.ASTORE, 11);
+                    this.visitVarInsn(Opcodes.ALOAD, 0);
+                    this.visitVarInsn(Opcodes.ALOAD, 11);
+                }
+                super.visitMethodInsn(opcode, owner, name, desc, itf);
+            }
+
+        }
+
+        ObfHelper m001 = ObfHelper.newMethod("func_188190_a", "net/minecraft/client/renderer/tileentity/TileEntitySkullRenderer", "(FFFLnet/minecraft/util/EnumFacing;FILcom/mojang/authlib/GameProfile;IF)V").setDevName("renderSkull");
+
+        public transformer002(ClassVisitor cv)
+        {
+            super(Opcodes.ASM5, cv);
+        }
+
+        @Override
+        public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions)
+        {
+            if (m001.match(name, desc))
+                return new method001(super.visitMethod(access, name, desc, signature, exceptions));
+            return super.visitMethod(access, name, desc, signature, exceptions);
+        }
+
+    }
+
     @Override
     public byte[] transform(String name, String transformedName, byte[] bytes)
     {
         if ("net.minecraft.client.entity.AbstractClientPlayer".equals(transformedName))
             return transform001(bytes);
+        if ("net.minecraft.client.renderer.tileentity.TileEntitySkullRenderer".equals(transformedName))
+            return transform002(bytes);
         return bytes;
     }
 
@@ -118,6 +170,14 @@ public class ASMTransformer implements IClassTransformer
         ClassReader classReader = new ClassReader(bytes);
         ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
         classReader.accept(new transformer001(classWriter), ClassReader.EXPAND_FRAMES);
+        return classWriter.toByteArray();
+    }
+
+    private byte[] transform002(byte[] bytes)
+    {
+        ClassReader classReader = new ClassReader(bytes);
+        ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+        classReader.accept(new transformer002(classWriter), ClassReader.EXPAND_FRAMES);
         return classWriter.toByteArray();
     }
 
