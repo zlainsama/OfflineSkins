@@ -28,7 +28,7 @@ public class Hooks
         return OfflineSkins.bindTexture(profile, result);
     }
 
-    public static ResourceLocation TileEntitySkull_bindTexture(GameProfile profile, ResourceLocation result)
+    public static ResourceLocation TileEntitySkullRenderer_bindTexture(GameProfile profile, ResourceLocation result)
     {
         return OfflineSkins.bindTexture(profile, result);
     }

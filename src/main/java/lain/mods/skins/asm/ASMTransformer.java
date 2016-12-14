@@ -129,7 +129,7 @@ public class ASMTransformer implements IClassTransformer
                     this.visitInsn(Opcodes.POP);
                     this.visitVarInsn(Opcodes.ALOAD, 7);
                     this.visitVarInsn(Opcodes.ALOAD, 11);
-                    this.visitMethodInsn(Opcodes.INVOKESTATIC, "lain/mods/skins/asm/Hooks", "TileEntitySkull_bindTexture", "(Lcom/mojang/authlib/GameProfile;Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/util/ResourceLocation;", false);
+                    this.visitMethodInsn(Opcodes.INVOKESTATIC, "lain/mods/skins/asm/Hooks", "TileEntitySkullRenderer_bindTexture", "(Lcom/mojang/authlib/GameProfile;Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/util/ResourceLocation;", false);
                     this.visitVarInsn(Opcodes.ASTORE, 11);
                     this.visitVarInsn(Opcodes.ALOAD, 0);
                     this.visitVarInsn(Opcodes.ALOAD, 11);
