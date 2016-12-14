@@ -1,14 +1,14 @@
 package lain.mods.skins.api;
 
-import net.minecraft.client.entity.AbstractClientPlayer;
+import com.mojang.authlib.GameProfile;
 
 public interface ISkinProvider
 {
 
     /**
-     * @param player
+     * @param profile
      * @return You can return null if no result.
      */
-    ISkin getSkin(AbstractClientPlayer player);
+    ISkin getSkin(GameProfile profile);
 
 }

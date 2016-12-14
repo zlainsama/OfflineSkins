@@ -11,15 +11,13 @@ import java.util.Map;
 import java.util.UUID;
 import javax.imageio.ImageIO;
 import lain.mods.skins.LegacyConversion;
-import lain.mods.skins.PlayerUtils;
 import lain.mods.skins.SkinData;
 import lain.mods.skins.api.ISkin;
 import lain.mods.skins.api.ISkinProvider;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.AbstractClientPlayer;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.ObjectUtils;
 import com.google.common.base.Strings;
+import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 
 public class MojangCachedSkinProvider implements ISkinProvider
@@ -39,37 +37,38 @@ public class MojangCachedSkinProvider implements ISkinProvider
     }
 
     @Override
-    public ISkin getSkin(AbstractClientPlayer player)
+    public ISkin getSkin(GameProfile profile)
     {
         final SkinData data = new SkinData();
-        data.profile = player.getGameProfile();
-        final boolean flag = PlayerUtils.isOfflinePlayer(player);
-        final UUID fbID = player.getUniqueID();
+        data.profile = profile;
         Shared.pool.execute(new Runnable()
         {
 
             @Override
             public void run()
             {
-                if (flag)
+                if (Shared.isOfflineProfile(data.profile))
                     data.profile = MojangService.getProfile(data.profile.getName(), data.profile);
 
                 BufferedImage image = null;
-                UUID uuid = ObjectUtils.defaultIfNull(data.profile.getId(), fbID);
+                UUID uuid = data.profile.getId();
 
-                Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> textures = Minecraft.getMinecraft().getSkinManager().loadSkinFromCache(data.profile);
-                if (textures.containsKey(MinecraftProfileTexture.Type.SKIN))
+                if (!Shared.isOfflineProfile(data.profile))
                 {
-                    String url = textures.get(MinecraftProfileTexture.Type.SKIN).getUrl();
-                    for (int n = 0; n < 5; n++)
-                        try
-                        {
-                            if ((image = readImageCached(_workDir, uuid.toString(), new URL(url), Minecraft.getMinecraft().getProxy())) != null)
-                                break;
-                        }
-                        catch (IOException e)
-                        {
-                        }
+                    Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> textures = Minecraft.getMinecraft().getSkinManager().loadSkinFromCache(data.profile);
+                    if (textures.containsKey(MinecraftProfileTexture.Type.SKIN))
+                    {
+                        String url = textures.get(MinecraftProfileTexture.Type.SKIN).getUrl();
+                        for (int n = 0; n < 5; n++)
+                            try
+                            {
+                                if ((image = readImageCached(_workDir, uuid.toString(), new URL(url), Minecraft.getMinecraft().getProxy())) != null)
+                                    break;
+                            }
+                            catch (IOException e)
+                            {
+                            }
+                    }
                 }
 
                 if (image != null && image != Shared.dummy)

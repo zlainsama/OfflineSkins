@@ -21,17 +21,30 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import com.mojang.authlib.GameProfile;
 
 @Mod(modid = "offlineskins", useMetadata = true, acceptedMinecraftVersions = "[1.10],[1.10.2]")
 public class OfflineSkins
 {
 
     @SideOnly(Side.CLIENT)
+    public static ResourceLocation bindTexture(GameProfile profile, ResourceLocation result)
+    {
+        if (SkinData.isDefaultSkin(result) && profile != null)
+        {
+            ISkin skin = skinService.getSkin(profile);
+            if (skin != null && skin.isSkinReady())
+                return skin.getSkinLocation();
+        }
+        return result;
+    }
+
+    @SideOnly(Side.CLIENT)
     public static ResourceLocation getLocationCape(AbstractClientPlayer player, ResourceLocation result)
     {
         if (result == null && capeService != null)
         {
-            ISkin cape = capeService.getSkin(player);
+            ISkin cape = capeService.getSkin(player.getGameProfile());
             if (cape != null && cape.isSkinReady())
                 return cape.getSkinLocation();
         }
@@ -44,9 +57,9 @@ public class OfflineSkins
         if (SkinPass)
             return result;
 
-        if (isDefaultSkin(player) && skinService != null)
+        if (usingDefaultSkin(player) && skinService != null)
         {
-            ISkin skin = skinService.getSkin(player);
+            ISkin skin = skinService.getSkin(player.getGameProfile());
             if (skin != null && skin.isSkinReady())
                 return skin.getSkinLocation();
         }
@@ -56,9 +69,9 @@ public class OfflineSkins
     @SideOnly(Side.CLIENT)
     public static String getSkinType(AbstractClientPlayer player, String result)
     {
-        if (isDefaultSkin(player) && skinService != null)
+        if (usingDefaultSkin(player) && skinService != null)
         {
-            ISkin skin = skinService.getSkin(player);
+            ISkin skin = skinService.getSkin(player.getGameProfile());
             if (skin != null && skin.isSkinReady())
                 return skin.getSkinType();
         }
@@ -66,7 +79,7 @@ public class OfflineSkins
     }
 
     @SideOnly(Side.CLIENT)
-    public static boolean isDefaultSkin(AbstractClientPlayer player)
+    public static boolean usingDefaultSkin(AbstractClientPlayer player)
     {
         try
         {
@@ -104,9 +117,9 @@ public class OfflineSkins
                     if (obj instanceof AbstractClientPlayer)
                     {
                         if (skinService != null)
-                            skinService.getSkin((AbstractClientPlayer) obj);
+                            skinService.getSkin(((AbstractClientPlayer) obj).getGameProfile());
                         if (capeService != null)
-                            capeService.getSkin((AbstractClientPlayer) obj);
+                            capeService.getSkin(((AbstractClientPlayer) obj).getGameProfile());
                     }
                 }
             }

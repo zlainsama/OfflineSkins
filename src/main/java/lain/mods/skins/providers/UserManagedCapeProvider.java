@@ -7,8 +7,8 @@ import lain.mods.skins.SkinData;
 import lain.mods.skins.api.ISkin;
 import lain.mods.skins.api.ISkinProvider;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.AbstractClientPlayer;
-import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
+import com.mojang.authlib.GameProfile;
 
 public class UserManagedCapeProvider implements ISkinProvider
 {
@@ -27,11 +27,13 @@ public class UserManagedCapeProvider implements ISkinProvider
     }
 
     @Override
-    public ISkin getSkin(AbstractClientPlayer player)
+    public ISkin getSkin(GameProfile profile)
     {
-        BufferedImage image = readImage(String.format("capes/uuid/%s.png", ObjectUtils.defaultIfNull(player.getGameProfile().getId(), player.getUniqueID()).toString().replaceAll("-", "")));
-        if (image == null)
-            image = readImage(String.format("capes/%s.png", ObjectUtils.defaultIfNull(player.getGameProfile().getName(), "")));
+        BufferedImage image = null;
+        if (!Shared.isOfflineProfile(profile))
+            image = readImage(String.format("capes/uuid/%s.png", profile.getId().toString().replaceAll("-", "")));
+        if (image == null && !StringUtils.isBlank(profile.getName()))
+            image = readImage(String.format("capes/%s.png", profile.getName()));
         if (image == null)
             return null;
         SkinData data = new SkinData();

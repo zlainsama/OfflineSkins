@@ -9,15 +9,14 @@ import java.net.Proxy;
 import java.net.URL;
 import java.util.UUID;
 import javax.imageio.ImageIO;
-import lain.mods.skins.PlayerUtils;
 import lain.mods.skins.SkinData;
 import lain.mods.skins.api.ISkin;
 import lain.mods.skins.api.ISkinProvider;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.AbstractClientPlayer;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.google.common.base.Strings;
+import com.mojang.authlib.GameProfile;
 
 public class CrafatarCachedCapeProvider implements ISkinProvider
 {
@@ -36,12 +35,10 @@ public class CrafatarCachedCapeProvider implements ISkinProvider
     }
 
     @Override
-    public ISkin getSkin(AbstractClientPlayer player)
+    public ISkin getSkin(GameProfile profile)
     {
         final SkinData data = new SkinData();
-        data.profile = player.getGameProfile();
-        final boolean skipUUID = PlayerUtils.isOfflinePlayer(player);
-        final UUID fbID = player.getUniqueID();
+        data.profile = profile;
         Shared.pool.execute(new Runnable()
         {
 
@@ -49,10 +46,10 @@ public class CrafatarCachedCapeProvider implements ISkinProvider
             public void run()
             {
                 BufferedImage image = null;
-                UUID uuid = ObjectUtils.defaultIfNull(data.profile.getId(), fbID);
-                String name = ObjectUtils.defaultIfNull(data.profile.getName(), "");
+                UUID uuid = data.profile.getId();
+                String name = data.profile.getName();
 
-                if (!skipUUID)
+                if (!Shared.isOfflineProfile(data.profile))
                 {
                     for (int n = 0; n < 5; n++)
                         try
@@ -64,7 +61,7 @@ public class CrafatarCachedCapeProvider implements ISkinProvider
                         {
                         }
                 }
-                if (image == null)
+                if (image == null && !StringUtils.isBlank(name))
                 {
                     for (int n = 0; n < 5; n++)
                         try
