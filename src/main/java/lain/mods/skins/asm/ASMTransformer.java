@@ -164,6 +164,59 @@ public class ASMTransformer implements IClassTransformer
 
     }
 
+    class transformer003 extends ClassVisitor
+    {
+
+        class method001 extends MethodVisitor
+        {
+
+            ObfHelper target = ObfHelper.newMethod("func_110577_a", "net/minecraft/client/renderer/texture/TextureManager", "(Lnet/minecraft/util/ResourceLocation;)V").setDevName("bindTexture");
+
+            public method001(MethodVisitor mv)
+            {
+                super(Opcodes.ASM5, mv);
+            }
+
+            @Override
+            public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf)
+            {
+                if (opcode == Opcodes.INVOKEVIRTUAL && target.match(name, desc))
+                {
+                    this.visitVarInsn(Opcodes.ASTORE, 32);
+                    this.visitVarInsn(Opcodes.ALOAD, 25);
+                    this.visitVarInsn(Opcodes.ALOAD, 32);
+                    this.visitMethodInsn(Opcodes.INVOKESTATIC, "lain/mods/skins/asm/Hooks", "GuiPlayerTabOverlay_bindTexture", "(Lcom/mojang/authlib/GameProfile;Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/util/ResourceLocation;", false);
+                }
+                super.visitMethodInsn(opcode, owner, name, desc, itf);
+            }
+
+            @Override
+            public void visitVarInsn(int opcode, int var)
+            {
+                if (opcode == Opcodes.ISTORE && var == 11)
+                    this.visitInsn(Opcodes.ICONST_1);
+                super.visitVarInsn(opcode, var);
+            }
+
+        }
+
+        ObfHelper m001 = ObfHelper.newMethod("func_175249_a", "net/minecraft/client/gui/GuiPlayerTabOverlay", "(ILnet/minecraft/scoreboard/Scoreboard;Lnet/minecraft/scoreboard/ScoreObjective;)V").setDevName("renderPlayerlist");
+
+        public transformer003(ClassVisitor cv)
+        {
+            super(Opcodes.ASM5, cv);
+        }
+
+        @Override
+        public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions)
+        {
+            if (m001.match(name, desc))
+                return new method001(super.visitMethod(access, name, desc, signature, exceptions));
+            return super.visitMethod(access, name, desc, signature, exceptions);
+        }
+
+    }
+
     @Override
     public byte[] transform(String name, String transformedName, byte[] bytes)
     {
@@ -171,6 +224,8 @@ public class ASMTransformer implements IClassTransformer
             return transform001(bytes);
         if ("net.minecraft.client.renderer.tileentity.TileEntitySkullRenderer".equals(transformedName))
             return transform002(bytes);
+        if ("net.minecraft.client.gui.GuiPlayerTabOverlay".equals(transformedName))
+            return transform003(bytes);
         return bytes;
     }
 
@@ -187,6 +242,14 @@ public class ASMTransformer implements IClassTransformer
         ClassReader classReader = new ClassReader(bytes);
         ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
         classReader.accept(new transformer002(classWriter), ClassReader.EXPAND_FRAMES);
+        return classWriter.toByteArray();
+    }
+
+    private byte[] transform003(byte[] bytes)
+    {
+        ClassReader classReader = new ClassReader(bytes);
+        ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+        classReader.accept(new transformer003(classWriter), ClassReader.EXPAND_FRAMES);
         return classWriter.toByteArray();
     }
 

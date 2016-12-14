@@ -23,9 +23,14 @@ public class Hooks
         return OfflineSkins.getSkinType(player, result);
     }
 
+    public static ResourceLocation GuiPlayerTabOverlay_bindTexture(GameProfile profile, ResourceLocation result)
+    {
+        return OfflineSkins.bindTexture(profile, result);
+    }
+
     public static ResourceLocation TileEntitySkull_bindTexture(GameProfile profile, ResourceLocation result)
     {
-        return OfflineSkins.TileEntitySkull_bindTexture(profile, result);
+        return OfflineSkins.bindTexture(profile, result);
     }
 
 }

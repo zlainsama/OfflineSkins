@@ -28,6 +28,18 @@ public class OfflineSkins
 {
 
     @SideOnly(Side.CLIENT)
+    public static ResourceLocation bindTexture(GameProfile profile, ResourceLocation result)
+    {
+        if (SkinData.isDefaultSkin(result) && profile != null)
+        {
+            ISkin skin = skinService.getSkin(profile);
+            if (skin != null && skin.isSkinReady())
+                return skin.getSkinLocation();
+        }
+        return result;
+    }
+
+    @SideOnly(Side.CLIENT)
     public static ResourceLocation getLocationCape(AbstractClientPlayer player, ResourceLocation result)
     {
         if (result == null && capeService != null)
@@ -62,18 +74,6 @@ public class OfflineSkins
             ISkin skin = skinService.getSkin(player.getGameProfile());
             if (skin != null && skin.isSkinReady())
                 return skin.getSkinType();
-        }
-        return result;
-    }
-
-    @SideOnly(Side.CLIENT)
-    public static ResourceLocation TileEntitySkull_bindTexture(GameProfile profile, ResourceLocation result)
-    {
-        if (SkinData.isDefaultSkin(result) && profile != null)
-        {
-            ISkin skin = skinService.getSkin(profile);
-            if (skin != null && skin.isSkinReady())
-                return skin.getSkinLocation();
         }
         return result;
     }
