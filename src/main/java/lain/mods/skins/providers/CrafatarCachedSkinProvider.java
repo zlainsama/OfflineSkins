@@ -50,7 +50,7 @@ public class CrafatarCachedSkinProvider implements ISkinProvider
                 UUID uuid = data.profile.getId();
                 String name = data.profile.getName();
 
-                if (uuid != null)
+                if (!Shared.isOfflineProfile(data.profile))
                 {
                     for (int n = 0; n < 5; n++)
                         try

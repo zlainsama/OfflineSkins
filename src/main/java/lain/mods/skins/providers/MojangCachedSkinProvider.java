@@ -47,13 +47,13 @@ public class MojangCachedSkinProvider implements ISkinProvider
             @Override
             public void run()
             {
-                if (data.profile.getId() == null)
+                if (Shared.isOfflineProfile(data.profile))
                     data.profile = MojangService.getProfile(data.profile.getName(), data.profile);
 
                 BufferedImage image = null;
                 UUID uuid = data.profile.getId();
 
-                if (uuid != null)
+                if (!Shared.isOfflineProfile(data.profile))
                 {
                     Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> textures = Minecraft.getMinecraft().getSkinManager().loadSkinFromCache(data.profile);
                     if (textures.containsKey(MinecraftProfileTexture.Type.SKIN))
