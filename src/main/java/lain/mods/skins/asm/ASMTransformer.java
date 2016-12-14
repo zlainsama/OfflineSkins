@@ -194,7 +194,10 @@ public class ASMTransformer implements IClassTransformer
             public void visitVarInsn(int opcode, int var)
             {
                 if (opcode == Opcodes.ISTORE && var == 11)
+                {
+                    this.visitInsn(Opcodes.POP);
                     this.visitInsn(Opcodes.ICONST_1);
+                }
                 super.visitVarInsn(opcode, var);
             }
 
