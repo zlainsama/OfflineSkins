@@ -23,7 +23,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import com.mojang.authlib.GameProfile;
 
-@Mod(modid = "offlineskins", useMetadata = true, acceptedMinecraftVersions = "[1.11]")
+@Mod(modid = "offlineskins", useMetadata = true, acceptedMinecraftVersions = "[1.11],[1.11.2]")
 public class OfflineSkins
 {
 
@@ -108,7 +108,7 @@ public class OfflineSkins
 
         if (event.phase == TickEvent.Phase.START)
         {
-            World world = Minecraft.getMinecraft().theWorld;
+            World world = Minecraft.getMinecraft().world;
             if (world != null && world.playerEntities != null && !world.playerEntities.isEmpty())
             {
                 for (Object obj : world.playerEntities)
