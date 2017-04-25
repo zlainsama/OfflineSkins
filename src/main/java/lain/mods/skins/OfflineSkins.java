@@ -133,17 +133,21 @@ public class OfflineSkins
         {
             Configuration config = new Configuration(event.getSuggestedConfigurationFile());
             boolean useCrafatar = config.get(Configuration.CATEGORY_CLIENT, "useCrafatar", true).getBoolean(true);
+            boolean useMojang = config.get(Configuration.CATEGORY_CLIENT, "useMojang", true).getBoolean(true);
             if (config.hasChanged())
                 config.save();
 
             skinService = SkinProviderAPI.createService();
             capeService = SkinProviderAPI.createService();
 
-            skinService.register(new MojangCachedSkinProvider());
+            if (useMojang)            	
+                skinService.register(new MojangCachedSkinProvider());
             skinService.register(new UserManagedSkinProvider());
             if (useCrafatar)
                 skinService.register(new CrafatarCachedSkinProvider());
-            capeService.register(new MojangCachedCapeProvider());
+            
+            if (useMojang)
+                capeService.register(new MojangCachedCapeProvider());
             capeService.register(new UserManagedCapeProvider());
             if (useCrafatar)
                 capeService.register(new CrafatarCachedCapeProvider());
