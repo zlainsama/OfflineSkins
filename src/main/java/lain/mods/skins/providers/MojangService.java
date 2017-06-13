@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import net.minecraft.client.Minecraft;
-import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import com.google.common.base.Optional;
 import com.google.common.cache.CacheBuilder;
@@ -69,7 +69,7 @@ public class MojangService
             {
                 if (in != null)
                 {
-                    GameProfile parsed = gson.fromJson(IOUtils.toString(in, Charsets.UTF_8), GameProfile.class);
+                    GameProfile parsed = gson.fromJson(IOUtils.toString(in, StandardCharsets.UTF_8), GameProfile.class);
                     if (parsed != null && parsed.getId() != null)
                         return Optional.of(Minecraft.getMinecraft().getSessionService().fillProfileProperties(new GameProfile(parsed.getId(), parsed.getName()), false));
                 }

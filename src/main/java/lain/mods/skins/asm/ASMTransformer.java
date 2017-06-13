@@ -235,7 +235,7 @@ public class ASMTransformer implements IClassTransformer
     private byte[] transform001(byte[] bytes)
     {
         ClassReader classReader = new ClassReader(bytes);
-        ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+        ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
         classReader.accept(new transformer001(classWriter), ClassReader.EXPAND_FRAMES);
         return classWriter.toByteArray();
     }
@@ -243,7 +243,7 @@ public class ASMTransformer implements IClassTransformer
     private byte[] transform002(byte[] bytes)
     {
         ClassReader classReader = new ClassReader(bytes);
-        ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+        ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
         classReader.accept(new transformer002(classWriter), ClassReader.EXPAND_FRAMES);
         return classWriter.toByteArray();
     }
@@ -251,7 +251,7 @@ public class ASMTransformer implements IClassTransformer
     private byte[] transform003(byte[] bytes)
     {
         ClassReader classReader = new ClassReader(bytes);
-        ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+        ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
         classReader.accept(new transformer003(classWriter), ClassReader.EXPAND_FRAMES);
         return classWriter.toByteArray();
     }
