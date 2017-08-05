@@ -23,7 +23,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import com.mojang.authlib.GameProfile;
 
-@Mod(modid = "offlineskins", useMetadata = true, acceptedMinecraftVersions = "[1.12]")
+@Mod(modid = "offlineskins", useMetadata = true, acceptedMinecraftVersions = "[1.12],[1.12.1]")
 public class OfflineSkins
 {
 
