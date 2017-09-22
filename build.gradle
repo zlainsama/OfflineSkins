@@ -25,13 +25,48 @@ minecraft {
     mappings = "snapshot_20170624"
 }
 
+reobf {
+    coreJar {}
+}
+
+task coreJar(type: Jar) {
+    from(sourceSets.main.output) {
+        include '**/asm/**'
+    }
+    manifest {
+        attributes 'FMLCorePlugin': 'lain.mods.skins.asm.Plugin'
+    }
+    classifier = 'core'
+    includeEmptyDirs = false
+}
+
+task signCoreJar(type: SignJar, dependsOn: reobfCoreJar) {
+    onlyIf {
+        project.hasProperty('mcModsStore')
+    }
+
+    if (project.hasProperty('mcModsStore')) {
+        keyStore = project.mcModsStore
+        alias = project.mcModsAlias
+        storePass = project.mcModsStorePass
+        keyPass = project.mcModsKeyPass
+        inputFile = coreJar.archivePath
+        outputFile = coreJar.archivePath
+    }
+}
+
 jar
 {
     manifest {
-        attributes 'FMLCorePlugin': 'lain.mods.skins.asm.Plugin',
-		           'FMLCorePluginContainsFMLMod': 'true'
+        attributes 'ContainedDeps': coreJar.archivePath.name
+    }
+    exclude '**/asm/**'
+    from(coreJar.archivePath.absolutePath) {
+        include '*'
     }
 }
+
+jar.dependsOn signCoreJar
 
 processResources
 {
