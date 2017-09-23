@@ -11,20 +11,22 @@ import net.minecraft.client.Minecraft;
 import org.apache.commons.lang3.StringUtils;
 import com.mojang.authlib.GameProfile;
 
-public class CrafatarCachedSkinProvider implements ISkinProvider
+public class CustomServerCachedSkinProvider implements ISkinProvider
 {
 
     private File _workDir;
+    private String _host;
 
-    public CrafatarCachedSkinProvider()
+    public CustomServerCachedSkinProvider(String host)
     {
         File file1 = new File(Minecraft.getMinecraft().mcDataDir, "cachedImages");
         if (!file1.exists())
             file1.mkdirs();
-        File file2 = new File(file1, "crafatar");
+        File file2 = new File(file1, "custom");
         if (!file2.exists())
             file2.mkdirs();
         prepareWorkDir(_workDir = new File(file2, "skins"));
+        _host = host;
     }
 
     @Override
@@ -43,9 +45,9 @@ public class CrafatarCachedSkinProvider implements ISkinProvider
                 String name = data.profile.getName();
 
                 if (!Shared.isOfflineProfile(data.profile))
-                    image = CachedImage.doRead(_workDir, uuid.toString(), String.format("https://crafatar.com/skins/%s", uuid), Minecraft.getMinecraft().getProxy(), 5);
+                    image = CachedImage.doRead(_workDir, uuid.toString(), String.format("%s/skins/%s", _host, uuid), Minecraft.getMinecraft().getProxy(), 5);
                 if (image == null && !StringUtils.isBlank(name))
-                    image = CachedImage.doRead(_workDir, name, String.format("https://crafatar.com/skins/%s", name), Minecraft.getMinecraft().getProxy(), 5);
+                    image = CachedImage.doRead(_workDir, name, String.format("%s/skins/%s", _host, name), Minecraft.getMinecraft().getProxy(), 5);
 
                 if (image != null)
                 {

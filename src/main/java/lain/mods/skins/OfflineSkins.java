@@ -5,6 +5,8 @@ import lain.mods.skins.api.ISkinProviderService;
 import lain.mods.skins.api.SkinProviderAPI;
 import lain.mods.skins.providers.CrafatarCachedCapeProvider;
 import lain.mods.skins.providers.CrafatarCachedSkinProvider;
+import lain.mods.skins.providers.CustomServerCachedCapeProvider;
+import lain.mods.skins.providers.CustomServerCachedSkinProvider;
 import lain.mods.skins.providers.MojangCachedCapeProvider;
 import lain.mods.skins.providers.MojangCachedSkinProvider;
 import lain.mods.skins.providers.UserManagedCapeProvider;
@@ -132,7 +134,9 @@ public class OfflineSkins
         if (event.getSide().isClient())
         {
             Configuration config = new Configuration(event.getSuggestedConfigurationFile());
-            boolean useCrafatar = config.get(Configuration.CATEGORY_CLIENT, "useCrafatar", true).getBoolean(true);
+            boolean useCrafatar = config.getBoolean("useCrafatar", Configuration.CATEGORY_CLIENT, true, "");
+            boolean useCustomServer = config.getBoolean("useCustomServer", Configuration.CATEGORY_CLIENT, false, "");
+            String hostCustomServer = config.getString("hostCustomServer", Configuration.CATEGORY_CLIENT, "http://example.com", "only http/https are supported, /skins/(uuid|username) and /capes/(uuid|username) will be queried for respective resources");
             if (config.hasChanged())
                 config.save();
 
@@ -143,10 +147,14 @@ public class OfflineSkins
             skinService.register(new UserManagedSkinProvider());
             if (useCrafatar)
                 skinService.register(new CrafatarCachedSkinProvider());
+            if (useCustomServer)
+                skinService.register(new CustomServerCachedSkinProvider(hostCustomServer));
             capeService.register(new MojangCachedCapeProvider());
             capeService.register(new UserManagedCapeProvider());
             if (useCrafatar)
                 capeService.register(new CrafatarCachedCapeProvider());
+            if (useCustomServer)
+                capeService.register(new CustomServerCachedCapeProvider(hostCustomServer));
 
             MinecraftForge.EVENT_BUS.register(this);
         }
