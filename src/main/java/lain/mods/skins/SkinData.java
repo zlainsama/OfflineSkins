@@ -45,17 +45,16 @@ public class SkinData implements ISkin
 
     public static String judgeSkinType(BufferedImage image)
     {
-        if (image.getWidth() == 64)
+        int w = image.getWidth();
+        int h = image.getHeight();
+        if (w == h * 2)
+            return "legacy";
+        if (w == h)
         {
-            int height = image.getHeight();
-            if (height == 32)
-                return "legacy";
-            else if (height == 64)
-            {
-                if (((image.getRGB(55, 20) & 0xFF000000) >>> 24) == 0)
-                    return "slim";
-                return "default";
-            }
+            int r = w / 64;
+            if (((image.getRGB(55 * r, 20 * r) & 0xFF000000) >>> 24) == 0)
+                return "slim";
+            return "default";
         }
         return "unknown";
     }
@@ -78,6 +77,11 @@ public class SkinData implements ISkin
     public SkinData(ResourceLocation location)
     {
         this.location = location;
+    }
+
+    public BufferedImage getImage()
+    {
+        return this.image;
     }
 
     @Override

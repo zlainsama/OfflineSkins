@@ -13,45 +13,47 @@ public class LegacyConversion
 
     public BufferedImage convert(BufferedImage legacy)
     {
-        imageWidth = 64;
-        imageHeight = 64;
+        int r = legacy.getWidth() / 64;
+
+        imageWidth = legacy.getWidth();
+        imageHeight = imageWidth;
 
         BufferedImage localBufferedImage = new BufferedImage(imageWidth, imageHeight, 2);
         Graphics localGraphics = localBufferedImage.getGraphics();
         localGraphics.drawImage(legacy, 0, 0, null);
 
-        if (legacy.getHeight() == 32)
+        if (legacy.getWidth() == legacy.getHeight() * 2)
         {
-            localGraphics.drawImage(localBufferedImage, 24, 48, 20, 52, 4, 16, 8, 20, null);
-            localGraphics.drawImage(localBufferedImage, 28, 48, 24, 52, 8, 16, 12, 20, null);
-            localGraphics.drawImage(localBufferedImage, 20, 52, 16, 64, 8, 20, 12, 32, null);
-            localGraphics.drawImage(localBufferedImage, 24, 52, 20, 64, 4, 20, 8, 32, null);
-            localGraphics.drawImage(localBufferedImage, 28, 52, 24, 64, 0, 20, 4, 32, null);
-            localGraphics.drawImage(localBufferedImage, 32, 52, 28, 64, 12, 20, 16, 32, null);
+            localGraphics.drawImage(localBufferedImage, 24 * r, 48 * r, 20 * r, 52 * r, 4 * r, 16 * r, 8 * r, 20 * r, null);
+            localGraphics.drawImage(localBufferedImage, 28 * r, 48 * r, 24 * r, 52 * r, 8 * r, 16 * r, 12 * r, 20 * r, null);
+            localGraphics.drawImage(localBufferedImage, 20 * r, 52 * r, 16 * r, 64 * r, 8 * r, 20 * r, 12 * r, 32 * r, null);
+            localGraphics.drawImage(localBufferedImage, 24 * r, 52 * r, 20 * r, 64 * r, 4 * r, 20 * r, 8 * r, 32 * r, null);
+            localGraphics.drawImage(localBufferedImage, 28 * r, 52 * r, 24 * r, 64 * r, 0 * r, 20 * r, 4 * r, 32 * r, null);
+            localGraphics.drawImage(localBufferedImage, 32 * r, 52 * r, 28 * r, 64 * r, 12 * r, 20 * r, 16 * r, 32 * r, null);
 
-            localGraphics.drawImage(localBufferedImage, 40, 48, 36, 52, 44, 16, 48, 20, null);
-            localGraphics.drawImage(localBufferedImage, 44, 48, 40, 52, 48, 16, 52, 20, null);
-            localGraphics.drawImage(localBufferedImage, 36, 52, 32, 64, 48, 20, 52, 32, null);
-            localGraphics.drawImage(localBufferedImage, 40, 52, 36, 64, 44, 20, 48, 32, null);
-            localGraphics.drawImage(localBufferedImage, 44, 52, 40, 64, 40, 20, 44, 32, null);
-            localGraphics.drawImage(localBufferedImage, 48, 52, 44, 64, 52, 20, 56, 32, null);
+            localGraphics.drawImage(localBufferedImage, 40 * r, 48 * r, 36 * r, 52 * r, 44 * r, 16 * r, 48 * r, 20 * r, null);
+            localGraphics.drawImage(localBufferedImage, 44 * r, 48 * r, 40 * r, 52 * r, 48 * r, 16 * r, 52 * r, 20 * r, null);
+            localGraphics.drawImage(localBufferedImage, 36 * r, 52 * r, 32 * r, 64 * r, 48 * r, 20 * r, 52 * r, 32 * r, null);
+            localGraphics.drawImage(localBufferedImage, 40 * r, 52 * r, 36 * r, 64 * r, 44 * r, 20 * r, 48 * r, 32 * r, null);
+            localGraphics.drawImage(localBufferedImage, 44 * r, 52 * r, 40 * r, 64 * r, 40 * r, 20 * r, 44 * r, 32 * r, null);
+            localGraphics.drawImage(localBufferedImage, 48 * r, 52 * r, 44 * r, 64 * r, 52 * r, 20 * r, 56 * r, 32 * r, null);
         }
 
         localGraphics.dispose();
 
         imageData = ((DataBufferInt) localBufferedImage.getRaster().getDataBuffer()).getData();
 
-        setAreaOpaque(0, 0, 32, 16);
-        setAreaTransparent(32, 0, 64, 32);
-        setAreaOpaque(0, 16, 64, 32);
+        setAreaOpaque(0 * r, 0 * r, 32 * r, 16 * r);
+        setAreaTransparent(32 * r, 0 * r, 64 * r, 32 * r);
+        setAreaOpaque(0 * r, 16 * r, 64 * r, 32 * r);
 
-        setAreaTransparent(0, 32, 16, 48);
-        setAreaTransparent(16, 32, 40, 48);
-        setAreaTransparent(40, 32, 56, 48);
+        setAreaTransparent(0 * r, 32 * r, 16 * r, 48 * r);
+        setAreaTransparent(16 * r, 32 * r, 40 * r, 48 * r);
+        setAreaTransparent(40 * r, 32 * r, 56 * r, 48 * r);
 
-        setAreaTransparent(0, 48, 16, 64);
-        setAreaOpaque(16, 48, 48, 64);
-        setAreaTransparent(48, 48, 64, 64);
+        setAreaTransparent(0 * r, 48 * r, 16 * r, 64 * r);
+        setAreaOpaque(16 * r, 48 * r, 48 * r, 64 * r);
+        setAreaTransparent(48 * r, 48 * r, 64 * r, 64 * r);
 
         return localBufferedImage;
     }
