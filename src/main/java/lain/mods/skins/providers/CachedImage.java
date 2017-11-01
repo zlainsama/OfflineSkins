@@ -96,6 +96,8 @@ public class CachedImage
         }, HashMap::putAll);
     }
 
+    public static int CacheMinTTL = 600;
+
     private File fImage;
     private File fMetadata;
 
@@ -204,7 +206,8 @@ public class CachedImage
                     {
                         age = 0;
                     }
-                    long validtime = age > 0 ? (System.currentTimeMillis() + (age * 1000)) : conn.getExpiration();
+                    long cur = System.currentTimeMillis();
+                    long validtime = Math.max(age > 0 ? (cur + (age * 1000)) : conn.getExpiration(), cur + (CacheMinTTL * 1000));
                     m.setValidtime(validtime);
                     m.writeToFile(fMetadata);
                 }

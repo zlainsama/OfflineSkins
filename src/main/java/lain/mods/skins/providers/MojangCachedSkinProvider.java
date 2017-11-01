@@ -44,12 +44,25 @@ public class MojangCachedSkinProvider implements ISkinProvider
 
                 BufferedImage image = null;
                 UUID uuid = data.profile.getId();
+                boolean slim = false;
 
                 if (!Shared.isOfflineProfile(data.profile))
                 {
                     Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> textures = Minecraft.getMinecraft().getSkinManager().loadSkinFromCache(data.profile);
                     if (textures.containsKey(MinecraftProfileTexture.Type.SKIN))
+                    {
                         image = CachedImage.doRead(_workDir, uuid.toString(), textures.get(MinecraftProfileTexture.Type.SKIN).getUrl(), Minecraft.getMinecraft().getProxy(), 5);
+                        if (image != null)
+                        {
+                            try
+                            {
+                                slim = "slim".equals(textures.get(MinecraftProfileTexture.Type.SKIN).getMetadata("model"));
+                            }
+                            catch (Exception e)
+                            {
+                            }
+                        }
+                    }
                 }
 
                 if (image != null)
@@ -58,6 +71,8 @@ public class MojangCachedSkinProvider implements ISkinProvider
                     if ("legacy".equals(type))
                         type = "default";
                     image = new LegacyConversion().convert(image);
+                    if (slim)
+                        type = "slim";
                     data.put(image, type);
                 }
             }

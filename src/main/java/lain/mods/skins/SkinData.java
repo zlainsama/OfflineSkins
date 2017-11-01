@@ -2,6 +2,8 @@ package lain.mods.skins;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import lain.mods.skins.api.ISkin;
@@ -19,11 +21,20 @@ public class SkinData implements ISkin
     class CachedTexture extends AbstractTexture
     {
 
-        final BufferedImage image;
+        final ResourceLocation location;
+        final SkinData skin;
 
-        CachedTexture(BufferedImage image)
+        CachedTexture(ResourceLocation location, SkinData skin)
         {
-            this.image = image;
+            this.location = location;
+            this.skin = skin;
+        }
+
+        @Override
+        public void deleteGlTexture()
+        {
+            super.deleteGlTexture();
+            SkinData.store.remove(location);
         }
 
         @Override
@@ -31,9 +42,15 @@ public class SkinData implements ISkin
         {
             deleteGlTexture();
 
-            TextureUtil.uploadTextureImageAllocate(getGlTextureId(), image, false, false);
+            TextureUtil.uploadTextureImageAllocate(getGlTextureId(), skin.image, false, false);
+            SkinData.store.put(location, skin);
         }
 
+    }
+
+    public static SkinData getData(ResourceLocation location)
+    {
+        return SkinData.store.get(location);
     }
 
     public static boolean isDefaultSkin(ResourceLocation location)
@@ -60,6 +77,7 @@ public class SkinData implements ISkin
     }
 
     private static Set<String> DefaultSkins = ImmutableSet.of("textures/entity/steve.png", "textures/entity/alex.png");
+    private static Map<ResourceLocation, SkinData> store = new HashMap<ResourceLocation, SkinData>();
 
     public GameProfile profile;
 
@@ -79,7 +97,7 @@ public class SkinData implements ISkin
         this.location = location;
     }
 
-    public BufferedImage getImage()
+    public final BufferedImage getImage()
     {
         return this.image;
     }
@@ -89,11 +107,11 @@ public class SkinData implements ISkin
     {
         if (image != null && location != null)
         {
-            if (texture == null || texture.image != image)
+            if (texture == null || texture.skin.image != image)
             {
                 if (texture != null)
                     texture.deleteGlTexture();
-                Minecraft.getMinecraft().getTextureManager().loadTexture(location, texture = new CachedTexture(image));
+                Minecraft.getMinecraft().getTextureManager().loadTexture(location, texture = new CachedTexture(location, this));
             }
         }
         return location;

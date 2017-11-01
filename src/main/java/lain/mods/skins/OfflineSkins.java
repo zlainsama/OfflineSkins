@@ -11,6 +11,7 @@ import java.util.function.Predicate;
 import lain.mods.skins.api.ISkin;
 import lain.mods.skins.api.ISkinProviderService;
 import lain.mods.skins.api.SkinProviderAPI;
+import lain.mods.skins.providers.CachedImage;
 import lain.mods.skins.providers.CrafatarCachedCapeProvider;
 import lain.mods.skins.providers.CrafatarCachedSkinProvider;
 import lain.mods.skins.providers.CustomServerCachedCapeProvider;
@@ -45,11 +46,20 @@ public class OfflineSkins
     @SideOnly(Side.CLIENT)
     public static ResourceLocation bindTexture(GameProfile profile, ResourceLocation result)
     {
-        if (SkinData.isDefaultSkin(result) && profile != null)
+        if ((OverrideVanilla || SkinData.isDefaultSkin(result)) && profile != null)
         {
             ISkin skin = skinService.getSkin(profile);
             if (skin != null && skin.isSkinReady())
-                return skin.getSkinLocation();
+            {
+                if (skin instanceof SkinData)
+                {
+                    BufferedImage image = ((SkinData) skin).getImage();
+                    if (image.getWidth() == 64 && image.getHeight() == 64) // TODO: add hires support for skull and playertablist
+                        return skin.getSkinLocation();
+                }
+                else
+                    return skin.getSkinLocation();
+            }
         }
         return result;
     }
@@ -87,15 +97,9 @@ public class OfflineSkins
     @SideOnly(Side.CLIENT)
     public static String getSkinType(AbstractClientPlayer player, String result)
     {
-        if (SkinPass)
-            return result;
-
-        if ((OverrideVanilla || usingDefaultSkin(player)) && skinService != null)
-        {
-            ISkin skin = skinService.getSkin(player.getGameProfile());
-            if (skin != null && skin.isSkinReady())
-                return skin.getSkinType();
-        }
+        SkinData skin = SkinData.getData(player.getLocationSkin());
+        if (skin != null)
+            return skin.getSkinType();
         return result;
     }
 
@@ -190,31 +194,19 @@ public class OfflineSkins
         {
             AbstractClientPlayer player = (AbstractClientPlayer) p;
             ModelPlayer model = event.getRenderer().getMainModel();
-            if ((OverrideVanilla || usingDefaultSkin(player)) && skinService != null)
+            SkinData skin = SkinData.getData(player.getLocationSkin());
+            if (skin != null)
             {
-                ISkin skin = skinService.getSkin(player.getGameProfile());
-                if (skin != null && skin.isSkinReady())
-                {
-                    if (skin instanceof SkinData)
-                    {
-                        BufferedImage image = ((SkinData) skin).getImage();
-                        model.textureWidth = image.getWidth();
-                        model.textureHeight = image.getHeight();
-                        setSubModelTextureSize_Main(model, image.getWidth(), image.getHeight());
-                    }
-                }
+                BufferedImage image = ((SkinData) skin).getImage();
+                model.textureWidth = image.getWidth();
+                model.textureHeight = image.getHeight();
+                setSubModelTextureSize_Main(model, image.getWidth(), image.getHeight());
             }
-            if ((OverrideVanilla || usingDefaultCape(player)) && capeService != null)
+            SkinData cape = SkinData.getData(player.getLocationCape());
+            if (cape != null)
             {
-                ISkin cape = capeService.getSkin(player.getGameProfile());
-                if (cape != null && cape.isSkinReady())
-                {
-                    if (cape instanceof SkinData)
-                    {
-                        BufferedImage image = ((SkinData) cape).getImage();
-                        setSubModelTextureSize_Cape(model, image.getWidth(), image.getHeight());
-                    }
-                }
+                BufferedImage image = ((SkinData) cape).getImage();
+                setSubModelTextureSize_Cape(model, image.getWidth(), image.getHeight());
             }
         }
     }
@@ -225,28 +217,34 @@ public class OfflineSkins
         if (event.getSide().isClient())
         {
             Configuration config = new Configuration(event.getSuggestedConfigurationFile());
+            boolean useMojang = config.getBoolean("useMojang", Configuration.CATEGORY_CLIENT, true, "");
             boolean useCrafatar = config.getBoolean("useCrafatar", Configuration.CATEGORY_CLIENT, true, "");
             boolean useCustomServer = config.getBoolean("useCustomServer", Configuration.CATEGORY_CLIENT, false, "");
             String hostCustomServer = config.getString("hostCustomServer", Configuration.CATEGORY_CLIENT, "http://example.com", "only http/https are supported, /skins/(uuid|username) and /capes/(uuid|username) will be queried for respective resources");
+            CachedImage.CacheMinTTL = config.getInt("cacheMinTTL", Configuration.CATEGORY_CLIENT, 600, 0, 86400, "in seconds");
             if (config.hasChanged())
                 config.save();
 
             skinService = SkinProviderAPI.createService();
             capeService = SkinProviderAPI.createService();
 
-            skinService.register(new MojangCachedSkinProvider());
             skinService.register(new UserManagedSkinProvider());
-            if (useCrafatar)
-                skinService.register(new CrafatarCachedSkinProvider());
             if (useCustomServer)
                 skinService.register(new CustomServerCachedSkinProvider(hostCustomServer));
-            capeService.register(new MojangCachedCapeProvider());
-            capeService.register(new UserManagedCapeProvider());
+            if (useMojang)
+                skinService.register(new MojangCachedSkinProvider());
             if (useCrafatar)
-                capeService.register(new CrafatarCachedCapeProvider());
+                skinService.register(new CrafatarCachedSkinProvider());
+
+            capeService.register(new UserManagedCapeProvider());
             if (useCustomServer)
                 capeService.register(new CustomServerCachedCapeProvider(hostCustomServer));
+            if (useMojang)
+                capeService.register(new MojangCachedCapeProvider());
+            if (useCrafatar)
+                capeService.register(new CrafatarCachedCapeProvider());
 
+            OverrideVanilla = true;
             MinecraftForge.EVENT_BUS.register(this);
         }
     }
