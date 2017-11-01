@@ -35,7 +35,7 @@ public class CachedImage
                 m.setValidtime(0);
             }
 
-            if (!m.isValid() || "!.N".equals(m.getEtag()))
+            if (!m.isValid())
                 images.add(new CachedImage(new File(fMetadata.getParentFile(), fMetadata.getName().substring(0, fMetadata.getName().length() - 9))));
         }
         images.forEach(CachedImage::delete);
@@ -97,7 +97,6 @@ public class CachedImage
     }
 
     public static int CacheMinTTL = 600;
-    public static int NegativeCacheTTL = 300;
 
     private File fImage;
     private File fMetadata;
@@ -138,24 +137,11 @@ public class CachedImage
 
         try
         {
-            if (m.isValid())
+            if (m.isValid() && fImage.exists())
             {
-                if ("!.N".equals(m.getEtag()))
-                    return null;
-                else if (fImage.exists())
-                {
-                    BufferedImage image = ImageIO.read(fImage);
-                    if (image != null)
-                        return image;
-                }
-            }
-            else
-            {
-                fImage.delete();
-                fMetadata.delete();
-
-                m.setEtag("");
-                m.setValidtime(0);
+                BufferedImage image = ImageIO.read(fImage);
+                if (image != null)
+                    return image;
             }
         }
         catch (IOException e)
@@ -192,16 +178,7 @@ public class CachedImage
             lastResponseCode = code;
             int c = code / 100;
             if (c == 4)
-            {
-                if (NegativeCacheTTL > 0)
-                {
-                    fImage.delete();
-                    m.setEtag("!.N");
-                    m.setValidtime(System.currentTimeMillis() + (NegativeCacheTTL * 1000));
-                    m.writeToFile(fMetadata);
-                }
                 return null;
-            }
             else if (c == 2)
             {
                 FileOutputStream s = null;
