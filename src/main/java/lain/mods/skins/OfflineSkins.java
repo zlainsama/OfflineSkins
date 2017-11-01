@@ -226,7 +226,7 @@ public class OfflineSkins
             boolean useCrafatar = config.getBoolean("useCrafatar", Configuration.CATEGORY_CLIENT, true, "");
             boolean useCustomServer = config.getBoolean("useCustomServer", Configuration.CATEGORY_CLIENT, false, "");
             String hostCustomServer = config.getString("hostCustomServer", Configuration.CATEGORY_CLIENT, "http://example.com", "only http/https are supported, /skins/(uuid|username) and /capes/(uuid|username) will be queried for respective resources");
-            CachedImage.CacheMinTTL = config.getInt("cacheMinTTL", Configuration.CATEGORY_CLIENT, 600, 0, 86400, "in seconds");
+            CachedImage.CacheMinTTL = config.getInt("cacheMinTTL", Configuration.CATEGORY_CLIENT, 1800, 0, 86400, "in seconds");
             if (config.hasChanged())
                 config.save();
 
