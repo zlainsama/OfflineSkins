@@ -112,8 +112,12 @@ public class ASMTransformer implements IClassTransformer
         {
 
             ObfHelper target = ObfHelper.newMethod("func_147499_a", "net/minecraft/client/renderer/tileentity/TileEntitySpecialRenderer", "(Lnet/minecraft/util/ResourceLocation;)V").setDevName("bindTexture");
+            ObfHelper humanoidHead = ObfHelper.newField("field_178468_i", "net/minecraft/client/renderer/tileentity/TileEntitySkullRenderer", "Lnet/minecraft/client/model/ModelSkeletonHead;").setDevName("humanoidHead");
+            ObfHelper skeletonHead = ObfHelper.newField("field_82896_a", "net/minecraft/client/model/ModelSkeletonHead", "Lnet/minecraft/client/model/ModelRenderer;").setDevName("skeletonHead");
+            ObfHelper setTextureSize = ObfHelper.newMethod("func_78787_b", "net/minecraft/client/model/ModelRenderer", "(II)Lnet/minecraft/client/model/ModelRenderer;").setDevName("setTextureSize");
 
             int lastALOAD = -1;
+            boolean hit = false;
 
             public method001(MethodVisitor mv)
             {
@@ -125,16 +129,28 @@ public class ASMTransformer implements IClassTransformer
             {
                 if (opcode == Opcodes.INVOKEVIRTUAL && target.match(name, desc) && lastALOAD == 11)
                 {
-                    this.visitInsn(Opcodes.POP);
+                    hit = true;
                     this.visitInsn(Opcodes.POP);
                     this.visitVarInsn(Opcodes.ALOAD, 7);
                     this.visitVarInsn(Opcodes.ALOAD, 11);
                     this.visitMethodInsn(Opcodes.INVOKESTATIC, "lain/mods/skins/asm/Hooks", "TileEntitySkullRenderer_bindTexture", "(Lcom/mojang/authlib/GameProfile;Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/util/ResourceLocation;", false);
                     this.visitVarInsn(Opcodes.ASTORE, 11);
-                    this.visitVarInsn(Opcodes.ALOAD, 0);
                     this.visitVarInsn(Opcodes.ALOAD, 11);
                 }
                 super.visitMethodInsn(opcode, owner, name, desc, itf);
+                if (hit)
+                {
+                    hit = false;
+                    this.visitVarInsn(Opcodes.ALOAD, 0);
+                    this.visitFieldInsn(Opcodes.GETFIELD, humanoidHead.getData(0), humanoidHead.getData(1), humanoidHead.getData(2));
+                    this.visitFieldInsn(Opcodes.GETFIELD, skeletonHead.getData(0), skeletonHead.getData(1), skeletonHead.getData(2));
+                    this.visitVarInsn(Opcodes.ALOAD, 11);
+                    this.visitMethodInsn(Opcodes.INVOKESTATIC, "lain/mods/skins/asm/Hooks", "getSkinWidth", "(Lnet/minecraft/util/ResourceLocation;)I", false);
+                    this.visitVarInsn(Opcodes.ALOAD, 11);
+                    this.visitMethodInsn(Opcodes.INVOKESTATIC, "lain/mods/skins/asm/Hooks", "getSkinHeight", "(Lnet/minecraft/util/ResourceLocation;)I", false);
+                    this.visitMethodInsn(Opcodes.INVOKEVIRTUAL, setTextureSize.getData(0), setTextureSize.getData(1), setTextureSize.getData(2), false);
+                    this.visitInsn(Opcodes.POP);
+                }
             }
 
             @Override

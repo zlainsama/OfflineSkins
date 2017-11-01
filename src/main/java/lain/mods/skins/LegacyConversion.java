@@ -13,7 +13,7 @@ public class LegacyConversion
 
     public BufferedImage convert(BufferedImage legacy)
     {
-        int r = legacy.getWidth() / 64;
+        int r = Math.max(legacy.getWidth() / 64, 1);
 
         imageWidth = legacy.getWidth();
         imageHeight = imageWidth;

@@ -68,7 +68,7 @@ public class SkinData implements ISkin
             return "legacy";
         if (w == h)
         {
-            int r = w / 64;
+            int r = Math.max(w / 64, 1);
             if (((image.getRGB(55 * r, 20 * r) & 0xFF000000) >>> 24) == 0)
                 return "slim";
             return "default";

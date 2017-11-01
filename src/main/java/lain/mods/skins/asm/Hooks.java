@@ -23,11 +23,25 @@ public class Hooks
         return OfflineSkins.getLocationSkin(player, result);
     }
 
+    public static int getSkinHeight(ResourceLocation location)
+    {
+        if (DISABLED)
+            return 64;
+        return OfflineSkins.getSkinHeight(location);
+    }
+
     public static String getSkinType(AbstractClientPlayer player, String result)
     {
         if (DISABLED)
             return result;
         return OfflineSkins.getSkinType(player, result);
+    }
+
+    public static int getSkinWidth(ResourceLocation location)
+    {
+        if (DISABLED)
+            return 64;
+        return OfflineSkins.getSkinWidth(location);
     }
 
     public static ResourceLocation GuiPlayerTabOverlay_bindTexture(GameProfile profile, ResourceLocation result)

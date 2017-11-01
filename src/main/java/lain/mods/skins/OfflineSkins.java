@@ -50,16 +50,7 @@ public class OfflineSkins
         {
             ISkin skin = skinService.getSkin(profile);
             if (skin != null && skin.isSkinReady())
-            {
-                if (skin instanceof SkinData)
-                {
-                    BufferedImage image = ((SkinData) skin).getImage();
-                    if (image.getWidth() == 64 && image.getHeight() == 64) // TODO: add hires support for skull and playertablist
-                        return skin.getSkinLocation();
-                }
-                else
-                    return skin.getSkinLocation();
-            }
+                return skin.getSkinLocation();
         }
         return result;
     }
@@ -95,12 +86,30 @@ public class OfflineSkins
     }
 
     @SideOnly(Side.CLIENT)
+    public static int getSkinHeight(ResourceLocation location)
+    {
+        SkinData skin = SkinData.getData(location);
+        if (skin != null)
+            return skin.getImage().getHeight();
+        return 64;
+    }
+
+    @SideOnly(Side.CLIENT)
     public static String getSkinType(AbstractClientPlayer player, String result)
     {
         SkinData skin = SkinData.getData(player.getLocationSkin());
         if (skin != null)
             return skin.getSkinType();
         return result;
+    }
+
+    @SideOnly(Side.CLIENT)
+    public static int getSkinWidth(ResourceLocation location)
+    {
+        SkinData skin = SkinData.getData(location);
+        if (skin != null)
+            return skin.getImage().getWidth();
+        return 64;
     }
 
     @SideOnly(Side.CLIENT)
@@ -179,8 +188,6 @@ public class OfflineSkins
     public void handlePlayerRender_Post(RenderPlayerEvent.Post event)
     {
         ModelPlayer model = event.getRenderer().getMainModel();
-        model.textureWidth = 64;
-        model.textureHeight = 64;
         setSubModelTextureSize_Main(model, 64, 64);
         setSubModelTextureSize_Cape(model, 64, 32);
     }
@@ -198,8 +205,6 @@ public class OfflineSkins
             if (skin != null)
             {
                 BufferedImage image = ((SkinData) skin).getImage();
-                model.textureWidth = image.getWidth();
-                model.textureHeight = image.getHeight();
                 setSubModelTextureSize_Main(model, image.getWidth(), image.getHeight());
             }
             SkinData cape = SkinData.getData(player.getLocationCape());
@@ -222,7 +227,6 @@ public class OfflineSkins
             boolean useCustomServer = config.getBoolean("useCustomServer", Configuration.CATEGORY_CLIENT, false, "");
             String hostCustomServer = config.getString("hostCustomServer", Configuration.CATEGORY_CLIENT, "http://example.com", "only http/https are supported, /skins/(uuid|username) and /capes/(uuid|username) will be queried for respective resources");
             CachedImage.CacheMinTTL = config.getInt("cacheMinTTL", Configuration.CATEGORY_CLIENT, 600, 0, 86400, "in seconds");
-            CachedImage.NegativeCacheTTL = config.getInt("negativeCacheTTL", Configuration.CATEGORY_CLIENT, 300, 0, 3600, "in seconds");
             if (config.hasChanged())
                 config.save();
 
