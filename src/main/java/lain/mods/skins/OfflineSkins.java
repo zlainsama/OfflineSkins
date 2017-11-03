@@ -141,9 +141,9 @@ public class OfflineSkins
     }
 
     @SideOnly(Side.CLIENT)
-    private static boolean SkinPass = false;
+    private static boolean SkinPass;
     @SideOnly(Side.CLIENT)
-    private static boolean CapePass = false;
+    private static boolean CapePass;
 
     @SideOnly(Side.CLIENT)
     public static ISkinProviderService skinService;
@@ -151,10 +151,10 @@ public class OfflineSkins
     public static ISkinProviderService capeService;
 
     @SideOnly(Side.CLIENT)
-    public static boolean OverrideVanilla = false;
+    public static boolean OverrideVanilla;
 
     @SideOnly(Side.CLIENT)
-    private Map<Class<?>, Optional<Field[]>> allSubModelFields = new HashMap<Class<?>, Optional<Field[]>>();
+    private Map<Class<?>, Optional<Field[]>> allSubModelFields;
 
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
@@ -250,13 +250,19 @@ public class OfflineSkins
                 capeService.register(new CrafatarCachedCapeProvider());
 
             OverrideVanilla = true;
+            allSubModelFields = new HashMap<Class<?>, Optional<Field[]>>();
             MinecraftForge.EVENT_BUS.register(this);
         }
+        else
+            System.err.println("This mod is client-only, please remove it from your server");
     }
 
     @SideOnly(Side.CLIENT)
     private void setSubModelTextureSize(ModelBase model, int width, int height, Predicate<ModelRenderer> filter)
     {
+        if (allSubModelFields == null)
+            return;
+
         Class<?> clazz = model.getClass();
         if (!allSubModelFields.containsKey(clazz))
         {
