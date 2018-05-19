@@ -1,92 +1,103 @@
 package lain.mods.skins;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import javax.annotation.Nullable;
 
 //code from net.minecraft.client.renderer.ImageBufferDownload
 public class LegacyConversion
 {
+
     private int[] imageData;
     private int imageWidth;
     private int imageHeight;
 
-    public BufferedImage convert(BufferedImage legacy)
+    @Nullable
+    public BufferedImage convert(BufferedImage image)
     {
-        int r = Math.max(legacy.getWidth() / 64, 1);
+        if (image == null)
+            return null;
 
-        imageWidth = legacy.getWidth();
+        int r = Math.max(image.getWidth() / 64, 1);
+
+        imageWidth = image.getWidth();
         imageHeight = imageWidth;
 
-        BufferedImage localBufferedImage = new BufferedImage(imageWidth, imageHeight, 2);
-        Graphics localGraphics = localBufferedImage.getGraphics();
-        localGraphics.drawImage(legacy, 0, 0, null);
+        BufferedImage i = new BufferedImage(imageWidth, imageHeight, 2);
+        Graphics g = i.getGraphics();
+        g.drawImage(image, 0, 0, null);
 
-        if (legacy.getWidth() == legacy.getHeight() * 2)
+        boolean legacy = image.getWidth() == image.getHeight() * 2;
+
+        if (legacy)
         {
-            localGraphics.drawImage(localBufferedImage, 24 * r, 48 * r, 20 * r, 52 * r, 4 * r, 16 * r, 8 * r, 20 * r, null);
-            localGraphics.drawImage(localBufferedImage, 28 * r, 48 * r, 24 * r, 52 * r, 8 * r, 16 * r, 12 * r, 20 * r, null);
-            localGraphics.drawImage(localBufferedImage, 20 * r, 52 * r, 16 * r, 64 * r, 8 * r, 20 * r, 12 * r, 32 * r, null);
-            localGraphics.drawImage(localBufferedImage, 24 * r, 52 * r, 20 * r, 64 * r, 4 * r, 20 * r, 8 * r, 32 * r, null);
-            localGraphics.drawImage(localBufferedImage, 28 * r, 52 * r, 24 * r, 64 * r, 0 * r, 20 * r, 4 * r, 32 * r, null);
-            localGraphics.drawImage(localBufferedImage, 32 * r, 52 * r, 28 * r, 64 * r, 12 * r, 20 * r, 16 * r, 32 * r, null);
-
-            localGraphics.drawImage(localBufferedImage, 40 * r, 48 * r, 36 * r, 52 * r, 44 * r, 16 * r, 48 * r, 20 * r, null);
-            localGraphics.drawImage(localBufferedImage, 44 * r, 48 * r, 40 * r, 52 * r, 48 * r, 16 * r, 52 * r, 20 * r, null);
-            localGraphics.drawImage(localBufferedImage, 36 * r, 52 * r, 32 * r, 64 * r, 48 * r, 20 * r, 52 * r, 32 * r, null);
-            localGraphics.drawImage(localBufferedImage, 40 * r, 52 * r, 36 * r, 64 * r, 44 * r, 20 * r, 48 * r, 32 * r, null);
-            localGraphics.drawImage(localBufferedImage, 44 * r, 52 * r, 40 * r, 64 * r, 40 * r, 20 * r, 44 * r, 32 * r, null);
-            localGraphics.drawImage(localBufferedImage, 48 * r, 52 * r, 44 * r, 64 * r, 52 * r, 20 * r, 56 * r, 32 * r, null);
+            g.setColor(new Color(0, 0, 0, 0));
+            g.fillRect(0, 32, 64, 32);
+            g.drawImage(i, 24 * r, 48 * r, 20 * r, 52 * r, 4 * r, 16 * r, 8 * r, 20 * r, null);
+            g.drawImage(i, 28 * r, 48 * r, 24 * r, 52 * r, 8 * r, 16 * r, 12 * r, 20 * r, null);
+            g.drawImage(i, 20 * r, 52 * r, 16 * r, 64 * r, 8 * r, 20 * r, 12 * r, 32 * r, null);
+            g.drawImage(i, 24 * r, 52 * r, 20 * r, 64 * r, 4 * r, 20 * r, 8 * r, 32 * r, null);
+            g.drawImage(i, 28 * r, 52 * r, 24 * r, 64 * r, 0 * r, 20 * r, 4 * r, 32 * r, null);
+            g.drawImage(i, 32 * r, 52 * r, 28 * r, 64 * r, 12 * r, 20 * r, 16 * r, 32 * r, null);
+            g.drawImage(i, 40 * r, 48 * r, 36 * r, 52 * r, 44 * r, 16 * r, 48 * r, 20 * r, null);
+            g.drawImage(i, 44 * r, 48 * r, 40 * r, 52 * r, 48 * r, 16 * r, 52 * r, 20 * r, null);
+            g.drawImage(i, 36 * r, 52 * r, 32 * r, 64 * r, 48 * r, 20 * r, 52 * r, 32 * r, null);
+            g.drawImage(i, 40 * r, 52 * r, 36 * r, 64 * r, 44 * r, 20 * r, 48 * r, 32 * r, null);
+            g.drawImage(i, 44 * r, 52 * r, 40 * r, 64 * r, 40 * r, 20 * r, 44 * r, 32 * r, null);
+            g.drawImage(i, 48 * r, 52 * r, 44 * r, 64 * r, 52 * r, 20 * r, 56 * r, 32 * r, null);
         }
 
-        localGraphics.dispose();
+        g.dispose();
 
-        imageData = ((DataBufferInt) localBufferedImage.getRaster().getDataBuffer()).getData();
+        imageData = ((DataBufferInt) i.getRaster().getDataBuffer()).getData();
 
         setAreaOpaque(0 * r, 0 * r, 32 * r, 16 * r);
-        setAreaTransparent(32 * r, 0 * r, 64 * r, 32 * r);
+        if (legacy)
+            setAreaTransparent(32 * r, 0 * r, 64 * r, 32 * r);
         setAreaOpaque(0 * r, 16 * r, 64 * r, 32 * r);
-
-        setAreaTransparent(0 * r, 32 * r, 16 * r, 48 * r);
-        setAreaTransparent(16 * r, 32 * r, 40 * r, 48 * r);
-        setAreaTransparent(40 * r, 32 * r, 56 * r, 48 * r);
-
-        setAreaTransparent(0 * r, 48 * r, 16 * r, 64 * r);
         setAreaOpaque(16 * r, 48 * r, 48 * r, 64 * r);
-        setAreaTransparent(48 * r, 48 * r, 64 * r, 64 * r);
 
-        return localBufferedImage;
+        return i;
     }
 
-    private boolean hasTransparency(int p_hasTransparency_1_, int p_hasTransparency_2_, int p_hasTransparency_3_, int p_hasTransparency_4_)
+    /**
+     * Makes the given area of the image opaque
+     */
+    private void setAreaOpaque(int x, int y, int width, int height)
     {
-        for (int i = p_hasTransparency_1_; i < p_hasTransparency_3_; i++)
+        for (int i = x; i < width; ++i)
         {
-            for (int j = p_hasTransparency_2_; j < p_hasTransparency_4_; j++)
+            for (int j = y; j < height; ++j)
             {
-                int k = imageData[(i + j * imageWidth)];
-                if ((k >> 24 & 0xFF) < 128)
-                    return true;
+                imageData[i + j * imageWidth] |= -16777216;
             }
         }
-        return false;
     }
 
-    private void setAreaOpaque(int p_setAreaOpaque_1_, int p_setAreaOpaque_2_, int p_setAreaOpaque_3_, int p_setAreaOpaque_4_)
+    private void setAreaTransparent(int x, int y, int width, int height)
     {
-        for (int i = p_setAreaOpaque_1_; i < p_setAreaOpaque_3_; i++)
-            for (int j = p_setAreaOpaque_2_; j < p_setAreaOpaque_4_; j++)
-                imageData[(i + j * imageWidth)] |= -16777216;
-    }
+        for (int i = x; i < width; ++i)
+        {
+            for (int j = y; j < height; ++j)
+            {
+                int k = imageData[i + j * imageWidth];
 
-    private void setAreaTransparent(int p_setAreaTransparent_1_, int p_setAreaTransparent_2_, int p_setAreaTransparent_3_, int p_setAreaTransparent_4_)
-    {
-        if (hasTransparency(p_setAreaTransparent_1_, p_setAreaTransparent_2_, p_setAreaTransparent_3_, p_setAreaTransparent_4_))
-            return;
+                if ((k >> 24 & 255) < 128)
+                {
+                    return;
+                }
+            }
+        }
 
-        for (int i = p_setAreaTransparent_1_; i < p_setAreaTransparent_3_; i++)
-            for (int j = p_setAreaTransparent_2_; j < p_setAreaTransparent_4_; j++)
-                imageData[(i + j * imageWidth)] &= 16777215;
+        for (int l = x; l < width; ++l)
+        {
+            for (int i1 = y; i1 < height; ++i1)
+            {
+                imageData[l + i1 * imageWidth] &= 16777215;
+            }
+        }
     }
 
 }
