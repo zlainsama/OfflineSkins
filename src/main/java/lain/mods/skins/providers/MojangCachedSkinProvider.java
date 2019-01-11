@@ -4,13 +4,13 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Map;
 import java.util.UUID;
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import lain.mods.skins.LegacyConversion;
 import lain.mods.skins.SkinData;
 import lain.mods.skins.api.ISkin;
 import lain.mods.skins.api.ISkinProvider;
 import net.minecraft.client.Minecraft;
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 
 public class MojangCachedSkinProvider implements ISkinProvider
 {

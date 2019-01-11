@@ -1,13 +1,15 @@
 package lain.mods.skins.asm;
 
+import com.mojang.authlib.GameProfile;
 import lain.mods.skins.OfflineSkins;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Loader;
-import com.mojang.authlib.GameProfile;
 
 public class Hooks
 {
+
+    private static final boolean DISABLED = !Loader.isModLoaded("offlineskins");
 
     public static ResourceLocation getLocationCape(AbstractClientPlayer player, ResourceLocation result)
     {
@@ -57,7 +59,5 @@ public class Hooks
             return result;
         return OfflineSkins.bindTexture(profile, result);
     }
-
-    private static final boolean DISABLED = !Loader.isModLoaded("offlineskins");
 
 }

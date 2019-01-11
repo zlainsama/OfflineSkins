@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
+import com.mojang.authlib.GameProfile;
 import lain.mods.skins.api.ISkin;
 import lain.mods.skins.api.ISkinProviderService;
 import lain.mods.skins.api.SkinProviderAPI;
@@ -37,11 +38,23 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import com.mojang.authlib.GameProfile;
 
 @Mod(modid = "offlineskins", useMetadata = true, acceptedMinecraftVersions = "[1.12, 1.13)", certificateFingerprint = "aaaf83332a11df02406e9f266b1b65c1306f0f76")
 public class OfflineSkins
 {
+
+    @SideOnly(Side.CLIENT)
+    private static boolean SkinPass;
+    @SideOnly(Side.CLIENT)
+    private static boolean CapePass;
+
+    @SideOnly(Side.CLIENT)
+    public static ISkinProviderService skinService;
+    @SideOnly(Side.CLIENT)
+    public static ISkinProviderService capeService;
+
+    @SideOnly(Side.CLIENT)
+    public static boolean OverrideVanilla;
 
     @SideOnly(Side.CLIENT)
     public static ResourceLocation bindTexture(GameProfile profile, ResourceLocation result)
@@ -139,19 +152,6 @@ public class OfflineSkins
             SkinPass = false;
         }
     }
-
-    @SideOnly(Side.CLIENT)
-    private static boolean SkinPass;
-    @SideOnly(Side.CLIENT)
-    private static boolean CapePass;
-
-    @SideOnly(Side.CLIENT)
-    public static ISkinProviderService skinService;
-    @SideOnly(Side.CLIENT)
-    public static ISkinProviderService capeService;
-
-    @SideOnly(Side.CLIENT)
-    public static boolean OverrideVanilla;
 
     @SideOnly(Side.CLIENT)
     private Map<Class<?>, Optional<Field[]>> allSubModelFields;

@@ -13,13 +13,6 @@ import com.mojang.authlib.GameProfile;
 public class Shared
 {
 
-    public static boolean isOfflineProfile(GameProfile profile)
-    {
-        if (profile == null || profile.getId() == null)
-            return true;
-        return !profileOnlineStatus.getUnchecked(profile);
-    }
-
     protected static final ExecutorService pool = Executors.newCachedThreadPool();
 
     private static final LoadingCache<GameProfile, Boolean> profileOnlineStatus = CacheBuilder.newBuilder().expireAfterAccess(60, TimeUnit.MINUTES).build(new CacheLoader<GameProfile, Boolean>()
@@ -32,5 +25,12 @@ public class Shared
         }
 
     });
+
+    public static boolean isOfflineProfile(GameProfile profile)
+    {
+        if (profile == null || profile.getId() == null)
+            return true;
+        return !profileOnlineStatus.getUnchecked(profile);
+    }
 
 }

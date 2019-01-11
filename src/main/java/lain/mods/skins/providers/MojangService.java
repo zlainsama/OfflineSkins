@@ -8,7 +8,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import net.minecraft.client.Minecraft;
 import org.apache.commons.io.IOUtils;
 import com.google.common.base.Optional;
 import com.google.common.cache.CacheBuilder;
@@ -19,26 +18,10 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.mojang.authlib.GameProfile;
 import com.mojang.util.UUIDTypeAdapter;
+import net.minecraft.client.Minecraft;
 
 public class MojangService
 {
-
-    public static GameProfile getProfile(String username)
-    {
-        return getProfile(username, DUMMY);
-    }
-
-    public static GameProfile getProfile(String username, GameProfile defaultValue)
-    {
-        try
-        {
-            return cachedProfiles.get(username).or(defaultValue);
-        }
-        catch (ExecutionException ignored)
-        {
-            return defaultValue;
-        }
-    }
 
     private static final LoadingCache<String, Optional<GameProfile>> cachedProfiles = CacheBuilder.newBuilder().expireAfterWrite(6, TimeUnit.HOURS).build(new CacheLoader<String, Optional<GameProfile>>()
     {
@@ -90,5 +73,22 @@ public class MojangService
     });
 
     private static final GameProfile DUMMY = new GameProfile(UUID.fromString("fed3a6ca-d7de-11e5-b5d2-0a1d41d68578"), "[Dummy]");
+
+    public static GameProfile getProfile(String username)
+    {
+        return getProfile(username, DUMMY);
+    }
+
+    public static GameProfile getProfile(String username, GameProfile defaultValue)
+    {
+        try
+        {
+            return cachedProfiles.get(username).or(defaultValue);
+        }
+        catch (ExecutionException ignored)
+        {
+            return defaultValue;
+        }
+    }
 
 }

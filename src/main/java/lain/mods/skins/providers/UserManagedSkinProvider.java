@@ -3,13 +3,13 @@ package lain.mods.skins.providers;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import javax.imageio.ImageIO;
+import org.apache.commons.lang3.StringUtils;
+import com.mojang.authlib.GameProfile;
 import lain.mods.skins.LegacyConversion;
 import lain.mods.skins.SkinData;
 import lain.mods.skins.api.ISkin;
 import lain.mods.skins.api.ISkinProvider;
 import net.minecraft.client.Minecraft;
-import org.apache.commons.lang3.StringUtils;
-import com.mojang.authlib.GameProfile;
 
 public class UserManagedSkinProvider implements ISkinProvider
 {

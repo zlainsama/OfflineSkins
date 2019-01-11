@@ -6,14 +6,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import com.google.common.collect.ImmutableSet;
+import com.mojang.authlib.GameProfile;
 import lain.mods.skins.api.ISkin;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
-import com.google.common.collect.ImmutableSet;
-import com.mojang.authlib.GameProfile;
 
 public class SkinData implements ISkin
 {
@@ -48,6 +48,9 @@ public class SkinData implements ISkin
 
     }
 
+    private static Set<String> DefaultSkins = ImmutableSet.of("textures/entity/steve.png", "textures/entity/alex.png");
+    private static Map<ResourceLocation, SkinData> store = new HashMap<ResourceLocation, SkinData>();
+
     public static SkinData getData(ResourceLocation location)
     {
         return SkinData.store.get(location);
@@ -75,9 +78,6 @@ public class SkinData implements ISkin
         }
         return "unknown";
     }
-
-    private static Set<String> DefaultSkins = ImmutableSet.of("textures/entity/steve.png", "textures/entity/alex.png");
-    private static Map<ResourceLocation, SkinData> store = new HashMap<ResourceLocation, SkinData>();
 
     public GameProfile profile;
 

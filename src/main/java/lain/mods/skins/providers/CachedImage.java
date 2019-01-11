@@ -19,6 +19,8 @@ import javax.imageio.ImageIO;
 public class CachedImage
 {
 
+    public static int CacheMinTTL = 600;
+
     public static void doCleanup(File dir)
     {
         List<CachedImage> images = new ArrayList<CachedImage>();
@@ -95,8 +97,6 @@ public class CachedImage
             m.put(as[0], as.length == 2 ? as[1] : null);
         }, HashMap::putAll);
     }
-
-    public static int CacheMinTTL = 600;
 
     private File fImage;
     private File fMetadata;
