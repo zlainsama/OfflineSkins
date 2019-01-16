@@ -22,7 +22,7 @@ public class UserManagedCapeProvider implements ISkinProvider
     {
         _dirN = new File(workDir.toFile(), "capes");
         _dirN.mkdirs();
-        _dirU = new File(_dirN, "uuids");
+        _dirU = new File(_dirN, "uuid");
         _dirU.mkdirs();
     }
 

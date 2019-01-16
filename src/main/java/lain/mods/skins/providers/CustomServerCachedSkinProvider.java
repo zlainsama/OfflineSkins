@@ -24,7 +24,7 @@ public class CustomServerCachedSkinProvider implements ISkinProvider
     {
         _dirN = new File(workDir.toFile(), "skins");
         _dirN.mkdirs();
-        _dirU = new File(_dirN, "uuids");
+        _dirU = new File(_dirN, "uuid");
         _dirU.mkdirs();
         _host = host;
 
