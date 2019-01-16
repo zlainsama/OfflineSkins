@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "lain.mods.skins.init.fabric.mixins",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "FabricOfflineSkinsMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "refmap": "OfflineSkins-refmap.json"
+}

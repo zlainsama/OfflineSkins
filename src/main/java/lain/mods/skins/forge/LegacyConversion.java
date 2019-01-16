@@ -1,4 +1,4 @@
-package lain.mods.skins;
+package lain.mods.skins.forge;
 
 import java.awt.Color;
 import java.awt.Graphics;

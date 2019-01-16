@@ -1,4 +1,4 @@
-package lain.mods.skins;
+package lain.mods.skins.forge;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.UUID;
 import com.google.common.collect.ImmutableSet;
 import com.mojang.authlib.GameProfile;
-import lain.mods.skins.api.ISkin;
+import lain.mods.skins.forge.api.ISkin;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.TextureUtil;

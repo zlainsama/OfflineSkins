@@ -1,106 +1,34 @@
-buildscript {
-    repositories {
-        jcenter()
-        maven { url = "http://files.minecraftforge.net/maven" }
-    }
-    dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
-    }
+plugins {
+    id 'fabric-loom' version '0.2.0-SNAPSHOT'
 }
-apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "1.12.2-v4"
-group= "lain.mods.skins"
-archivesBaseName = "OfflineSkins"
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
-sourceCompatibility = targetCompatibility = "1.8"
-compileJava {
-    sourceCompatibility = targetCompatibility = "1.8"
-}
+archivesBaseName = "offlineskins"
+version = "v1-fabric"
 
 minecraft {
-    version = "1.12.2-14.23.0.2486"
-    runDir = "run"
-
-    mappings = "snapshot_20170624"
 }
 
-reobf {
-    coreJar {}
+dependencies {
+    minecraft "com.mojang:minecraft:19w02a"
+    mappings "net.fabricmc:yarn:19w02a.12"
+    modCompile "net.fabricmc:fabric-loader:0.3.2.92"
+
+    // Fabric API. This is technically optional, but you probably want it anyway.
+    modCompile "net.fabricmc:fabric:0.1.4.71"
 }
 
-task coreJar(type: Jar) {
-    from(sourceSets.main.output) {
-        include '**/asm/**'
-    }
-    manifest {
-        attributes 'FMLCorePlugin': 'lain.mods.skins.asm.Plugin'
-    }
-    classifier = 'core'
-    includeEmptyDirs = false
+// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+// if it is present.
+// If you remove this task, sources will not be generated.
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
 }
-
-task signCoreJar(type: SignJar, dependsOn: reobfCoreJar) {
-    onlyIf {
-        project.hasProperty('mcModsStore')
-    }
-
-    if (project.hasProperty('mcModsStore')) {
-        keyStore = project.mcModsStore
-        alias = project.mcModsAlias
-        storePass = project.mcModsStorePass
-        keyPass = project.mcModsKeyPass
-        inputFile = coreJar.archivePath
-        outputFile = coreJar.archivePath
-    }
-}
-
-jar
-{
-    manifest {
-        attributes 'ContainedDeps': coreJar.archivePath.name
-    }
-    exclude '**/asm/**'
-    from(coreJar.archivePath.absolutePath) {
-        include '*'
-    }
-}
-
-jar.dependsOn signCoreJar
 
 processResources
 {
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
-
     from 'LICENSE.txt'
-
-    from(sourceSets.main.resources.srcDirs)
-    {
-        include 'mcmod.info'
-
-        expand 'version':project.version, 'mcversion':project.minecraft.version
-    }
-
-    from(sourceSets.main.resources.srcDirs)
-    {
-        exclude 'mcmod.info'
-    }
 }
-
-task signJar(type: SignJar, dependsOn: reobfJar) {
-    onlyIf {
-        project.hasProperty('mcModsStore')
-    }
-
-    if (project.hasProperty('mcModsStore')) {
-        keyStore = project.mcModsStore
-        alias = project.mcModsAlias
-        storePass = project.mcModsStorePass
-        keyPass = project.mcModsKeyPass
-        inputFile = jar.archivePath
-        outputFile = jar.archivePath
-    }
-}
-
-build.dependsOn signJar

@@ -1,0 +1,14 @@
+{
+  "id": "offlineskins",
+  "name": "offlineskins",
+  "version": "v1-fabric",
+  "side": "universal",
+  "description": "made it possible to cache your skins for offline use",
+  "license": "MIT",
+  "initializers": [
+    "lain.mods.skins.init.fabric.FabricOfflineSkins"
+  ],
+  "mixins": {
+    "client": "OfflineSkins-mixins.client.json"
+  }
+}

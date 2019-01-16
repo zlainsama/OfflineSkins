@@ -1,88 +1,146 @@
 package lain.mods.skins.api;
 
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
-import com.google.common.collect.Lists;
-import com.mojang.authlib.GameProfile;
+import lain.mods.skins.api.interfaces.IPlayerProfile;
+import lain.mods.skins.api.interfaces.ISkin;
+import lain.mods.skins.api.interfaces.ISkinProvider;
+import lain.mods.skins.api.interfaces.ISkinProviderService;
 
 public class SkinProviderAPI
 {
 
-    public static ISkinProviderService createService()
+    /**
+     * The service for skins.
+     */
+    public static final ISkinProviderService SKIN = create();
+    /**
+     * The service for capes.
+     */
+    public static final ISkinProviderService CAPE = create();
+
+    /**
+     * @return an empty ISkinProviderService with default implementation.
+     */
+    public static ISkinProviderService create()
     {
         return new ISkinProviderService()
         {
 
-            private final List<ISkinProvider> providers = Lists.newArrayList();
-            private final LoadingCache<GameProfile, List<ISkin>> cache = CacheBuilder.newBuilder().expireAfterAccess(15, TimeUnit.SECONDS).removalListener(new RemovalListener<GameProfile, List<ISkin>>()
+            private final List<ISkinProvider> providers = new ArrayList<>();
+
+            private final LoadingCache<IPlayerProfile, ISkin> cache = CacheBuilder.newBuilder().expireAfterAccess(15, TimeUnit.SECONDS).removalListener(new RemovalListener<IPlayerProfile, ISkin>()
             {
 
                 @Override
-                public void onRemoval(RemovalNotification<GameProfile, List<ISkin>> notification)
+                public void onRemoval(RemovalNotification<IPlayerProfile, ISkin> notification)
                 {
-                    List<ISkin> list = notification.getValue();
-                    if (list != null)
-                    {
-                        for (ISkin skin : list)
-                            skin.onRemoval();
-                    }
+                    ISkin skin = notification.getValue();
+                    if (skin != null)
+                        skin.onRemoval();
                 }
 
-            }).build(new CacheLoader<GameProfile, List<ISkin>>()
+            }).build(new CacheLoader<IPlayerProfile, ISkin>()
             {
 
                 @Override
-                public List<ISkin> load(GameProfile key) throws Exception
+                public ISkin load(IPlayerProfile key) throws Exception
                 {
-                    List<ISkin> list = Lists.newArrayList();
-                    for (ISkinProvider p : providers)
+                    return new ISkin()
                     {
-                        try
+
+                        private final Collection<ISkin> skins = providers.stream().map(provider -> {
+                            return provider.getSkin(key);
+                        }).filter(skin -> {
+                            return skin != null;
+                        }).collect(Collectors.toCollection(ArrayList::new));
+
+                        private Optional<ISkin> find()
                         {
-                            ISkin s = p.getSkin(key);
-                            if (s != null)
-                                list.add(s);
+                            return skins.stream().filter(ISkin::isDataReady).findFirst();
                         }
-                        catch (Exception e)
+
+                        @Override
+                        public ByteBuffer getData()
                         {
-                            e.printStackTrace();
+                            return find().map(ISkin::getData).orElse(null);
                         }
-                    }
-                    return list;
+
+                        @Override
+                        public String getSkinType()
+                        {
+                            return find().map(ISkin::getSkinType).orElse(null);
+                        }
+
+                        @Override
+                        public boolean isDataReady()
+                        {
+                            return find().map(ISkin::isDataReady).orElse(false);
+                        }
+
+                        @Override
+                        public void onRemoval()
+                        {
+                            for (ISkin skin : skins)
+                                skin.onRemoval();
+                        }
+
+                        @Override
+                        public boolean setRemovalListener(Consumer<ISkin> listener)
+                        {
+                            boolean any = false;
+                            for (ISkin skin : skins)
+                                if (skin.setRemovalListener(listener) && !any)
+                                    any = true;
+                            return any;
+                        }
+
+                        @Override
+                        public boolean setSkinFilter(Function<ByteBuffer, ByteBuffer> filter)
+                        {
+                            boolean any = false;
+                            for (ISkin skin : skins)
+                                if (skin.setSkinFilter(filter) && !any)
+                                    any = true;
+                            return any;
+                        }
+
+                    };
                 }
 
             });
 
             @Override
-            public void clear()
+            public void clearProviders()
             {
                 providers.clear();
                 cache.invalidateAll();
             }
 
             @Override
-            public ISkin getSkin(GameProfile profile)
+            public ISkin getSkin(IPlayerProfile profile)
             {
-                List<ISkin> list = cache.getUnchecked(profile);
-                for (ISkin skin : list)
-                {
-                    if (skin.isSkinReady())
-                        return skin;
-                }
-                return null;
+                return cache.getUnchecked(profile);
             }
 
             @Override
-            public void register(ISkinProvider provider)
+            public boolean registerProvider(ISkinProvider provider)
             {
                 if (provider == null || provider == this)
-                    throw new UnsupportedOperationException();
-                providers.add(provider);
+                    return false;
+                return providers.add(provider);
             }
 
         };

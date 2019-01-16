@@ -1,36 +1,41 @@
 package lain.mods.skins.providers;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
+import java.util.WeakHashMap;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import com.google.common.base.Charsets;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.mojang.authlib.GameProfile;
+import lain.mods.skins.api.interfaces.IPlayerProfile;
 
 public class Shared
 {
 
-    protected static final ExecutorService pool = Executors.newCachedThreadPool();
+    private static final Executor pool = Executors.newCachedThreadPool();
+    private static final Map<UUID, Boolean> offline = new WeakHashMap<>();
 
-    private static final LoadingCache<GameProfile, Boolean> profileOnlineStatus = CacheBuilder.newBuilder().expireAfterAccess(60, TimeUnit.MINUTES).build(new CacheLoader<GameProfile, Boolean>()
+    protected static void execute(Runnable task)
     {
+        pool.execute(task);
+    }
 
-        @Override
-        public Boolean load(GameProfile key) throws Exception
-        {
-            return !UUID.nameUUIDFromBytes(("OfflinePlayer:" + key.getName()).getBytes(Charsets.UTF_8)).equals(key.getId());
-        }
-
-    });
-
-    public static boolean isOfflineProfile(GameProfile profile)
+    protected static boolean isBlank(CharSequence cs)
     {
-        if (profile == null || profile.getId() == null)
+        int strLen;
+        if (cs == null || (strLen = cs.length()) == 0)
             return true;
-        return !profileOnlineStatus.getUnchecked(profile);
+        for (int i = 0; i < strLen; i++)
+            if (!Character.isWhitespace(cs.charAt(i)))
+                return false;
+        return true;
+    }
+
+    protected static boolean isOfflinePlayerProfile(IPlayerProfile profile)
+    {
+        UUID id = profile.getPlayerID();
+        if (!offline.containsKey(id))
+            offline.put(id, UUID.nameUUIDFromBytes(("OfflinePlayer:" + profile.getPlayerName()).getBytes(StandardCharsets.UTF_8)).equals(id));
+        return offline.get(id);
     }
 
 }
