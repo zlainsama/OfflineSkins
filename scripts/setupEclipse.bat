@@ -1,3 +1,3 @@
 @echo off
 cd ..
-start gradlew eclipse
+start gradlew genSources eclipse
