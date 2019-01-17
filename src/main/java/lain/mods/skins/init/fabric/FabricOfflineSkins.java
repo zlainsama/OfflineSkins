@@ -34,7 +34,9 @@ import lain.mods.skins.providers.MojangCachedSkinProvider;
 import lain.mods.skins.providers.UserManagedCapeProvider;
 import lain.mods.skins.providers.UserManagedSkinProvider;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.events.client.ClientTickEvent;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
 
 public class FabricOfflineSkins implements ClientModInitializer
@@ -151,6 +153,19 @@ public class FabricOfflineSkins implements ClientModInitializer
     @Override
     public void onInitializeClient()
     {
+        ClientTickEvent.CLIENT.register(mc -> {
+            if (mc.world != null)
+            {
+                for (PlayerEntity player : mc.world.players)
+                {
+                    GameProfile profile = validateProfile(player.getGameProfile());
+
+                    SkinProviderAPI.SKIN.getSkin(wrapProfile(profile));
+                    SkinProviderAPI.CAPE.getSkin(wrapProfile(profile));
+                }
+            }
+        });
+
         reloadConfig();
     }
 

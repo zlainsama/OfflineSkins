@@ -203,7 +203,7 @@ public class CachedReader
         return this;
     }
 
-    public CachedReader setMaxRetries(int maxTries)
+    public CachedReader setMaxTries(int maxTries)
     {
         _maxTries = maxTries;
         return this;
