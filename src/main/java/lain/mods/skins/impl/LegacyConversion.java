@@ -1,4 +1,4 @@
-package lain.mods.skins.impl.fabric;
+package lain.mods.skins.impl;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -10,7 +10,6 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.function.Function;
 import javax.imageio.ImageIO;
-import lain.mods.skins.impl.SkinData;
 
 public class LegacyConversion
 {
