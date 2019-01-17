@@ -12,16 +12,16 @@ import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
 @Mixin(AbstractClientPlayerEntity.class)
-public abstract class FabricOfflineSkinsMixin extends PlayerEntity
+public abstract class AbstractClientPlayerEntityMixin extends PlayerEntity
 {
 
-    public FabricOfflineSkinsMixin(World world, GameProfile profile)
+    public AbstractClientPlayerEntityMixin(World world, GameProfile profile)
     {
         super(world, profile);
     }
 
     @Inject(method = "method_3119()Lnet/minecraft/util/Identifier;", at = @At("RETURN"), cancellable = true)
-    private void getLocationCape(CallbackInfoReturnable<Identifier> info)
+    private void getLocationCape_nBXjeY(CallbackInfoReturnable<Identifier> info)
     {
         Identifier loc = FabricOfflineSkins.getLocationCape(getGameProfile(), info.getReturnValue());
         if (loc != null)
@@ -29,7 +29,7 @@ public abstract class FabricOfflineSkinsMixin extends PlayerEntity
     }
 
     @Inject(method = "method_3117()Lnet/minecraft/util/Identifier;", at = @At("RETURN"), cancellable = true)
-    private void getLocationSkin(CallbackInfoReturnable<Identifier> info)
+    private void getLocationSkin_nBXjeY(CallbackInfoReturnable<Identifier> info)
     {
         Identifier loc = FabricOfflineSkins.getLocationSkin(getGameProfile(), info.getReturnValue());
         if (loc != null)
@@ -37,7 +37,7 @@ public abstract class FabricOfflineSkinsMixin extends PlayerEntity
     }
 
     @Inject(method = "method_3121()Ljava/lang/String;", at = @At("RETURN"), cancellable = true)
-    private void getSkinType(CallbackInfoReturnable<String> info)
+    private void getSkinType_nBXjeY(CallbackInfoReturnable<String> info)
     {
         String type = FabricOfflineSkins.getSkinType(getGameProfile(), info.getReturnValue());
         if (type != null)
