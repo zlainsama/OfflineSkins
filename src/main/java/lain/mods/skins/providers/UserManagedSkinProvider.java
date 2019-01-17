@@ -30,17 +30,18 @@ public class UserManagedSkinProvider implements ISkinProvider
     @Override
     public ISkin getSkin(IPlayerProfile profile)
     {
-        byte[] data = null;
-        if (!Shared.isOfflinePlayerProfile(profile))
-            data = readFile(_dirU, "%s.png", profile.getPlayerID().toString().replaceAll("-", ""));
-        if (data == null && !Shared.isBlank(profile.getPlayerName()))
-            data = readFile(_dirN, "%s.png", profile.getPlayerName());
-        if (data == null)
-            return null;
         SkinData skin = new SkinData();
         if (_filter != null)
             skin.setSkinFilter(_filter);
-        skin.put(data, SkinData.judgeSkinType(data));
+        Shared.execute(() -> {
+            byte[] data = null;
+            if (!Shared.isOfflinePlayerProfile(profile))
+                data = readFile(_dirU, "%s.png", profile.getPlayerID().toString().replaceAll("-", ""));
+            if (data == null && !Shared.isBlank(profile.getPlayerName()))
+                data = readFile(_dirN, "%s.png", profile.getPlayerName());
+            if (data != null)
+                skin.put(data, SkinData.judgeSkinType(data));
+        });
         return skin;
     }
 
