@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
+import lain.mods.skins.impl.Shared;
 
 public class CachedReader
 {
@@ -109,8 +110,7 @@ public class CachedReader
                             }
                             finally
                             {
-                                if (fos != null)
-                                    fos.close();
+                                Shared.closeQuietly(fos);
                             }
                             break;
                         default:
@@ -129,8 +129,7 @@ public class CachedReader
                     }
                     finally
                     {
-                        if (fos != null)
-                            fos.close();
+                        Shared.closeQuietly(fos);
                     }
                 }
 

@@ -21,6 +21,7 @@ import lain.mods.skins.api.interfaces.ISkin;
 import lain.mods.skins.impl.ConfigOptions;
 import lain.mods.skins.impl.LegacyConversion;
 import lain.mods.skins.impl.PlayerProfile;
+import lain.mods.skins.impl.Shared;
 import lain.mods.skins.impl.fabric.CustomSkinTexture;
 import lain.mods.skins.providers.CrafatarCachedCapeProvider;
 import lain.mods.skins.providers.CrafatarCachedSkinProvider;
@@ -140,8 +141,7 @@ public class FabricOfflineSkins implements ClientModInitializer
             {
                 try
                 {
-                    if (w != null)
-                        w.close();
+                    Shared.closeQuietly(w);
                 }
                 catch (Throwable t)
                 {

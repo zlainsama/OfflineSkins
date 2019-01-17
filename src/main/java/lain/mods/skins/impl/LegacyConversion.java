@@ -34,10 +34,8 @@ public class LegacyConversion
                 }
                 finally
                 {
-                    if (out != null)
-                        out.close();
-                    if (in != null)
-                        in.close();
+                    Shared.closeQuietly(out);
+                    Shared.closeQuietly(in);
                 }
             }
             catch (Throwable t)

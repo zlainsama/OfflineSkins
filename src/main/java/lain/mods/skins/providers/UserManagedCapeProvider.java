@@ -9,6 +9,7 @@ import java.util.function.Function;
 import lain.mods.skins.api.interfaces.IPlayerProfile;
 import lain.mods.skins.api.interfaces.ISkin;
 import lain.mods.skins.api.interfaces.ISkinProvider;
+import lain.mods.skins.impl.Shared;
 import lain.mods.skins.impl.SkinData;
 
 public class UserManagedCapeProvider implements ISkinProvider

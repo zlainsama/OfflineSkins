@@ -43,8 +43,7 @@ public class SkinData implements ISkin
             }
             finally
             {
-                if (input != null)
-                    input.close();
+                Shared.closeQuietly(input);
             }
         }
         catch (Throwable ignored)
