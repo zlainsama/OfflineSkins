@@ -32,7 +32,7 @@ public class SkinProviderAPI
     public static final ISkinProviderService CAPE = create();
 
     /**
-     * @return an empty ISkinProviderService with default implementation.
+     * @return an empty ISkinProviderService with default implementation, a bundled ISkin object will be created during runtime.
      */
     public static ISkinProviderService create()
     {
