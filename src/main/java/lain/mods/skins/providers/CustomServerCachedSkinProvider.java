@@ -44,7 +44,7 @@ public class CustomServerCachedSkinProvider implements ISkinProvider
         SkinData skin = new SkinData();
         if (_filter != null)
             skin.setSkinFilter(_filter);
-        Shared.execute(() -> {
+        Shared.pool.execute(() -> {
             byte[] data = null;
             UUID uuid = profile.getPlayerID();
             String name = profile.getPlayerName();

@@ -42,7 +42,7 @@ public class CrafatarCachedCapeProvider implements ISkinProvider
         SkinData skin = new SkinData();
         if (_filter != null)
             skin.setSkinFilter(_filter);
-        Shared.execute(() -> {
+        Shared.pool.execute(() -> {
             byte[] data = null;
             UUID uuid = profile.getPlayerID();
             if (!Shared.isOfflinePlayerProfile(profile))

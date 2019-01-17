@@ -12,6 +12,7 @@ import java.util.UUID;
 import java.util.WeakHashMap;
 import java.util.stream.Collectors;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mojang.authlib.GameProfile;
@@ -20,6 +21,7 @@ import lain.mods.skins.api.interfaces.IPlayerProfile;
 import lain.mods.skins.api.interfaces.ISkin;
 import lain.mods.skins.impl.ConfigOptions;
 import lain.mods.skins.impl.LegacyConversion;
+import lain.mods.skins.impl.MojangService;
 import lain.mods.skins.impl.PlayerProfile;
 import lain.mods.skins.impl.Shared;
 import lain.mods.skins.impl.fabric.CustomSkinTexture;
@@ -53,6 +55,8 @@ public class FabricOfflineSkins implements ClientModInitializer
 
     public static Identifier getLocationCape(GameProfile profile, Identifier result)
     {
+        profile = validateProfile(profile);
+
         if (capePass)
             return null;
 
@@ -67,6 +71,8 @@ public class FabricOfflineSkins implements ClientModInitializer
 
     public static Identifier getLocationSkin(GameProfile profile, Identifier result)
     {
+        profile = validateProfile(profile);
+
         if (skinPass)
             return null;
 
@@ -92,6 +98,8 @@ public class FabricOfflineSkins implements ClientModInitializer
 
     public static String getSkinType(GameProfile profile, String result)
     {
+        profile = validateProfile(profile);
+
         Identifier location = getLocationSkin(profile, null);
         if (location != null)
         {
@@ -105,6 +113,30 @@ public class FabricOfflineSkins implements ClientModInitializer
     private static boolean isDefaultSkin(Identifier id)
     {
         return "minecraft".equals(id.getNamespace()) && DefaultSkins.contains(id.getPath());
+    }
+
+    private static GameProfile validateProfile(GameProfile profile)
+    {
+        if (Shared.isOfflinePlayerProfile(wrapProfile(profile)))
+        {
+            ListenableFuture<GameProfile> future = MojangService.getOnlineProfile(profile.getName());
+            if (future.isDone())
+            {
+                try
+                {
+                    if (!future.isCancelled())
+                    {
+                        GameProfile resolved = future.get();
+                        if (resolved != null && resolved != Shared.DUMMY)
+                            return resolved;
+                    }
+                }
+                catch (Throwable ignored)
+                {
+                }
+            }
+        }
+        return profile;
     }
 
     private static IPlayerProfile wrapProfile(GameProfile profile)

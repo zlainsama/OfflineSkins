@@ -6,8 +6,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.UUID;
 import java.util.WeakHashMap;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
 import com.mojang.authlib.GameProfile;
 import lain.mods.skins.api.interfaces.IPlayerProfile;
 
@@ -15,8 +16,8 @@ public class Shared
 {
 
     public static final GameProfile DUMMY = new GameProfile(UUID.fromString("ae9460f5-bf72-468e-89b6-4eead59001ad"), "");
+    public static final ListeningExecutorService pool = MoreExecutors.listeningDecorator(Executors.newCachedThreadPool());
 
-    private static final Executor pool = Executors.newCachedThreadPool();
     private static final Map<UUID, Boolean> offline = new WeakHashMap<>();
 
     public static void closeQuietly(Closeable c)
@@ -29,11 +30,6 @@ public class Shared
         catch (IOException ignored)
         {
         }
-    }
-
-    public static void execute(Runnable task)
-    {
-        pool.execute(task);
     }
 
     public static boolean isBlank(CharSequence cs)

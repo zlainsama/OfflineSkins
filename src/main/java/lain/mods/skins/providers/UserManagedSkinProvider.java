@@ -33,7 +33,7 @@ public class UserManagedSkinProvider implements ISkinProvider
         SkinData skin = new SkinData();
         if (_filter != null)
             skin.setSkinFilter(_filter);
-        Shared.execute(() -> {
+        Shared.pool.execute(() -> {
             byte[] data = null;
             if (!Shared.isOfflinePlayerProfile(profile))
                 data = readFile(_dirU, "%s.png", profile.getPlayerID().toString().replaceAll("-", ""));

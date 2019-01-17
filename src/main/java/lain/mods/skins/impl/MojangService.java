@@ -1,4 +1,4 @@
-package lain.mods.skins.providers;
+package lain.mods.skins.impl;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -20,7 +20,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.mojang.authlib.GameProfile;
 import com.mojang.util.UUIDTypeAdapter;
-import lain.mods.skins.impl.Shared;
 import lain.mods.skins.impl.fabric.MinecraftUtils;
 
 public class MojangService
@@ -119,11 +118,16 @@ public class MojangService
 
     /**
      * @param username the username to query about.
-     * @return {@link Shared#DUMMY DUMMY} if failed or not found.
+     * @return a ListenableFuture of a resolved online profile, otherwise {@link Shared#DUMMY DUMMY}.
      */
-    public static GameProfile getOnlineProfile(String username)
+    public static ListenableFuture<GameProfile> getOnlineProfile(String username)
     {
-        return cache.getUnchecked(username).orElse(Shared.DUMMY);
+        Optional<GameProfile> cachedResult;
+        if ((cachedResult = cache.getIfPresent(username)) != null)
+            return Futures.immediateFuture(cachedResult.orElse(Shared.DUMMY));
+        return Shared.pool.submit(() -> {
+            return cache.getUnchecked(username).orElse(Shared.DUMMY);
+        });
     }
 
 }
