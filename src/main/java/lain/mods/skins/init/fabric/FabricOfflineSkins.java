@@ -94,7 +94,7 @@ public class FabricOfflineSkins implements ClientModInitializer
         Identifier location = getLocationSkin(profile, null);
         if (location != null)
         {
-            ISkin skin = SkinProviderAPI.CAPE.getSkin(wrapProfile(profile));
+            ISkin skin = SkinProviderAPI.SKIN.getSkin(wrapProfile(profile));
             if (skin != null && skin.isDataReady())
                 return skin.getSkinType();
         }
