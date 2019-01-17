@@ -16,7 +16,7 @@ import net.minecraft.util.Identifier;
 public abstract class SkullBlockEntityRendererMixin extends BlockEntityRenderer<SkullBlockEntity>
 {
 
-    @Inject(method = "method_3578(Lnet/minecraft/block/SkullBlock$SkullType;Lcom/mojang/authlib/GameProfile;)Lnet/minecraft/util/Identifier;", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "method_3578(Lnet/minecraft/block/SkullBlock$SkullType;Lcom/mojang/authlib/GameProfile;)Lnet/minecraft/util/Identifier;", at = @At("RETURN"), cancellable = true, require = 0)
     private void getLocationTexture_nBXjeY(SkullBlock.SkullType type, GameProfile profile, CallbackInfoReturnable<Identifier> info)
     {
         if (type == SkullBlock.Type.PLAYER && profile != null)
