@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
+import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import lain.mods.skins.api.interfaces.IPlayerProfile;
 import lain.mods.skins.api.interfaces.ISkin;
@@ -49,7 +50,7 @@ public class MojangCachedCapeProvider implements ISkinProvider
             UUID uuid = profile.getPlayerID();
             if (!Shared.isOfflinePlayerProfile(profile))
             {
-                Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> textures = MinecraftUtils.getProfileTextures(profile);
+                Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> textures = MinecraftUtils.getSessionService().getTextures((GameProfile) profile.getOriginal(), false);
                 if (textures != null && textures.containsKey(MinecraftProfileTexture.Type.CAPE))
                 {
                     MinecraftProfileTexture tex = textures.get(MinecraftProfileTexture.Type.CAPE);

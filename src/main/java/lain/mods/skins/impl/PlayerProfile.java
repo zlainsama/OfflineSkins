@@ -2,19 +2,59 @@ package lain.mods.skins.impl;
 
 import java.lang.ref.WeakReference;
 import java.util.UUID;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.mojang.authlib.GameProfile;
 import lain.mods.skins.api.interfaces.IPlayerProfile;
 
 public class PlayerProfile implements IPlayerProfile
 {
 
+    private static final LoadingCache<GameProfile, PlayerProfile> profiles = CacheBuilder.newBuilder().weakKeys().build(new CacheLoader<GameProfile, PlayerProfile>()
+    {
+
+        @Override
+        public PlayerProfile load(GameProfile key) throws Exception
+        {
+            return new PlayerProfile(key);
+        }
+
+    });
+
+    public static PlayerProfile wrapGameProfile(GameProfile profile)
+    {
+        PlayerProfile p = profiles.getUnchecked(profile);
+
+        if (Shared.isOfflinePlayerProfile(p))
+        {
+            ListenableFuture<GameProfile> future = MojangService.getOnlineProfile(p.getPlayerName());
+            if (future.isDone())
+            {
+                try
+                {
+                    if (!future.isCancelled())
+                    {
+                        GameProfile resolved = future.get();
+                        if (resolved != null && resolved != Shared.DUMMY && !Shared.isOfflinePlayerProfile(profiles.getUnchecked(resolved)))
+                            p.set(resolved);
+                    }
+                }
+                catch (Throwable ignored)
+                {
+                }
+            }
+        }
+
+        return p;
+    }
+
     private WeakReference<GameProfile> _profile;
 
-    public PlayerProfile(GameProfile profile)
+    private PlayerProfile(GameProfile profile)
     {
-        if (profile == null)
-            throw new IllegalArgumentException("profile must not be null");
-        _profile = new WeakReference<GameProfile>(profile);
+        set(profile);
     }
 
     @Override
@@ -62,6 +102,13 @@ public class PlayerProfile implements IPlayerProfile
         if ((p = _profile.get()) == null) // gc
             return 0;
         return p.hashCode();
+    }
+
+    private void set(GameProfile profile)
+    {
+        if (profile == null)
+            throw new IllegalArgumentException("profile must not be null");
+        _profile = new WeakReference<GameProfile>(profile);
     }
 
 }
