@@ -3,7 +3,6 @@ package lain.mods.skins.providers;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.UUID;
-import org.apache.commons.lang3.StringUtils;
 import com.mojang.authlib.GameProfile;
 import lain.mods.skins.SkinData;
 import lain.mods.skins.api.ISkin;
@@ -39,12 +38,9 @@ public class CrafatarCachedCapeProvider implements ISkinProvider
             {
                 BufferedImage image = null;
                 UUID uuid = data.profile.getId();
-                String name = data.profile.getName();
 
                 if (!Shared.isOfflineProfile(data.profile))
                     image = CachedImage.doRead(_workDir, uuid.toString(), String.format("https://crafatar.com/capes/%s", uuid), Minecraft.getMinecraft().getProxy(), 5);
-                if (image == null && !StringUtils.isBlank(name))
-                    image = CachedImage.doRead(_workDir, name, String.format("https://crafatar.com/capes/%s", name), Minecraft.getMinecraft().getProxy(), 5);
 
                 if (image != null)
                 {
