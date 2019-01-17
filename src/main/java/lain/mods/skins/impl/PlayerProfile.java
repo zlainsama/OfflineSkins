@@ -15,7 +15,7 @@ public class PlayerProfile implements IPlayerProfile
     public PlayerProfile(GameProfile profile)
     {
         if (profile == null)
-            throw new IllegalArgumentException("profile must not be null.");
+            throw new IllegalArgumentException("profile must not be null");
         _profile = new WeakReference<GameProfile>(profile);
     }
 

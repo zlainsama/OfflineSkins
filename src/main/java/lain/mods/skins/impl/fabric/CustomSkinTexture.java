@@ -13,12 +13,14 @@ import net.minecraft.util.Identifier;
 public class CustomSkinTexture extends ResourceTexture
 {
 
-    private WeakReference<ByteBuffer> data;
+    private WeakReference<ByteBuffer> _data;
 
     public CustomSkinTexture(Identifier location, ByteBuffer data)
     {
         super(location);
-        this.data = new WeakReference<ByteBuffer>(data);
+        if (data == null)
+            throw new IllegalArgumentException("buffer must not be null");
+        _data = new WeakReference<ByteBuffer>(data);
     }
 
     public Identifier getLocation()
@@ -32,10 +34,11 @@ public class CustomSkinTexture extends ResourceTexture
         NativeImage image = null;
         try
         {
-            if (data.get() == null) // gc
+            ByteBuffer buf;
+            if ((buf = _data.get()) == null) // gc
                 throw new FileNotFoundException(getLocation().toString());
 
-            image = NativeImage.fromByteBuffer(data.get().duplicate());
+            image = NativeImage.fromByteBuffer(buf.duplicate());
 
             synchronized (this)
             {
