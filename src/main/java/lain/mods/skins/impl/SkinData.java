@@ -17,7 +17,7 @@ public class SkinData implements ISkin
 
     public static String judgeSkinType(byte[] data)
     {
-        return judgeSkinType(ByteBuffer.wrap(data)); // as it won't be used by the game, it can be a normal buffer.
+        return judgeSkinType(ByteBuffer.wrap(data)); // as it won't be used by the game, it's safe to use a normal buffer.
     }
 
     public static String judgeSkinType(ByteBuffer data)
