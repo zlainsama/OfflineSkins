@@ -46,7 +46,7 @@ public class CrafatarCachedSkinProvider implements ISkinProvider
             if (!Shared.isOfflinePlayerProfile(profile))
                 data = CachedReader.create().setLocal(_dirU, uuid.toString()).setRemote("https://crafatar.com/skins/%s", uuid).setDataStore(_store).read();
             if (data != null)
-                skin.put(data);
+                skin.put(data, SkinData.judgeSkinType(data));
         });
         return skin;
     }

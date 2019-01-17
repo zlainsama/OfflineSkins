@@ -39,7 +39,7 @@ public class UserManagedSkinProvider implements ISkinProvider
         SkinData skin = new SkinData();
         if (_filter != null)
             skin.setSkinFilter(_filter);
-        skin.put(data);
+        skin.put(data, SkinData.judgeSkinType(data));
         return skin;
     }
 

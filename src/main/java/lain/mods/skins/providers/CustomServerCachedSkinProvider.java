@@ -51,7 +51,7 @@ public class CustomServerCachedSkinProvider implements ISkinProvider
             if (data == null && !Shared.isBlank(name))
                 data = CachedReader.create().setLocal(_dirN, name).setRemote("%s/skins/%s", _host, name).setDataStore(_store).read();
             if (data != null)
-                skin.put(data);
+                skin.put(data, SkinData.judgeSkinType(data));
         });
         return skin;
     }

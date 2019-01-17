@@ -15,6 +15,11 @@ import lain.mods.skins.api.interfaces.ISkin;
 public class SkinData implements ISkin
 {
 
+    public static String judgeSkinType(byte[] data)
+    {
+        return judgeSkinType(ByteBuffer.wrap(data)); // as it won't be used by the game, it can be a normal buffer.
+    }
+
     public static String judgeSkinType(ByteBuffer data)
     {
         try
@@ -27,7 +32,7 @@ public class SkinData implements ISkin
                 int w = image.getWidth();
                 int h = image.getHeight();
                 if (w == h * 2)
-                    return "legacy";
+                    return "default"; // it's actually "legacy", but there will always be a filter to convert them into "default".
                 if (w == h)
                 {
                     int r = Math.max(w / 64, 1);
@@ -114,21 +119,6 @@ public class SkinData implements ISkin
 
         data = null;
         type = null;
-    }
-
-    public void put(byte[] data)
-    {
-        ByteBuffer buf = null;
-        if (data != null)
-        {
-            buf = toBuffer(data);
-            for (Function<ByteBuffer, ByteBuffer> filter : filters)
-                if ((buf = filter.apply(buf)) == null)
-                    break;
-        }
-
-        this.data = buf;
-        this.type = judgeSkinType(buf);
     }
 
     public void put(byte[] data, String type)
