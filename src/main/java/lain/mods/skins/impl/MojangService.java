@@ -36,7 +36,6 @@ public class MojangService
             try
             {
                 GameProfile profile = makeRequest(String.format("https://api.mojang.com/users/profiles/minecraft/%s", key));
-                System.out.println(profile);
                 if (profile != null && profile != Shared.DUMMY)
                     profile = MinecraftUtils.getSessionService().fillProfileProperties(profile, false);
                 return Optional.ofNullable(profile);
