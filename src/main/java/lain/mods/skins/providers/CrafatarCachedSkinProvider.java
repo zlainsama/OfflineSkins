@@ -11,6 +11,7 @@ import lain.mods.skins.api.interfaces.ISkin;
 import lain.mods.skins.api.interfaces.ISkinProvider;
 import lain.mods.skins.impl.Shared;
 import lain.mods.skins.impl.SkinData;
+import lain.mods.skins.impl.fabric.MinecraftUtils;
 
 public class CrafatarCachedSkinProvider implements ISkinProvider
 {
@@ -45,7 +46,7 @@ public class CrafatarCachedSkinProvider implements ISkinProvider
             byte[] data = null;
             UUID uuid = profile.getPlayerID();
             if (!Shared.isOfflinePlayerProfile(profile))
-                data = CachedReader.create().setLocal(_dirU, uuid.toString()).setRemote("https://crafatar.com/skins/%s", uuid).setDataStore(_store).read();
+                data = CachedReader.create().setLocal(_dirU, uuid.toString()).setRemote("https://crafatar.com/skins/%s", uuid).setDataStore(_store).setProxy(MinecraftUtils.getProxy()).read();
             if (data != null)
                 skin.put(data, SkinData.judgeSkinType(data));
         });
