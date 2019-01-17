@@ -8,7 +8,6 @@ import java.net.MalformedURLException;
 import java.net.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.file.Files;
 import java.util.HashMap;
@@ -44,7 +43,7 @@ public class CachedReader
         }, HashMap::putAll);
     }
 
-    public ByteBuffer read()
+    public byte[] read()
     {
         if (_local == null || _remote == null || _dataStore == null)
             return null;
@@ -159,7 +158,7 @@ public class CachedReader
                 }
 
                 if (_local.exists() && !_local.isDirectory() && _local.canRead())
-                    return ByteBuffer.wrap(Files.readAllBytes(_local.toPath()));
+                    return Files.readAllBytes(_local.toPath());
             }
             catch (IOException e)
             {

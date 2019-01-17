@@ -39,8 +39,9 @@ public interface ISkin
 
     /**
      * Set a filter to perform an action on the data and possibly transform it before it got pushed to the game. <br>
-     * The returned value will be used instead of the original. <br>
-     * Multiple filters will be applied one by one in a chain.
+     * The returned buffer will be used instead of the original. <br>
+     * Multiple filters will be applied one by one in a chain. <br>
+     * Don't forget to {@link ByteBuffer#rewind() rewind()} before return it if you modified it's state.
      *
      * @param filter the filter to set.
      * @return true if successful, null and duplicates will fail.

@@ -1,8 +1,10 @@
 package lain.mods.skins.impl;
 
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.Consumer;
@@ -17,23 +19,68 @@ public class SkinData implements ISkin
     {
         try
         {
-            BufferedImage image = ImageIO.read(new ByteArrayInputStream(data.array()));
-            int w = image.getWidth();
-            int h = image.getHeight();
-            if (w == h * 2)
-                return "legacy";
-            if (w == h)
+            InputStream input = null;
+            try
             {
-                int r = Math.max(w / 64, 1);
-                if (((image.getRGB(55 * r, 20 * r) & 0xFF000000) >>> 24) == 0)
-                    return "slim";
-                return "default";
+                input = wrapByteBufferAsInputStream(data);
+                BufferedImage image = ImageIO.read(input);
+                int w = image.getWidth();
+                int h = image.getHeight();
+                if (w == h * 2)
+                    return "legacy";
+                if (w == h)
+                {
+                    int r = Math.max(w / 64, 1);
+                    if (((image.getRGB(55 * r, 20 * r) & 0xFF000000) >>> 24) == 0)
+                        return "slim";
+                    return "default";
+                }
+            }
+            finally
+            {
+                if (input != null)
+                    input.close();
             }
         }
         catch (Throwable ignored)
         {
         }
         return "unknown";
+    }
+
+    public static ByteBuffer toBuffer(byte[] data)
+    {
+        ByteBuffer buf = ByteBuffer.allocateDirect(data.length).order(ByteOrder.nativeOrder());
+        buf.put(data);
+        buf.rewind();
+        return buf;
+    }
+
+    public static InputStream wrapByteBufferAsInputStream(ByteBuffer original)
+    {
+        ByteBuffer buf = original.duplicate();
+        return new InputStream()
+        {
+
+            @Override
+            public int read() throws IOException
+            {
+                if (!buf.hasRemaining())
+                    return -1;
+                return buf.get() & 0xFF;
+            }
+
+            @Override
+            public int read(byte[] bytes, int off, int len) throws IOException
+            {
+                if (!buf.hasRemaining())
+                    return -1;
+                len = Math.min(len, buf.remaining());
+                buf.get(bytes, off, len);
+                return len;
+            }
+
+        };
     }
 
     private ByteBuffer data;
@@ -69,29 +116,33 @@ public class SkinData implements ISkin
         type = null;
     }
 
-    public void put(ByteBuffer data)
+    public void put(byte[] data)
     {
+        ByteBuffer buf = null;
         if (data != null)
         {
+            buf = toBuffer(data);
             for (Function<ByteBuffer, ByteBuffer> filter : filters)
-                if ((data = filter.apply(data)) == null)
+                if ((buf = filter.apply(buf)) == null)
                     break;
         }
 
-        this.data = data;
-        this.type = judgeSkinType(data);
+        this.data = buf;
+        this.type = judgeSkinType(buf);
     }
 
-    public void put(ByteBuffer data, String type)
+    public void put(byte[] data, String type)
     {
+        ByteBuffer buf = null;
         if (data != null)
         {
+            buf = toBuffer(data);
             for (Function<ByteBuffer, ByteBuffer> filter : filters)
-                if ((data = filter.apply(data)) == null)
+                if ((buf = filter.apply(buf)) == null)
                     break;
         }
 
-        this.data = data;
+        this.data = buf;
         this.type = type;
     }
 

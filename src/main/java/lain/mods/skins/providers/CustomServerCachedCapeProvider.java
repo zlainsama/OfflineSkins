@@ -43,7 +43,7 @@ public class CustomServerCachedCapeProvider implements ISkinProvider
         if (_filter != null)
             skin.setSkinFilter(_filter);
         Shared.execute(() -> {
-            ByteBuffer data = null;
+            byte[] data = null;
             UUID uuid = profile.getPlayerID();
             String name = profile.getPlayerName();
             if (!Shared.isOfflinePlayerProfile(profile))

@@ -82,7 +82,7 @@ public class FabricOfflineSkins implements ClientModInitializer
     {
         if (!textures.containsKey(data))
         {
-            CustomSkinTexture texture = new CustomSkinTexture(generateRandomLocation(), data.duplicate());
+            CustomSkinTexture texture = new CustomSkinTexture(generateRandomLocation(), data);
             MinecraftClient.getInstance().getTextureManager().registerTexture(texture.getLocation(), texture);
             textures.put(data, texture);
         }

@@ -29,7 +29,7 @@ public class UserManagedCapeProvider implements ISkinProvider
     @Override
     public ISkin getSkin(IPlayerProfile profile)
     {
-        ByteBuffer data = null;
+        byte[] data = null;
         if (!Shared.isOfflinePlayerProfile(profile))
             data = readFile(_dirU, "%s.png", profile.getPlayerID().toString().replaceAll("-", ""));
         if (data == null && !Shared.isBlank(profile.getPlayerName()))
@@ -43,11 +43,11 @@ public class UserManagedCapeProvider implements ISkinProvider
         return skin;
     }
 
-    private ByteBuffer readFile(File dir, String filename)
+    private byte[] readFile(File dir, String filename)
     {
         try
         {
-            return ByteBuffer.wrap(Files.readAllBytes(new File(dir, filename).toPath()));
+            return Files.readAllBytes(new File(dir, filename).toPath());
         }
         catch (IOException e)
         {
@@ -55,7 +55,7 @@ public class UserManagedCapeProvider implements ISkinProvider
         }
     }
 
-    private ByteBuffer readFile(File dir, String filename, Object... args)
+    private byte[] readFile(File dir, String filename, Object... args)
     {
         return readFile(dir, String.format(filename, args));
     }

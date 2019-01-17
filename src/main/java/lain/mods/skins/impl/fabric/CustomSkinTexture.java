@@ -41,7 +41,7 @@ public class CustomSkinTexture extends ResourceTexture
         NativeImage image = null;
         try
         {
-            image = NativeImage.fromByteBuffer(data.get());
+            image = NativeImage.fromByteBuffer(data.get().duplicate());
 
             synchronized (this)
             {

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.util.function.Function;
+import lain.mods.skins.impl.SkinData;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.SkinRemappingImageFilter;
 
@@ -24,19 +25,20 @@ public class LegacyConversion
                 try
                 {
                     tmp = File.createTempFile("mcos", null);
-                    tmpI = NativeImage.fromByteBuffer(data);
+                    tmpI = NativeImage.fromByteBuffer(data.duplicate());
                     tmpO = filter.filterImage(tmpI);
                     filter.method_3238();
-                    data = ByteBuffer.wrap(Files.readAllBytes(tmp.toPath()));
+                    tmpI.writeFile(tmp);
+                    data = SkinData.toBuffer(Files.readAllBytes(tmp.toPath()));
                 }
                 finally
                 {
-                    if (tmp != null)
-                        tmp.delete();
-                    if (tmpI != null)
-                        tmpI.close();
                     if (tmpO != null)
                         tmpO.close();
+                    if (tmpI != null)
+                        tmpI.close();
+                    if (tmp != null)
+                        tmp.delete();
                 }
             }
             catch (IOException e)
