@@ -29,6 +29,8 @@ import lain.mods.skins.providers.CrafatarCachedCapeProvider;
 import lain.mods.skins.providers.CrafatarCachedSkinProvider;
 import lain.mods.skins.providers.CustomServerCachedCapeProvider;
 import lain.mods.skins.providers.CustomServerCachedSkinProvider;
+import lain.mods.skins.providers.MojangCachedCapeProvider;
+import lain.mods.skins.providers.MojangCachedSkinProvider;
 import lain.mods.skins.providers.UserManagedCapeProvider;
 import lain.mods.skins.providers.UserManagedSkinProvider;
 import net.fabricmc.api.ClientModInitializer;
@@ -199,6 +201,8 @@ public class FabricOfflineSkins implements ClientModInitializer
         SkinProviderAPI.SKIN.registerProvider(new UserManagedSkinProvider(Paths.get(".", "cachedImages")).withFilter(LegacyConversion.createFilter()));
         if (config.useCustomServer)
             SkinProviderAPI.SKIN.registerProvider(new CustomServerCachedSkinProvider(Paths.get(".", "cachedImages", "custom"), config.hostCustomServer).withFilter(LegacyConversion.createFilter()));
+        if (config.useMojang)
+            SkinProviderAPI.SKIN.registerProvider(new MojangCachedSkinProvider(Paths.get(".", "cachedImages", "mojang")).withFilter(LegacyConversion.createFilter()));
         if (config.useCrafatar)
             SkinProviderAPI.SKIN.registerProvider(new CrafatarCachedSkinProvider(Paths.get(".", "cachedImages", "crafatar")).withFilter(LegacyConversion.createFilter()));
 
@@ -206,6 +210,8 @@ public class FabricOfflineSkins implements ClientModInitializer
         SkinProviderAPI.CAPE.registerProvider(new UserManagedCapeProvider(Paths.get(".", "cachedImages")));
         if (config.useCustomServer)
             SkinProviderAPI.CAPE.registerProvider(new CustomServerCachedCapeProvider(Paths.get(".", "cachedImages", "custom"), config.hostCustomServer));
+        if (config.useMojang)
+            SkinProviderAPI.CAPE.registerProvider(new MojangCachedCapeProvider(Paths.get(".", "cachedImages", "mojang")));
         if (config.useCrafatar)
             SkinProviderAPI.CAPE.registerProvider(new CrafatarCachedCapeProvider(Paths.get(".", "cachedImages", "crafatar")));
     }

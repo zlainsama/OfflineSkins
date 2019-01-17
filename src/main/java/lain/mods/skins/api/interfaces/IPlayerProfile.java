@@ -6,6 +6,11 @@ public interface IPlayerProfile
 {
 
     /**
+     * @return the actual profile object.
+     */
+    Object getOriginal();
+
+    /**
      * @return the uuid of the profile.
      */
     UUID getPlayerID();

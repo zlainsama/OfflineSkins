@@ -13,7 +13,7 @@ public interface ISkin
     ByteBuffer getData();
 
     /**
-     * @return "default" for classical 4-pixel arms, "slim" for 3-pixel slim arms, "cape" for capes. (note that "cape" is not an official thing)
+     * @return "default" for classical 4-pixel arms, "slim" for 3-pixel slim arms, "legacy" for old skin format, "cape" for capes. (note that "legacy" and "cape" are not official things)
      */
     String getSkinType();
 

@@ -3,6 +3,7 @@ package lain.mods.skins.impl;
 public class ConfigOptions
 {
 
+    public boolean useMojang;
     public boolean useCrafatar;
     public boolean useCustomServer;
     public String hostCustomServer;
@@ -12,6 +13,7 @@ public class ConfigOptions
      */
     public ConfigOptions defaultOptions()
     {
+        useMojang = true;
         useCrafatar = true;
         useCustomServer = false;
         hostCustomServer = "http://example.com";

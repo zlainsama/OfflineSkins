@@ -29,6 +29,15 @@ public class PlayerProfile implements IPlayerProfile
     }
 
     @Override
+    public Object getOriginal()
+    {
+        GameProfile p;
+        if ((p = _profile.get()) == null) // gc
+            return Shared.DUMMY;
+        return p;
+    }
+
+    @Override
     public UUID getPlayerID()
     {
         GameProfile p;
