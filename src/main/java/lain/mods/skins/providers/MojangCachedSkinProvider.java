@@ -3,9 +3,9 @@ package lain.mods.skins.providers;
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
@@ -22,7 +22,7 @@ public class MojangCachedSkinProvider implements ISkinProvider
     private File _dirN;
     private File _dirU;
     private Function<ByteBuffer, ByteBuffer> _filter;
-    private Map<String, String> _store = new HashMap<>();
+    private Map<String, String> _store = new ConcurrentHashMap<>();
 
     public MojangCachedSkinProvider(Path workDir)
     {

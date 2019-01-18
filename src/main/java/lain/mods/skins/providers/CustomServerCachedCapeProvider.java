@@ -3,9 +3,9 @@ package lain.mods.skins.providers;
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import lain.mods.skins.api.interfaces.IPlayerProfile;
 import lain.mods.skins.api.interfaces.ISkin;
@@ -21,7 +21,7 @@ public class CustomServerCachedCapeProvider implements ISkinProvider
     private File _dirU;
     private Function<ByteBuffer, ByteBuffer> _filter;
     private String _host;
-    private Map<String, String> _store = new HashMap<>();
+    private Map<String, String> _store = new ConcurrentHashMap<>();
 
     public CustomServerCachedCapeProvider(Path workDir, String host)
     {

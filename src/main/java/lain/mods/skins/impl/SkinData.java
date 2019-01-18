@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import javax.imageio.ImageIO;
@@ -89,8 +89,8 @@ public class SkinData implements ISkin
 
     private ByteBuffer data;
     private String type;
-    private final Collection<Consumer<ISkin>> listeners = new ArrayList<>();
-    private final Collection<Function<ByteBuffer, ByteBuffer>> filters = new ArrayList<>();
+    private final Collection<Consumer<ISkin>> listeners = new CopyOnWriteArrayList<>();
+    private final Collection<Function<ByteBuffer, ByteBuffer>> filters = new CopyOnWriteArrayList<>();
 
     @Override
     public ByteBuffer getData()
