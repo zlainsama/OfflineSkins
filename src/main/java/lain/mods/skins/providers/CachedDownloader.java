@@ -16,12 +16,12 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import lain.mods.skins.impl.Shared;
 
-public class CachedReader
+public class CachedDownloader
 {
 
-    public static CachedReader create()
+    public static CachedDownloader create()
     {
-        return new CachedReader();
+        return new CachedDownloader();
     }
 
     private int _cacheMinTTL = 600;
@@ -32,7 +32,7 @@ public class CachedReader
     private Proxy _proxy;
     private URL _remote;
 
-    private CachedReader()
+    private CachedDownloader()
     {
     }
 
@@ -167,55 +167,55 @@ public class CachedReader
         return null;
     }
 
-    public CachedReader setCacheMinTTL(int cacheMinTTL)
+    public CachedDownloader setCacheMinTTL(int cacheMinTTL)
     {
         _cacheMinTTL = cacheMinTTL;
         return this;
     }
 
-    public CachedReader setDataStore(Map<String, String> dataStore)
+    public CachedDownloader setDataStore(Map<String, String> dataStore)
     {
         _dataStore = dataStore;
         return this;
     }
 
-    public CachedReader setErrorCodeHandler(Predicate<Integer> handler)
+    public CachedDownloader setErrorCodeHandler(Predicate<Integer> handler)
     {
         _handler = handler;
         return this;
     }
 
-    public CachedReader setLocal(File local)
+    public CachedDownloader setLocal(File local)
     {
         _local = local;
         return this;
     }
 
-    public CachedReader setLocal(File dir, String filename)
+    public CachedDownloader setLocal(File dir, String filename)
     {
         _local = new File(dir, filename);
         return this;
     }
 
-    public CachedReader setLocal(File dir, String format, Object... args)
+    public CachedDownloader setLocal(File dir, String format, Object... args)
     {
         _local = new File(dir, String.format(format, args));
         return this;
     }
 
-    public CachedReader setMaxTries(int maxTries)
+    public CachedDownloader setMaxTries(int maxTries)
     {
         _maxTries = maxTries;
         return this;
     }
 
-    public CachedReader setProxy(Proxy proxy)
+    public CachedDownloader setProxy(Proxy proxy)
     {
         _proxy = proxy;
         return this;
     }
 
-    public CachedReader setRemote(String remote)
+    public CachedDownloader setRemote(String remote)
     {
         try
         {
@@ -228,7 +228,7 @@ public class CachedReader
         return this;
     }
 
-    public CachedReader setRemote(String format, Object... args)
+    public CachedDownloader setRemote(String format, Object... args)
     {
         try
         {
@@ -241,7 +241,7 @@ public class CachedReader
         return this;
     }
 
-    public CachedReader setRemote(URL remote)
+    public CachedDownloader setRemote(URL remote)
     {
         _remote = remote;
         return this;

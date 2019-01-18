@@ -54,7 +54,7 @@ public class MojangCachedSkinProvider implements ISkinProvider
                 if (textures != null && textures.containsKey(MinecraftProfileTexture.Type.SKIN))
                 {
                     MinecraftProfileTexture tex = textures.get(MinecraftProfileTexture.Type.SKIN);
-                    data = CachedReader.create().setLocal(_dirU, uuid.toString()).setRemote(tex.getUrl()).setDataStore(_store).setProxy(MinecraftUtils.getProxy()).read();
+                    data = CachedDownloader.create().setLocal(_dirU, uuid.toString()).setRemote(tex.getUrl()).setDataStore(_store).setProxy(MinecraftUtils.getProxy()).read();
                     if (data != null)
                         skin.put(data, "slim".equals(tex.getMetadata("model")) ? "slim" : "default");
                 }
