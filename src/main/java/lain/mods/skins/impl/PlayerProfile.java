@@ -1,7 +1,10 @@
 package lain.mods.skins.impl;
 
 import java.lang.ref.WeakReference;
+import java.util.Collection;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -51,6 +54,7 @@ public class PlayerProfile implements IPlayerProfile
     }
 
     private WeakReference<GameProfile> _profile;
+    private final Collection<Consumer<IPlayerProfile>> _listeners = new CopyOnWriteArrayList<>();
 
     private PlayerProfile(GameProfile profile)
     {
@@ -109,6 +113,16 @@ public class PlayerProfile implements IPlayerProfile
         if (profile == null)
             throw new IllegalArgumentException("profile must not be null");
         _profile = new WeakReference<GameProfile>(profile);
+        for (Consumer<IPlayerProfile> l : _listeners)
+            l.accept(this);
+    }
+
+    @Override
+    public boolean setUpdateListener(Consumer<IPlayerProfile> listener)
+    {
+        if (listener == null || _listeners.contains(listener))
+            return false;
+        return _listeners.add(listener);
     }
 
 }
