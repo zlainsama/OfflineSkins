@@ -1,4 +1,4 @@
-package lain.mods.skins.asm;
+package lain.mods.skins.impl.forge.asm;
 
 import java.util.List;
 import java.util.Map;

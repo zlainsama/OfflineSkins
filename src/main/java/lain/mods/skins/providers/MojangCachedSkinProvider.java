@@ -1,105 +1,72 @@
 package lain.mods.skins.providers;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
+import java.nio.ByteBuffer;
+import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
-import lain.mods.skins.LegacyConversion;
-import lain.mods.skins.SkinData;
-import lain.mods.skins.api.ISkin;
-import lain.mods.skins.api.ISkinProvider;
-import net.minecraft.client.Minecraft;
+import lain.mods.skins.api.interfaces.IPlayerProfile;
+import lain.mods.skins.api.interfaces.ISkin;
+import lain.mods.skins.api.interfaces.ISkinProvider;
+import lain.mods.skins.impl.Shared;
+import lain.mods.skins.impl.SkinData;
+import lain.mods.skins.impl.forge.MinecraftUtils;
 
 public class MojangCachedSkinProvider implements ISkinProvider
 {
 
-    private File _workDir;
+    private File _dirN;
+    private File _dirU;
+    private Function<ByteBuffer, ByteBuffer> _filter;
+    private Map<String, String> _store = new HashMap<>();
 
-    public MojangCachedSkinProvider()
+    public MojangCachedSkinProvider(Path workDir)
     {
-        File file1 = new File(Minecraft.getMinecraft().mcDataDir, "cachedImages");
-        if (!file1.exists())
-            file1.mkdirs();
-        File file2 = new File(file1, "mojang");
-        if (!file2.exists())
-            file2.mkdirs();
-        prepareWorkDir(_workDir = new File(file2, "skins"));
+        _dirN = new File(workDir.toFile(), "skins");
+        _dirN.mkdirs();
+        _dirU = new File(_dirN, "uuid");
+        _dirU.mkdirs();
+
+        for (File file : _dirN.listFiles())
+            if (file.isFile())
+                file.delete();
+        for (File file : _dirU.listFiles())
+            if (file.isFile())
+                file.delete();
     }
 
     @Override
-    public ISkin getSkin(GameProfile profile)
+    public ISkin getSkin(IPlayerProfile profile)
     {
-        final SkinData data = new SkinData();
-        data.profile = profile;
-        Shared.pool.execute(new Runnable()
-        {
-
-            @Override
-            public void run()
+        SkinData skin = new SkinData();
+        if (_filter != null)
+            skin.setSkinFilter(_filter);
+        Shared.pool.execute(() -> {
+            byte[] data = null;
+            UUID uuid = profile.getPlayerID();
+            if (!Shared.isOfflinePlayerProfile(profile))
             {
-                if (Shared.isOfflineProfile(data.profile))
-                    data.profile = MojangService.getProfile(data.profile.getName(), data.profile);
-
-                BufferedImage image = null;
-                UUID uuid = data.profile.getId();
-                boolean slim = false;
-
-                if (!Shared.isOfflineProfile(data.profile))
+                Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> textures = MinecraftUtils.getSessionService().getTextures((GameProfile) profile.getOriginal(), false);
+                if (textures != null && textures.containsKey(MinecraftProfileTexture.Type.SKIN))
                 {
-                    Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> textures = Minecraft.getMinecraft().getSkinManager().loadSkinFromCache(data.profile);
-                    if (textures.containsKey(MinecraftProfileTexture.Type.SKIN))
-                    {
-                        image = CachedImage.doRead(_workDir, uuid.toString(), textures.get(MinecraftProfileTexture.Type.SKIN).getUrl(), Minecraft.getMinecraft().getProxy(), 5);
-                        if (image != null)
-                        {
-                            try
-                            {
-                                slim = "slim".equals(textures.get(MinecraftProfileTexture.Type.SKIN).getMetadata("model"));
-                            }
-                            catch (Exception e)
-                            {
-                            }
-                        }
-                    }
-                }
-
-                if (image != null)
-                {
-                    String type = SkinData.judgeSkinType(image);
-                    if ("legacy".equals(type))
-                        type = "default";
-                    image = new LegacyConversion().convert(image);
-                    if (slim)
-                        type = "slim";
-                    data.put(image, type);
+                    MinecraftProfileTexture tex = textures.get(MinecraftProfileTexture.Type.SKIN);
+                    data = CachedReader.create().setLocal(_dirU, uuid.toString()).setRemote(tex.getUrl()).setDataStore(_store).setProxy(MinecraftUtils.getProxy()).read();
+                    if (data != null)
+                        skin.put(data, "slim".equals(tex.getMetadata("model")) ? "slim" : "default");
                 }
             }
-
         });
-        return data;
+        return skin;
     }
 
-    private void prepareWorkDir(File workDir)
+    public MojangCachedSkinProvider withFilter(Function<ByteBuffer, ByteBuffer> filter)
     {
-        if (!workDir.exists())
-        {
-            workDir.mkdirs();
-        }
-        else
-        {
-            // Legacy
-            for (File f : workDir.listFiles(f -> f.getName().endsWith(".validtime")))
-            {
-                String n = f.getName().substring(0, f.getName().length() - 10);
-                new File(f.getParentFile(), n).delete();
-                new File(f.getParentFile(), n + ".etag").delete();
-                new File(f.getParentFile(), n + ".validtime").delete();
-            }
-
-            CachedImage.doCleanup(workDir);
-        }
+        _filter = filter;
+        return this;
     }
 
 }

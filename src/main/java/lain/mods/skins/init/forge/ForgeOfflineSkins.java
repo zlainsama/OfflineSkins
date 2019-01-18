@@ -1,18 +1,24 @@
-package lain.mods.skins;
+package lain.mods.skins.init.forge;
 
-import java.awt.image.BufferedImage;
 import java.lang.reflect.Field;
+import java.nio.ByteBuffer;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.WeakHashMap;
 import java.util.function.Predicate;
+import com.google.common.collect.ImmutableSet;
 import com.mojang.authlib.GameProfile;
-import lain.mods.skins.api.ISkin;
-import lain.mods.skins.api.ISkinProviderService;
 import lain.mods.skins.api.SkinProviderAPI;
-import lain.mods.skins.providers.CachedImage;
+import lain.mods.skins.api.interfaces.ISkin;
+import lain.mods.skins.impl.LegacyConversion;
+import lain.mods.skins.impl.PlayerProfile;
+import lain.mods.skins.impl.forge.CustomSkinTexture;
 import lain.mods.skins.providers.CrafatarCachedCapeProvider;
 import lain.mods.skins.providers.CrafatarCachedSkinProvider;
 import lain.mods.skins.providers.CustomServerCachedCapeProvider;
@@ -26,12 +32,14 @@ import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelPlayer;
 import net.minecraft.client.model.ModelRenderer;
+import net.minecraft.client.renderer.texture.ITextureObject;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -40,117 +48,115 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @Mod(modid = "offlineskins", useMetadata = true, acceptedMinecraftVersions = "[1.12, 1.13)", certificateFingerprint = "aaaf83332a11df02406e9f266b1b65c1306f0f76")
-public class OfflineSkins
+public class ForgeOfflineSkins
 {
 
     @SideOnly(Side.CLIENT)
     private static boolean SkinPass;
     @SideOnly(Side.CLIENT)
     private static boolean CapePass;
-
-    @SideOnly(Side.CLIENT)
-    public static ISkinProviderService skinService;
-    @SideOnly(Side.CLIENT)
-    public static ISkinProviderService capeService;
-
     @SideOnly(Side.CLIENT)
     public static boolean OverrideVanilla;
+    @SideOnly(Side.CLIENT)
+    private static Set<String> DefaultSkins;
+    @SideOnly(Side.CLIENT)
+    private static Map<ByteBuffer, CustomSkinTexture> textures;
 
     @SideOnly(Side.CLIENT)
     public static ResourceLocation bindTexture(GameProfile profile, ResourceLocation result)
     {
-        if ((OverrideVanilla || SkinData.isDefaultSkin(result)) && profile != null)
+        if ((OverrideVanilla || isDefaultSkin(result)) && profile != null)
         {
-            ISkin skin = skinService.getSkin(profile);
-            if (skin != null && skin.isSkinReady())
-                return skin.getSkinLocation();
+            ISkin skin = SkinProviderAPI.SKIN.getSkin(PlayerProfile.wrapGameProfile(profile));
+            if (skin != null && skin.isDataReady())
+                return getOrCreateTexture(skin.getData()).getLocation();
         }
-        return result;
+        return null;
+    }
+
+    @SideOnly(Side.CLIENT)
+    private static ResourceLocation generateRandomLocation()
+    {
+        return new ResourceLocation("offlineskins", String.format("textures/generated/%s", UUID.randomUUID().toString()));
     }
 
     @SideOnly(Side.CLIENT)
     public static ResourceLocation getLocationCape(AbstractClientPlayer player, ResourceLocation result)
     {
         if (CapePass)
-            return result;
+            return null;
 
-        if ((OverrideVanilla || usingDefaultCape(player)) && capeService != null)
+        if (OverrideVanilla || result == null)
         {
-            ISkin cape = capeService.getSkin(player.getGameProfile());
-            if (cape != null && cape.isSkinReady())
-                return cape.getSkinLocation();
+            ISkin skin = SkinProviderAPI.CAPE.getSkin(PlayerProfile.wrapGameProfile(player.getGameProfile()));
+            if (skin != null && skin.isDataReady())
+                return getOrCreateTexture(skin.getData()).getLocation();
         }
-        return result;
+        return null;
     }
 
     @SideOnly(Side.CLIENT)
     public static ResourceLocation getLocationSkin(AbstractClientPlayer player, ResourceLocation result)
     {
         if (SkinPass)
-            return result;
+            return null;
 
-        if ((OverrideVanilla || usingDefaultSkin(player)) && skinService != null)
+        if (OverrideVanilla || isDefaultSkin(result))
         {
-            ISkin skin = skinService.getSkin(player.getGameProfile());
-            if (skin != null && skin.isSkinReady())
-                return skin.getSkinLocation();
+            ISkin skin = SkinProviderAPI.SKIN.getSkin(PlayerProfile.wrapGameProfile(player.getGameProfile()));
+            if (skin != null && skin.isDataReady())
+                return getOrCreateTexture(skin.getData()).getLocation();
         }
-        return result;
+        return null;
+    }
+
+    @SideOnly(Side.CLIENT)
+    private static CustomSkinTexture getOrCreateTexture(ByteBuffer data)
+    {
+        if (!textures.containsKey(data))
+        {
+            CustomSkinTexture texture = new CustomSkinTexture(generateRandomLocation(), data);
+            FMLClientHandler.instance().getClient().getTextureManager().loadTexture(texture.getLocation(), texture);
+            textures.put(data, texture);
+        }
+        return textures.get(data);
     }
 
     @SideOnly(Side.CLIENT)
     public static int getSkinHeight(ResourceLocation location)
     {
-        SkinData skin = SkinData.getData(location);
-        if (skin != null)
-            return skin.getImage().getHeight();
-        return 64;
+        ITextureObject texture = FMLClientHandler.instance().getClient().getTextureManager().getTexture(location);
+        if (texture instanceof CustomSkinTexture)
+            return ((CustomSkinTexture) texture).getHeight();
+        return -1;
     }
 
     @SideOnly(Side.CLIENT)
     public static String getSkinType(AbstractClientPlayer player, String result)
     {
-        SkinData skin = SkinData.getData(player.getLocationSkin());
-        if (skin != null)
-            return skin.getSkinType();
-        return result;
+        ResourceLocation location = getLocationSkin(player, null);
+        if (location != null)
+        {
+            ISkin skin = SkinProviderAPI.SKIN.getSkin(PlayerProfile.wrapGameProfile(player.getGameProfile()));
+            if (skin != null && skin.isDataReady())
+                return skin.getSkinType();
+        }
+        return null;
     }
 
     @SideOnly(Side.CLIENT)
     public static int getSkinWidth(ResourceLocation location)
     {
-        SkinData skin = SkinData.getData(location);
-        if (skin != null)
-            return skin.getImage().getWidth();
-        return 64;
+        ITextureObject texture = FMLClientHandler.instance().getClient().getTextureManager().getTexture(location);
+        if (texture instanceof CustomSkinTexture)
+            return ((CustomSkinTexture) texture).getWidth();
+        return -1;
     }
 
     @SideOnly(Side.CLIENT)
-    public static boolean usingDefaultCape(AbstractClientPlayer player)
+    private static boolean isDefaultSkin(ResourceLocation location)
     {
-        try
-        {
-            CapePass = true;
-            return player.getLocationCape() == null;
-        }
-        finally
-        {
-            CapePass = false;
-        }
-    }
-
-    @SideOnly(Side.CLIENT)
-    public static boolean usingDefaultSkin(AbstractClientPlayer player)
-    {
-        try
-        {
-            SkinPass = true;
-            return SkinData.isDefaultSkin(player.getLocationSkin());
-        }
-        finally
-        {
-            SkinPass = false;
-        }
+        return "minecraft".equals(location.getResourceDomain()) && DefaultSkins.contains(location.getResourcePath());
     }
 
     @SideOnly(Side.CLIENT)
@@ -160,24 +166,15 @@ public class OfflineSkins
     @SubscribeEvent
     public void handleClientTicks(TickEvent.ClientTickEvent event)
     {
-        if (skinService == null && capeService == null)
-            return;
-
         if (event.phase == TickEvent.Phase.START)
         {
             World world = Minecraft.getMinecraft().world;
-            if (world != null && world.playerEntities != null && !world.playerEntities.isEmpty())
+            if (world != null)
             {
-                for (Object obj : world.playerEntities)
+                for (EntityPlayer player : world.playerEntities)
                 {
-                    // This should keep skins/capes loaded.
-                    if (obj instanceof AbstractClientPlayer)
-                    {
-                        if (skinService != null)
-                            skinService.getSkin(((AbstractClientPlayer) obj).getGameProfile());
-                        if (capeService != null)
-                            capeService.getSkin(((AbstractClientPlayer) obj).getGameProfile());
-                    }
+                    SkinProviderAPI.SKIN.getSkin(PlayerProfile.wrapGameProfile(player.getGameProfile()));
+                    SkinProviderAPI.CAPE.getSkin(PlayerProfile.wrapGameProfile(player.getGameProfile()));
                 }
             }
         }
@@ -201,17 +198,19 @@ public class OfflineSkins
         {
             AbstractClientPlayer player = (AbstractClientPlayer) p;
             ModelPlayer model = event.getRenderer().getMainModel();
-            SkinData skin = SkinData.getData(player.getLocationSkin());
-            if (skin != null)
+            ResourceLocation locSkin = getLocationSkin(player, null);
+            ResourceLocation locCape = getLocationCape(player, null);
+            if (locSkin != null)
             {
-                BufferedImage image = ((SkinData) skin).getImage();
-                setSubModelTextureSize_Main(model, image.getWidth(), image.getHeight());
+                ITextureObject texture = FMLClientHandler.instance().getClient().getTextureManager().getTexture(locSkin);
+                if (texture instanceof CustomSkinTexture)
+                    setSubModelTextureSize_Main(model, ((CustomSkinTexture) texture).getWidth(), ((CustomSkinTexture) texture).getHeight());
             }
-            SkinData cape = SkinData.getData(player.getLocationCape());
-            if (cape != null)
+            if (locCape != null)
             {
-                BufferedImage image = ((SkinData) cape).getImage();
-                setSubModelTextureSize_Cape(model, image.getWidth(), image.getHeight());
+                ITextureObject texture = FMLClientHandler.instance().getClient().getTextureManager().getTexture(locCape);
+                if (texture instanceof CustomSkinTexture)
+                    setSubModelTextureSize_Cape(model, ((CustomSkinTexture) texture).getWidth(), ((CustomSkinTexture) texture).getHeight());
             }
         }
     }
@@ -221,40 +220,39 @@ public class OfflineSkins
     {
         if (event.getSide().isClient())
         {
+            DefaultSkins = ImmutableSet.of("textures/entity/steve.png", "textures/entity/alex.png");
+            textures = new WeakHashMap<>();
+
             Configuration config = new Configuration(event.getSuggestedConfigurationFile());
             boolean useMojang = config.getBoolean("useMojang", Configuration.CATEGORY_CLIENT, true, "");
             boolean useCrafatar = config.getBoolean("useCrafatar", Configuration.CATEGORY_CLIENT, true, "");
             boolean useCustomServer = config.getBoolean("useCustomServer", Configuration.CATEGORY_CLIENT, false, "");
             String hostCustomServer = config.getString("hostCustomServer", Configuration.CATEGORY_CLIENT, "http://example.com", "only http/https are supported, /skins/(uuid|username) and /capes/(uuid|username) will be queried for respective resources");
-            CachedImage.CacheMinTTL = config.getInt("cacheMinTTL", Configuration.CATEGORY_CLIENT, 1800, 0, 86400, "in seconds");
             if (config.hasChanged())
                 config.save();
 
-            skinService = SkinProviderAPI.createService();
-            capeService = SkinProviderAPI.createService();
-
-            skinService.register(new UserManagedSkinProvider());
+            SkinProviderAPI.SKIN.clearProviders();
+            SkinProviderAPI.SKIN.registerProvider(new UserManagedSkinProvider(Paths.get(".", "cachedImages")).withFilter(LegacyConversion.createFilter()));
             if (useCustomServer)
-                skinService.register(new CustomServerCachedSkinProvider(hostCustomServer));
+                SkinProviderAPI.SKIN.registerProvider(new CustomServerCachedSkinProvider(Paths.get(".", "cachedImages", "custom"), hostCustomServer).withFilter(LegacyConversion.createFilter()));
             if (useMojang)
-                skinService.register(new MojangCachedSkinProvider());
+                SkinProviderAPI.SKIN.registerProvider(new MojangCachedSkinProvider(Paths.get(".", "cachedImages", "mojang")).withFilter(LegacyConversion.createFilter()));
             if (useCrafatar)
-                skinService.register(new CrafatarCachedSkinProvider());
+                SkinProviderAPI.SKIN.registerProvider(new CrafatarCachedSkinProvider(Paths.get(".", "cachedImages", "crafatar")).withFilter(LegacyConversion.createFilter()));
 
-            capeService.register(new UserManagedCapeProvider());
+            SkinProviderAPI.CAPE.clearProviders();
+            SkinProviderAPI.CAPE.registerProvider(new UserManagedCapeProvider(Paths.get(".", "cachedImages")));
             if (useCustomServer)
-                capeService.register(new CustomServerCachedCapeProvider(hostCustomServer));
+                SkinProviderAPI.CAPE.registerProvider(new CustomServerCachedCapeProvider(Paths.get(".", "cachedImages", "custom"), hostCustomServer));
             if (useMojang)
-                capeService.register(new MojangCachedCapeProvider());
+                SkinProviderAPI.CAPE.registerProvider(new MojangCachedCapeProvider(Paths.get(".", "cachedImages", "mojang")));
             if (useCrafatar)
-                capeService.register(new CrafatarCachedCapeProvider());
+                SkinProviderAPI.CAPE.registerProvider(new CrafatarCachedCapeProvider(Paths.get(".", "cachedImages", "crafatar")));
 
             OverrideVanilla = true;
             allSubModelFields = new HashMap<Class<?>, Optional<Field[]>>();
             MinecraftForge.EVENT_BUS.register(this);
         }
-        else
-            System.err.println("This mod is client-only, please remove it from your server");
     }
 
     @SideOnly(Side.CLIENT)

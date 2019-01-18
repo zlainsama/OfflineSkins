@@ -1,87 +1,68 @@
 package lain.mods.skins.providers;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
+import java.nio.ByteBuffer;
+import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
-import org.apache.commons.lang3.StringUtils;
-import com.mojang.authlib.GameProfile;
-import lain.mods.skins.LegacyConversion;
-import lain.mods.skins.SkinData;
-import lain.mods.skins.api.ISkin;
-import lain.mods.skins.api.ISkinProvider;
-import net.minecraft.client.Minecraft;
+import java.util.function.Function;
+import lain.mods.skins.api.interfaces.IPlayerProfile;
+import lain.mods.skins.api.interfaces.ISkin;
+import lain.mods.skins.api.interfaces.ISkinProvider;
+import lain.mods.skins.impl.Shared;
+import lain.mods.skins.impl.SkinData;
+import lain.mods.skins.impl.forge.MinecraftUtils;
 
 public class CustomServerCachedSkinProvider implements ISkinProvider
 {
 
-    private File _workDir;
+    private File _dirN;
+    private File _dirU;
+    private Function<ByteBuffer, ByteBuffer> _filter;
     private String _host;
+    private Map<String, String> _store = new HashMap<>();
 
-    public CustomServerCachedSkinProvider(String host)
+    public CustomServerCachedSkinProvider(Path workDir, String host)
     {
-        File file1 = new File(Minecraft.getMinecraft().mcDataDir, "cachedImages");
-        if (!file1.exists())
-            file1.mkdirs();
-        File file2 = new File(file1, "custom");
-        if (!file2.exists())
-            file2.mkdirs();
-        prepareWorkDir(_workDir = new File(file2, "skins"));
+        _dirN = new File(workDir.toFile(), "skins");
+        _dirN.mkdirs();
+        _dirU = new File(_dirN, "uuid");
+        _dirU.mkdirs();
         _host = host;
+
+        for (File file : _dirN.listFiles())
+            if (file.isFile())
+                file.delete();
+        for (File file : _dirU.listFiles())
+            if (file.isFile())
+                file.delete();
     }
 
     @Override
-    public ISkin getSkin(GameProfile profile)
+    public ISkin getSkin(IPlayerProfile profile)
     {
-        final SkinData data = new SkinData();
-        data.profile = profile;
-        Shared.pool.execute(new Runnable()
-        {
-
-            @Override
-            public void run()
-            {
-                BufferedImage image = null;
-                UUID uuid = data.profile.getId();
-                String name = data.profile.getName();
-
-                if (!Shared.isOfflineProfile(data.profile))
-                    image = CachedImage.doRead(_workDir, uuid.toString(), String.format("%s/skins/%s", _host, uuid), Minecraft.getMinecraft().getProxy(), 5);
-                if (image == null && !StringUtils.isBlank(name))
-                    image = CachedImage.doRead(_workDir, name, String.format("%s/skins/%s", _host, name), Minecraft.getMinecraft().getProxy(), 5);
-
-                if (image != null)
-                {
-                    String type = SkinData.judgeSkinType(image);
-                    if ("legacy".equals(type))
-                        type = "default";
-                    image = new LegacyConversion().convert(image);
-                    data.put(image, type);
-                }
-            }
-
+        SkinData skin = new SkinData();
+        if (_filter != null)
+            skin.setSkinFilter(_filter);
+        Shared.pool.execute(() -> {
+            byte[] data = null;
+            UUID uuid = profile.getPlayerID();
+            String name = profile.getPlayerName();
+            if (!Shared.isOfflinePlayerProfile(profile))
+                data = CachedReader.create().setLocal(_dirU, uuid.toString()).setRemote("%s/skins/%s", _host, uuid).setDataStore(_store).setProxy(MinecraftUtils.getProxy()).read();
+            if (data == null && !Shared.isBlank(name))
+                data = CachedReader.create().setLocal(_dirN, name).setRemote("%s/skins/%s", _host, name).setDataStore(_store).setProxy(MinecraftUtils.getProxy()).read();
+            if (data != null)
+                skin.put(data, SkinData.judgeSkinType(data));
         });
-        return data;
+        return skin;
     }
 
-    private void prepareWorkDir(File workDir)
+    public CustomServerCachedSkinProvider withFilter(Function<ByteBuffer, ByteBuffer> filter)
     {
-        if (!workDir.exists())
-        {
-            workDir.mkdirs();
-        }
-        else
-        {
-            // Legacy
-            for (File f : workDir.listFiles(f -> f.getName().endsWith(".validtime")))
-            {
-                String n = f.getName().substring(0, f.getName().length() - 10);
-                new File(f.getParentFile(), n).delete();
-                new File(f.getParentFile(), n + ".etag").delete();
-                new File(f.getParentFile(), n + ".validtime").delete();
-            }
-
-            CachedImage.doCleanup(workDir);
-        }
+        _filter = filter;
+        return this;
     }
 
 }

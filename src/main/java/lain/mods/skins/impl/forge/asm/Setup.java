@@ -1,4 +1,4 @@
-package lain.mods.skins.asm;
+package lain.mods.skins.impl.forge.asm;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -9,7 +9,7 @@ buildscript {
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "1.12.2-v4"
+version = "1.12.2-v5"
 group= "lain.mods.skins"
 archivesBaseName = "OfflineSkins"
 
@@ -34,7 +34,7 @@ task coreJar(type: Jar) {
         include '**/asm/**'
     }
     manifest {
-        attributes 'FMLCorePlugin': 'lain.mods.skins.asm.Plugin'
+        attributes 'FMLCorePlugin': 'lain.mods.skins.impl.forge.asm.Plugin'
     }
     classifier = 'core'
     includeEmptyDirs = false

@@ -1,20 +1,55 @@
-package lain.mods.skins;
+package lain.mods.skins.impl;
 
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
-import javax.annotation.Nullable;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.util.function.Function;
+import javax.imageio.ImageIO;
 
-//code from net.minecraft.client.renderer.ImageBufferDownload
 public class LegacyConversion
 {
+
+    public static Function<ByteBuffer, ByteBuffer> createFilter()
+    {
+        return data -> {
+            ByteBuffer original = data;
+            try
+            {
+                InputStream in = null;
+                OutputStream out = null;
+                try
+                {
+                    BufferedImage image = new LegacyConversion().convert(ImageIO.read(in = SkinData.wrapByteBufferAsInputStream(data)));
+                    if (image != null)
+                    {
+                        ImageIO.write(image, "png", out = new ByteArrayOutputStream());
+                        out.flush();
+                        data = SkinData.toBuffer(((ByteArrayOutputStream) out).toByteArray());
+                    }
+                }
+                finally
+                {
+                    Shared.closeQuietly(out);
+                    Shared.closeQuietly(in);
+                }
+            }
+            catch (Throwable t)
+            {
+                data = original;
+            }
+            return data;
+        };
+    }
 
     private int[] imageData;
     private int imageWidth;
     private int imageHeight;
 
-    @Nullable
     public BufferedImage convert(BufferedImage image)
     {
         if (image == null)
@@ -62,9 +97,6 @@ public class LegacyConversion
         return i;
     }
 
-    /**
-     * Makes the given area of the image opaque
-     */
     private void setAreaOpaque(int x, int y, int width, int height)
     {
         for (int i = x; i < width; ++i)
