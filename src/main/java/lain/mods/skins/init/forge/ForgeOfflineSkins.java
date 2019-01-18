@@ -69,7 +69,7 @@ public class ForgeOfflineSkins
         {
             ISkin skin = SkinProviderAPI.SKIN.getSkin(PlayerProfile.wrapGameProfile(profile));
             if (skin != null && skin.isDataReady())
-                return getOrCreateTexture(skin.getData()).getLocation();
+                return getOrCreateTexture(skin.getData(), skin).getLocation();
         }
         return null;
     }
@@ -90,7 +90,7 @@ public class ForgeOfflineSkins
         {
             ISkin skin = SkinProviderAPI.CAPE.getSkin(PlayerProfile.wrapGameProfile(player.getGameProfile()));
             if (skin != null && skin.isDataReady())
-                return getOrCreateTexture(skin.getData()).getLocation();
+                return getOrCreateTexture(skin.getData(), skin).getLocation();
         }
         return null;
     }
@@ -105,19 +105,32 @@ public class ForgeOfflineSkins
         {
             ISkin skin = SkinProviderAPI.SKIN.getSkin(PlayerProfile.wrapGameProfile(player.getGameProfile()));
             if (skin != null && skin.isDataReady())
-                return getOrCreateTexture(skin.getData()).getLocation();
+                return getOrCreateTexture(skin.getData(), skin).getLocation();
         }
         return null;
     }
 
     @SideOnly(Side.CLIENT)
-    private static CustomSkinTexture getOrCreateTexture(ByteBuffer data)
+    private static CustomSkinTexture getOrCreateTexture(ByteBuffer data, ISkin skin)
     {
         if (!textures.containsKey(data))
         {
             CustomSkinTexture texture = new CustomSkinTexture(generateRandomLocation(), data);
             FMLClientHandler.instance().getClient().getTextureManager().loadTexture(texture.getLocation(), texture);
             textures.put(data, texture);
+
+            if (skin != null)
+            {
+                skin.setRemovalListener(s -> {
+                    if (data == s.getData())
+                    {
+                        FMLClientHandler.instance().getClient().addScheduledTask(() -> {
+                            FMLClientHandler.instance().getClient().getTextureManager().deleteTexture(texture.getLocation());
+                            textures.remove(data);
+                        });
+                    }
+                });
+            }
         }
         return textures.get(data);
     }

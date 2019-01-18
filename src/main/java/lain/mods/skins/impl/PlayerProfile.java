@@ -113,6 +113,7 @@ public class PlayerProfile implements IPlayerProfile
         if (profile == null)
             throw new IllegalArgumentException("profile must not be null");
         _profile = new WeakReference<GameProfile>(profile);
+
         for (Consumer<IPlayerProfile> l : _listeners)
             l.accept(this);
     }
