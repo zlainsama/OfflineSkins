@@ -16,7 +16,7 @@ public class Shared
 {
 
     public static final GameProfile DUMMY = new GameProfile(UUID.fromString("ae9460f5-bf72-468e-89b6-4eead59001ad"), "");
-    public static final ListeningExecutorService pool = MoreExecutors.listeningDecorator(Executors.newCachedThreadPool());
+    public static final ListeningExecutorService pool = MoreExecutors.listeningDecorator(Executors.newWorkStealingPool());
 
     private static final Cache<UUID, Boolean> offlines = CacheBuilder.newBuilder().weakKeys().build();
 
