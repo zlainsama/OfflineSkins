@@ -62,7 +62,7 @@ public class FabricOfflineSkins implements ClientModInitializer
         {
             ISkin skin = SkinProviderAPI.CAPE.getSkin(PlayerProfile.wrapGameProfile(profile));
             if (skin != null && skin.isDataReady())
-                return getOrCreateTexture(skin.getData()).getLocation();
+                return getOrCreateTexture(skin.getData(), skin).getLocation();
         }
         return null;
     }
@@ -76,18 +76,31 @@ public class FabricOfflineSkins implements ClientModInitializer
         {
             ISkin skin = SkinProviderAPI.SKIN.getSkin(PlayerProfile.wrapGameProfile(profile));
             if (skin != null && skin.isDataReady())
-                return getOrCreateTexture(skin.getData()).getLocation();
+                return getOrCreateTexture(skin.getData(), skin).getLocation();
         }
         return null;
     }
 
-    private static CustomSkinTexture getOrCreateTexture(ByteBuffer data)
+    private static CustomSkinTexture getOrCreateTexture(ByteBuffer data, ISkin skin)
     {
         if (!textures.containsKey(data))
         {
             CustomSkinTexture texture = new CustomSkinTexture(generateRandomLocation(), data);
             MinecraftClient.getInstance().getTextureManager().registerTexture(texture.getLocation(), texture);
             textures.put(data, texture);
+
+            if (skin != null)
+            {
+                skin.setRemovalListener(s -> {
+                    if (data == s.getData())
+                    {
+                        MinecraftClient.getInstance().execute(() -> {
+                            MinecraftClient.getInstance().getTextureManager().destroyTexture(texture.getLocation());
+                            textures.remove(data);
+                        });
+                    }
+                });
+            }
         }
         return textures.get(data);
     }

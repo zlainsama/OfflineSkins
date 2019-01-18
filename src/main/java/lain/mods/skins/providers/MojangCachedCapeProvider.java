@@ -3,9 +3,9 @@ package lain.mods.skins.providers;
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
@@ -22,7 +22,7 @@ public class MojangCachedCapeProvider implements ISkinProvider
     private File _dirN;
     private File _dirU;
     private Function<ByteBuffer, ByteBuffer> _filter;
-    private Map<String, String> _store = new HashMap<>();
+    private Map<String, String> _store = new ConcurrentHashMap<>();
 
     public MojangCachedCapeProvider(Path workDir)
     {
@@ -48,13 +48,13 @@ public class MojangCachedCapeProvider implements ISkinProvider
         Shared.pool.execute(() -> {
             byte[] data = null;
             UUID uuid = profile.getPlayerID();
-            if (!Shared.isOfflinePlayerProfile(profile))
+            if (!Shared.isOfflinePlayer(profile.getPlayerID(), profile.getPlayerName()))
             {
                 Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> textures = MinecraftUtils.getSessionService().getTextures((GameProfile) profile.getOriginal(), false);
                 if (textures != null && textures.containsKey(MinecraftProfileTexture.Type.CAPE))
                 {
                     MinecraftProfileTexture tex = textures.get(MinecraftProfileTexture.Type.CAPE);
-                    data = CachedReader.create().setLocal(_dirU, uuid.toString()).setRemote(tex.getUrl()).setDataStore(_store).setProxy(MinecraftUtils.getProxy()).read();
+                    data = CachedDownloader.create().setLocal(_dirU, uuid.toString()).setRemote(tex.getUrl()).setDataStore(_store).setProxy(MinecraftUtils.getProxy()).read();
                     if (data != null)
                         skin.put(data, "cape");
                 }

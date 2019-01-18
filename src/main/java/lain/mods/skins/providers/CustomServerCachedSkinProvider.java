@@ -3,9 +3,9 @@ package lain.mods.skins.providers;
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import lain.mods.skins.api.interfaces.IPlayerProfile;
 import lain.mods.skins.api.interfaces.ISkin;
@@ -21,7 +21,7 @@ public class CustomServerCachedSkinProvider implements ISkinProvider
     private File _dirU;
     private Function<ByteBuffer, ByteBuffer> _filter;
     private String _host;
-    private Map<String, String> _store = new HashMap<>();
+    private Map<String, String> _store = new ConcurrentHashMap<>();
 
     public CustomServerCachedSkinProvider(Path workDir, String host)
     {
@@ -49,10 +49,10 @@ public class CustomServerCachedSkinProvider implements ISkinProvider
             byte[] data = null;
             UUID uuid = profile.getPlayerID();
             String name = profile.getPlayerName();
-            if (!Shared.isOfflinePlayerProfile(profile))
-                data = CachedReader.create().setLocal(_dirU, uuid.toString()).setRemote("%s/skins/%s", _host, uuid).setDataStore(_store).setProxy(MinecraftUtils.getProxy()).read();
+            if (!Shared.isOfflinePlayer(profile.getPlayerID(), profile.getPlayerName()))
+                data = CachedDownloader.create().setLocal(_dirU, uuid.toString()).setRemote("%s/skins/%s", _host, uuid).setDataStore(_store).setProxy(MinecraftUtils.getProxy()).read();
             if (data == null && !Shared.isBlank(name))
-                data = CachedReader.create().setLocal(_dirN, name).setRemote("%s/skins/%s", _host, name).setDataStore(_store).setProxy(MinecraftUtils.getProxy()).read();
+                data = CachedDownloader.create().setLocal(_dirN, name).setRemote("%s/skins/%s", _host, name).setDataStore(_store).setProxy(MinecraftUtils.getProxy()).read();
             if (data != null)
                 skin.put(data, SkinData.judgeSkinType(data));
         });

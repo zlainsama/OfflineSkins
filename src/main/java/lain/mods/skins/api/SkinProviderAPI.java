@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -32,14 +33,12 @@ public class SkinProviderAPI
     public static final ISkinProviderService CAPE = create();
 
     /**
-     * @return an empty ISkinProviderService with default implementation, a single ISkin object will be created during runtime with all available ISkin objects bundled in it.
+     * @return an empty ISkinProviderService with default implementation, a single ISkin object will be created during runtime with all available ISkin objects bundled in it, if a corresponding profile changes during the lifetime of an ISkin object, the ISkin object will be discarded and a new one will be created.
      */
     public static ISkinProviderService create()
     {
         return new ISkinProviderService()
         {
-
-            private final List<ISkinProvider> providers = new ArrayList<>();
 
             private final LoadingCache<IPlayerProfile, ISkin> cache = CacheBuilder.newBuilder().expireAfterAccess(15, TimeUnit.SECONDS).removalListener(new RemovalListener<IPlayerProfile, ISkin>()
             {
@@ -58,6 +57,8 @@ public class SkinProviderAPI
                 @Override
                 public ISkin load(IPlayerProfile key) throws Exception
                 {
+                    key.setUpdateListener(profileChangeListener);
+
                     return new ISkin()
                     {
 
@@ -121,6 +122,12 @@ public class SkinProviderAPI
                 }
 
             });
+
+            private final List<ISkinProvider> providers = new CopyOnWriteArrayList<>();
+            private final Consumer<IPlayerProfile> profileChangeListener = profile -> {
+                if (cache.getIfPresent(profile) != null)
+                    cache.refresh(profile);
+            };
 
             @Override
             public void clearProviders()
