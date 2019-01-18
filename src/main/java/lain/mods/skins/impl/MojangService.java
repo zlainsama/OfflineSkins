@@ -25,7 +25,35 @@ import lain.mods.skins.impl.forge.MinecraftUtils;
 public class MojangService
 {
 
-    private static final LoadingCache<String, Optional<GameProfile>> cache = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.DAYS).refreshAfterWrite(10, TimeUnit.MINUTES).build(new CacheLoader<String, Optional<GameProfile>>()
+    private static final LoadingCache<GameProfile, Optional<GameProfile>> filledProfiles = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.DAYS).refreshAfterWrite(10, TimeUnit.MINUTES).build(new CacheLoader<GameProfile, Optional<GameProfile>>()
+    {
+
+        @Override
+        public Optional<GameProfile> load(GameProfile key) throws Exception
+        {
+            if (key == null || key.getId() == null)
+                throw new IllegalArgumentException("bad profile");
+            if (key.isComplete() && !key.getProperties().isEmpty())
+                return Optional.of(key);
+            GameProfile filled = MinecraftUtils.getSessionService().fillProfileProperties(key, false);
+            if (key == filled)
+                return Optional.empty();
+            return Optional.of(filled);
+        }
+
+        @Override
+        public ListenableFuture<Optional<GameProfile>> reload(GameProfile key, Optional<GameProfile> oldValue) throws Exception
+        {
+            if (oldValue.isPresent())
+                return Futures.immediateFuture(oldValue);
+            return Shared.pool.submit(() -> {
+                return load(key);
+            });
+        }
+
+    });
+
+    private static final LoadingCache<String, Optional<GameProfile>> resolvedProfiles = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.DAYS).refreshAfterWrite(10, TimeUnit.MINUTES).build(new CacheLoader<String, Optional<GameProfile>>()
     {
 
         private final Gson gson = new GsonBuilder().registerTypeAdapter(UUID.class, new UUIDTypeAdapter()).create();
@@ -35,10 +63,7 @@ public class MojangService
         {
             try
             {
-                GameProfile profile = makeRequest(String.format("https://api.mojang.com/users/profiles/minecraft/%s", key));
-                if (profile != null && profile != Shared.DUMMY)
-                    profile = MinecraftUtils.getSessionService().fillProfileProperties(profile, false);
-                return Optional.ofNullable(profile);
+                return Optional.ofNullable(makeRequest(String.format("https://api.mojang.com/users/profiles/minecraft/%s", key)));
             }
             catch (Throwable t)
             {
@@ -110,22 +135,42 @@ public class MojangService
         {
             if (oldValue.isPresent())
                 return Futures.immediateFuture(oldValue);
-            return super.reload(key, oldValue);
+            return Shared.pool.submit(() -> {
+                return load(key);
+            });
         }
 
     });
 
     /**
-     * @param username the username to query about.
-     * @return a ListenableFuture of a resolved online profile, otherwise {@link Shared#DUMMY DUMMY}.
+     * @param profile the profile to fill, requires an ID.
+     * @return a ListenableFuture of a filled profile, otherwise previous profile.
      */
-    public static ListenableFuture<GameProfile> getOnlineProfile(String username)
+    public static ListenableFuture<GameProfile> fillProfile(GameProfile profile)
     {
+        if (profile == null || profile.getId() == null)
+            return Futures.immediateFuture(profile);
         Optional<GameProfile> cachedResult;
-        if ((cachedResult = cache.getIfPresent(username)) != null)
+        if ((cachedResult = filledProfiles.getIfPresent(profile)) != null)
+            return Futures.immediateFuture(cachedResult.orElse(profile));
+        return Shared.pool.submit(() -> {
+            return filledProfiles.getUnchecked(profile).orElse(profile);
+        });
+    }
+
+    /**
+     * @param username the username to query about.
+     * @return a ListenableFuture of a resolved profile without any properties, otherwise {@link Shared#DUMMY DUMMY}.
+     */
+    public static ListenableFuture<GameProfile> getProfile(String username)
+    {
+        if (Shared.isBlank(username))
+            return Futures.immediateFuture(Shared.DUMMY);
+        Optional<GameProfile> cachedResult;
+        if ((cachedResult = resolvedProfiles.getIfPresent(username)) != null)
             return Futures.immediateFuture(cachedResult.orElse(Shared.DUMMY));
         return Shared.pool.submit(() -> {
-            return cache.getUnchecked(username).orElse(Shared.DUMMY);
+            return resolvedProfiles.getUnchecked(username).orElse(Shared.DUMMY);
         });
     }
 

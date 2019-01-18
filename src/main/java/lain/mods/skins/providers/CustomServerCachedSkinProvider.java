@@ -49,7 +49,7 @@ public class CustomServerCachedSkinProvider implements ISkinProvider
             byte[] data = null;
             UUID uuid = profile.getPlayerID();
             String name = profile.getPlayerName();
-            if (!Shared.isOfflinePlayerProfile(profile))
+            if (!Shared.isOfflinePlayer(profile.getPlayerID(), profile.getPlayerName()))
                 data = CachedReader.create().setLocal(_dirU, uuid.toString()).setRemote("%s/skins/%s", _host, uuid).setDataStore(_store).setProxy(MinecraftUtils.getProxy()).read();
             if (data == null && !Shared.isBlank(name))
                 data = CachedReader.create().setLocal(_dirN, name).setRemote("%s/skins/%s", _host, name).setDataStore(_store).setProxy(MinecraftUtils.getProxy()).read();

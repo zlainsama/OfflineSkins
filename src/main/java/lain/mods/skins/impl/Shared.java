@@ -11,7 +11,6 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.mojang.authlib.GameProfile;
-import lain.mods.skins.api.interfaces.IPlayerProfile;
 
 public class Shared
 {
@@ -44,11 +43,8 @@ public class Shared
         return true;
     }
 
-    public static boolean isOfflinePlayerProfile(IPlayerProfile profile)
+    public static boolean isOfflinePlayer(UUID id, String name)
     {
-        UUID id = profile.getPlayerID();
-        String name = profile.getPlayerName();
-
         try
         {
             return offlines.get(id, () -> {

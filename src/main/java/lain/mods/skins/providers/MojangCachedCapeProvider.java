@@ -48,7 +48,7 @@ public class MojangCachedCapeProvider implements ISkinProvider
         Shared.pool.execute(() -> {
             byte[] data = null;
             UUID uuid = profile.getPlayerID();
-            if (!Shared.isOfflinePlayerProfile(profile))
+            if (!Shared.isOfflinePlayer(profile.getPlayerID(), profile.getPlayerName()))
             {
                 Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> textures = MinecraftUtils.getSessionService().getTextures((GameProfile) profile.getOriginal(), false);
                 if (textures != null && textures.containsKey(MinecraftProfileTexture.Type.CAPE))
