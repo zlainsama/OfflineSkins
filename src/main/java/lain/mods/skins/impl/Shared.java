@@ -52,6 +52,8 @@ public class Shared
         try
         {
             return offlines.get(id, () -> {
+                if (isBlank(name))
+                    return true;
                 return UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes(StandardCharsets.UTF_8)).equals(id);
             });
         }
