@@ -25,7 +25,7 @@ import lain.mods.skins.impl.forge.MinecraftUtils;
 public class MojangService
 {
 
-    private static final LoadingCache<GameProfile, Optional<GameProfile>> filledProfiles = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.DAYS).refreshAfterWrite(10, TimeUnit.MINUTES).build(new CacheLoader<GameProfile, Optional<GameProfile>>()
+    private static final LoadingCache<GameProfile, Optional<GameProfile>> filledProfiles = CacheBuilder.newBuilder().expireAfterAccess(3, TimeUnit.HOURS).refreshAfterWrite(30, TimeUnit.MINUTES).build(new CacheLoader<GameProfile, Optional<GameProfile>>()
     {
 
         @Override
@@ -53,7 +53,7 @@ public class MojangService
 
     });
 
-    private static final LoadingCache<String, Optional<GameProfile>> resolvedProfiles = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.DAYS).refreshAfterWrite(10, TimeUnit.MINUTES).build(new CacheLoader<String, Optional<GameProfile>>()
+    private static final LoadingCache<String, Optional<GameProfile>> resolvedProfiles = CacheBuilder.newBuilder().expireAfterAccess(3, TimeUnit.HOURS).refreshAfterWrite(30, TimeUnit.MINUTES).build(new CacheLoader<String, Optional<GameProfile>>()
     {
 
         private final Gson gson = new GsonBuilder().registerTypeAdapter(UUID.class, new UUIDTypeAdapter()).create();
@@ -134,7 +134,11 @@ public class MojangService
         public ListenableFuture<Optional<GameProfile>> reload(String key, Optional<GameProfile> oldValue) throws Exception
         {
             if (oldValue.isPresent())
+            {
+                if (oldValue.get() == Shared.DUMMY)
+                    return Futures.immediateFuture(Optional.empty());
                 return Futures.immediateFuture(oldValue);
+            }
             return Shared.pool.submit(() -> {
                 return load(key);
             });
