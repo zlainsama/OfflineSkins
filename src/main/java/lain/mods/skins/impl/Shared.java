@@ -8,7 +8,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.ForkJoinPool.ManagedBlocker;
 import java.util.function.Consumer;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -30,7 +29,7 @@ public class Shared
         Object[] result = new Object[2];
         try
         {
-            ForkJoinPool.managedBlock(new ManagedBlocker()
+            ForkJoinPool.managedBlock(new ForkJoinPool.ManagedBlocker()
             {
 
                 @Override
