@@ -1,4 +1,4 @@
-package lain.mods.skins.impl.forge.asm;
+package lain.mods.skins.init.forge.asm;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
@@ -29,7 +29,7 @@ public class ASMTransformer implements IClassTransformer
                     this.visitVarInsn(Opcodes.ASTORE, 1);
                     this.visitVarInsn(Opcodes.ALOAD, 0);
                     this.visitVarInsn(Opcodes.ALOAD, 1);
-                    this.visitMethodInsn(Opcodes.INVOKESTATIC, "lain/mods/skins/impl/forge/asm/Hooks", "getLocationCape", "(Lnet/minecraft/client/entity/AbstractClientPlayer;Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/util/ResourceLocation;", false);
+                    this.visitMethodInsn(Opcodes.INVOKESTATIC, "lain/mods/skins/init/forge/asm/Hooks", "getLocationCape", "(Lnet/minecraft/client/entity/AbstractClientPlayer;Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/util/ResourceLocation;", false);
                 }
                 super.visitInsn(opcode);
             }
@@ -52,7 +52,7 @@ public class ASMTransformer implements IClassTransformer
                     this.visitVarInsn(Opcodes.ASTORE, 1);
                     this.visitVarInsn(Opcodes.ALOAD, 0);
                     this.visitVarInsn(Opcodes.ALOAD, 1);
-                    this.visitMethodInsn(Opcodes.INVOKESTATIC, "lain/mods/skins/impl/forge/asm/Hooks", "getLocationSkin", "(Lnet/minecraft/client/entity/AbstractClientPlayer;Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/util/ResourceLocation;", false);
+                    this.visitMethodInsn(Opcodes.INVOKESTATIC, "lain/mods/skins/init/forge/asm/Hooks", "getLocationSkin", "(Lnet/minecraft/client/entity/AbstractClientPlayer;Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/util/ResourceLocation;", false);
                 }
                 super.visitInsn(opcode);
             }
@@ -75,7 +75,7 @@ public class ASMTransformer implements IClassTransformer
                     this.visitVarInsn(Opcodes.ASTORE, 1);
                     this.visitVarInsn(Opcodes.ALOAD, 0);
                     this.visitVarInsn(Opcodes.ALOAD, 1);
-                    this.visitMethodInsn(Opcodes.INVOKESTATIC, "lain/mods/skins/impl/forge/asm/Hooks", "getSkinType", "(Lnet/minecraft/client/entity/AbstractClientPlayer;Ljava/lang/String;)Ljava/lang/String;", false);
+                    this.visitMethodInsn(Opcodes.INVOKESTATIC, "lain/mods/skins/init/forge/asm/Hooks", "getSkinType", "(Lnet/minecraft/client/entity/AbstractClientPlayer;Ljava/lang/String;)Ljava/lang/String;", false);
                 }
                 super.visitInsn(opcode);
             }
@@ -133,7 +133,7 @@ public class ASMTransformer implements IClassTransformer
                     this.visitInsn(Opcodes.POP);
                     this.visitVarInsn(Opcodes.ALOAD, 7);
                     this.visitVarInsn(Opcodes.ALOAD, 11);
-                    this.visitMethodInsn(Opcodes.INVOKESTATIC, "lain/mods/skins/impl/forge/asm/Hooks", "TileEntitySkullRenderer_bindTexture", "(Lcom/mojang/authlib/GameProfile;Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/util/ResourceLocation;", false);
+                    this.visitMethodInsn(Opcodes.INVOKESTATIC, "lain/mods/skins/init/forge/asm/Hooks", "TileEntitySkullRenderer_bindTexture", "(Lcom/mojang/authlib/GameProfile;Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/util/ResourceLocation;", false);
                     this.visitVarInsn(Opcodes.ASTORE, 11);
                     this.visitVarInsn(Opcodes.ALOAD, 11);
                 }
@@ -145,9 +145,9 @@ public class ASMTransformer implements IClassTransformer
                     this.visitFieldInsn(Opcodes.GETFIELD, humanoidHead.getData(0), humanoidHead.getData(1), humanoidHead.getData(2));
                     this.visitFieldInsn(Opcodes.GETFIELD, skeletonHead.getData(0), skeletonHead.getData(1), skeletonHead.getData(2));
                     this.visitVarInsn(Opcodes.ALOAD, 11);
-                    this.visitMethodInsn(Opcodes.INVOKESTATIC, "lain/mods/skins/impl/forge/asm/Hooks", "getSkinWidth", "(Lnet/minecraft/util/ResourceLocation;)I", false);
+                    this.visitMethodInsn(Opcodes.INVOKESTATIC, "lain/mods/skins/init/forge/asm/Hooks", "getSkinWidth", "(Lnet/minecraft/util/ResourceLocation;)I", false);
                     this.visitVarInsn(Opcodes.ALOAD, 11);
-                    this.visitMethodInsn(Opcodes.INVOKESTATIC, "lain/mods/skins/impl/forge/asm/Hooks", "getSkinHeight", "(Lnet/minecraft/util/ResourceLocation;)I", false);
+                    this.visitMethodInsn(Opcodes.INVOKESTATIC, "lain/mods/skins/init/forge/asm/Hooks", "getSkinHeight", "(Lnet/minecraft/util/ResourceLocation;)I", false);
                     this.visitMethodInsn(Opcodes.INVOKEVIRTUAL, setTextureSize.getData(0), setTextureSize.getData(1), setTextureSize.getData(2), false);
                     this.visitInsn(Opcodes.POP);
                 }
@@ -201,7 +201,7 @@ public class ASMTransformer implements IClassTransformer
                     this.visitVarInsn(Opcodes.ASTORE, 32);
                     this.visitVarInsn(Opcodes.ALOAD, 25);
                     this.visitVarInsn(Opcodes.ALOAD, 32);
-                    this.visitMethodInsn(Opcodes.INVOKESTATIC, "lain/mods/skins/impl/forge/asm/Hooks", "GuiPlayerTabOverlay_bindTexture", "(Lcom/mojang/authlib/GameProfile;Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/util/ResourceLocation;", false);
+                    this.visitMethodInsn(Opcodes.INVOKESTATIC, "lain/mods/skins/init/forge/asm/Hooks", "GuiPlayerTabOverlay_bindTexture", "(Lcom/mojang/authlib/GameProfile;Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/util/ResourceLocation;", false);
                 }
                 super.visitMethodInsn(opcode, owner, name, desc, itf);
             }

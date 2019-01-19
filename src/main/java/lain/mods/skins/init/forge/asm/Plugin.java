@@ -1,11 +1,11 @@
-package lain.mods.skins.impl.forge.asm;
+package lain.mods.skins.init.forge.asm;
 
 import java.util.Map;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 
 @IFMLLoadingPlugin.Name("offlineskins")
 @IFMLLoadingPlugin.MCVersion("")
-@IFMLLoadingPlugin.TransformerExclusions("lain.mods.skins.impl.forge.asm.")
+@IFMLLoadingPlugin.TransformerExclusions("lain.mods.skins.init.forge.asm.")
 public class Plugin implements IFMLLoadingPlugin
 {
 
@@ -21,7 +21,7 @@ public class Plugin implements IFMLLoadingPlugin
     @Override
     public String[] getASMTransformerClass()
     {
-        return new String[] { "lain.mods.skins.impl.forge.asm.ASMTransformer" };
+        return new String[] { "lain.mods.skins.init.forge.asm.ASMTransformer" };
     }
 
     @Override
@@ -33,7 +33,7 @@ public class Plugin implements IFMLLoadingPlugin
     @Override
     public String getSetupClass()
     {
-        return "lain.mods.skins.impl.forge.asm.Setup";
+        return "lain.mods.skins.init.forge.asm.Setup";
     }
 
     @Override

@@ -1,4 +1,4 @@
-package lain.mods.skins.impl.forge.asm;
+package lain.mods.skins.init.forge.asm;
 
 import com.mojang.authlib.GameProfile;
 import lain.mods.skins.init.forge.ForgeOfflineSkins;
