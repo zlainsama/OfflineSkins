@@ -100,7 +100,8 @@ public class MojangService
                     {
                         StringBuilder buf = new StringBuilder();
                         readLines(in, buf);
-                        return gson.fromJson(buf.toString(), GameProfile.class);
+                        GameProfile constructed = gson.fromJson(buf.toString(), GameProfile.class);
+                        return new GameProfile(constructed.getId(), constructed.getName()); // reconstruct it because default JsonDeserializer doesn't construct a GameProfile properly, can't use GameProfileSerializer because it's a private class.
                     }
                 }
                 catch (JsonSyntaxException e)
