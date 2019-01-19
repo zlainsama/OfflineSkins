@@ -18,7 +18,7 @@ import lain.mods.skins.api.interfaces.IPlayerProfile;
 public class PlayerProfile implements IPlayerProfile
 {
 
-    private static final LoadingCache<GameProfile, PlayerProfile> profiles = CacheBuilder.newBuilder().weakKeys().expireAfterWrite(10, TimeUnit.MINUTES).build(new CacheLoader<GameProfile, PlayerProfile>()
+    private static final LoadingCache<GameProfile, PlayerProfile> profiles = CacheBuilder.newBuilder().weakKeys().refreshAfterWrite(10, TimeUnit.MINUTES).build(new CacheLoader<GameProfile, PlayerProfile>()
     {
 
         @Override
@@ -184,6 +184,19 @@ public class PlayerProfile implements IPlayerProfile
             return profile;
         }
 
+        @Override
+        public ListenableFuture<PlayerProfile> reload(GameProfile key, PlayerProfile oldValue) throws Exception
+        {
+            return Shared.pool.submit(() -> {
+                PlayerProfile newValue = load(key);
+                Shared.pool.execute(() -> {
+                    if (oldValue.getOriginal() != newValue.getOriginal())
+                        oldValue.set(newValue.getOriginal());
+                });
+                return newValue;
+            });
+        }
+
     });
 
     public static PlayerProfile wrapGameProfile(GameProfile profile)
@@ -211,7 +224,7 @@ public class PlayerProfile implements IPlayerProfile
     }
 
     @Override
-    public Object getOriginal()
+    public GameProfile getOriginal()
     {
         GameProfile p;
         if ((p = _profile.get()) == null) // gc
