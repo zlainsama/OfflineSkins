@@ -4,8 +4,12 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinPool.ManagedBlocker;
+import java.util.function.Consumer;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.util.concurrent.ListeningExecutorService;
@@ -19,6 +23,56 @@ public class Shared
     public static final ListeningExecutorService pool = MoreExecutors.listeningDecorator(Executors.newWorkStealingPool());
 
     private static final Cache<UUID, Boolean> offlines = CacheBuilder.newBuilder().weakKeys().build();
+
+    @SuppressWarnings("unchecked")
+    public static <V> V blockyCall(Callable<V> task, V defaultValue, Consumer<Throwable> report)
+    {
+        Object[] result = new Object[2];
+        try
+        {
+            ForkJoinPool.managedBlock(new ManagedBlocker()
+            {
+
+                @Override
+                public boolean block() throws InterruptedException
+                {
+                    try
+                    {
+                        result[0] = task.call();
+                    }
+                    catch (Throwable t)
+                    {
+                        if (result[1] == null)
+                            result[1] = t;
+                        else
+                            ((Throwable) result[1]).addSuppressed(t);
+                    }
+                    return true;
+                }
+
+                @Override
+                public boolean isReleasable()
+                {
+                    return false;
+                }
+
+            });
+        }
+        catch (Throwable t)
+        {
+            if (result[1] == null)
+                result[1] = t;
+            else
+                ((Throwable) result[1]).addSuppressed(t);
+        }
+        if (result[1] != null)
+        {
+            if (report != null)
+                report.accept((Throwable) result[1]);
+            return defaultValue;
+        }
+        return (V) result[0];
+    }
 
     public static void closeQuietly(Closeable c)
     {

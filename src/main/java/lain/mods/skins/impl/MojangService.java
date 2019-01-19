@@ -35,7 +35,9 @@ public class MojangService
                 throw new IllegalArgumentException("bad profile");
             if (key.isComplete() && !key.getProperties().isEmpty())
                 return Optional.of(key);
-            GameProfile filled = MinecraftUtils.getSessionService().fillProfileProperties(key, false);
+            GameProfile filled = Shared.blockyCall(() -> {
+                return MinecraftUtils.getSessionService().fillProfileProperties(key, false);
+            }, key, null);
             if (key == filled)
                 return Optional.empty();
             return Optional.of(filled);
@@ -63,7 +65,9 @@ public class MojangService
         {
             try
             {
-                return Optional.ofNullable(makeRequest(String.format("https://api.mojang.com/users/profiles/minecraft/%s", key)));
+                return Optional.ofNullable(Shared.blockyCall(() -> {
+                    return makeRequest(String.format("https://api.mojang.com/users/profiles/minecraft/%s", key));
+                }, null, null));
             }
             catch (Throwable t)
             {

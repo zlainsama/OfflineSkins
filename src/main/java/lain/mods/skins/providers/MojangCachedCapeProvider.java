@@ -54,7 +54,9 @@ public class MojangCachedCapeProvider implements ISkinProvider
                 if (textures != null && textures.containsKey(MinecraftProfileTexture.Type.CAPE))
                 {
                     MinecraftProfileTexture tex = textures.get(MinecraftProfileTexture.Type.CAPE);
-                    data = CachedDownloader.create().setLocal(_dirU, uuid.toString()).setRemote(tex.getUrl()).setDataStore(_store).setProxy(MinecraftUtils.getProxy()).read();
+                    data = Shared.blockyCall(() -> {
+                        return CachedDownloader.create().setLocal(_dirU, uuid.toString()).setRemote(tex.getUrl()).setDataStore(_store).setProxy(MinecraftUtils.getProxy()).read();
+                    }, null, null);
                     if (data != null)
                         skin.put(data, "cape");
                 }

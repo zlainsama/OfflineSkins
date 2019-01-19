@@ -36,9 +36,13 @@ public class UserManagedCapeProvider implements ISkinProvider
         Shared.pool.execute(() -> {
             byte[] data = null;
             if (!Shared.isOfflinePlayer(profile.getPlayerID(), profile.getPlayerName()))
-                data = readFile(_dirU, "%s.png", profile.getPlayerID().toString().replaceAll("-", ""));
+                data = Shared.blockyCall(() -> {
+                    return readFile(_dirU, "%s.png", profile.getPlayerID().toString().replaceAll("-", ""));
+                }, null, null);
             if (data == null && !Shared.isBlank(profile.getPlayerName()))
-                data = readFile(_dirN, "%s.png", profile.getPlayerName());
+                data = Shared.blockyCall(() -> {
+                    return readFile(_dirN, "%s.png", profile.getPlayerName());
+                }, null, null);
             if (data != null)
                 skin.put(data, "cape");
         });
