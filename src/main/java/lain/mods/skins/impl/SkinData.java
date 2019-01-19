@@ -22,32 +22,29 @@ public class SkinData implements ISkin
 
     public static String judgeSkinType(ByteBuffer data)
     {
+        InputStream input = null;
         try
         {
-            InputStream input = null;
-            try
+            input = wrapByteBufferAsInputStream(data);
+            BufferedImage image = ImageIO.read(input);
+            int w = image.getWidth();
+            int h = image.getHeight();
+            if (w == h * 2)
+                return "default"; // it's actually "legacy", but there will always be a filter to convert them into "default".
+            if (w == h)
             {
-                input = wrapByteBufferAsInputStream(data);
-                BufferedImage image = ImageIO.read(input);
-                int w = image.getWidth();
-                int h = image.getHeight();
-                if (w == h * 2)
-                    return "default"; // it's actually "legacy", but there will always be a filter to convert them into "default".
-                if (w == h)
-                {
-                    int r = Math.max(w / 64, 1);
-                    if (((image.getRGB(55 * r, 20 * r) & 0xFF000000) >>> 24) == 0)
-                        return "slim";
-                    return "default";
-                }
-            }
-            finally
-            {
-                Shared.closeQuietly(input);
+                int r = Math.max(w / 64, 1);
+                if (((image.getRGB(55 * r, 20 * r) & 0xFF000000) >>> 24) == 0)
+                    return "slim";
+                return "default";
             }
         }
         catch (Throwable ignored)
         {
+        }
+        finally
+        {
+            Shared.closeQuietly(input);
         }
         return "unknown";
     }
@@ -120,7 +117,7 @@ public class SkinData implements ISkin
         type = null;
     }
 
-    public void put(byte[] data, String type)
+    public synchronized void put(byte[] data, String type)
     {
         ByteBuffer buf = null;
         if (data != null)
