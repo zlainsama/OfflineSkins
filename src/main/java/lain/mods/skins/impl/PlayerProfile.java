@@ -75,7 +75,7 @@ public class PlayerProfile implements IPlayerProfile
                                         }
                                     }
 
-                                }, Shared.pool);
+                                });
                             }
                         }
                     }
@@ -133,12 +133,12 @@ public class PlayerProfile implements IPlayerProfile
                                             }
                                         }
 
-                                    }, Shared.pool);
+                                    });
                                 }
                             }
                         }
 
-                    }, Shared.pool);
+                    });
                 }
             }
             else if (key.getId() != null && key.getProperties().isEmpty())
@@ -177,7 +177,7 @@ public class PlayerProfile implements IPlayerProfile
                             }
                         }
 
-                    }, Shared.pool);
+                    });
                 }
             }
 
@@ -189,10 +189,8 @@ public class PlayerProfile implements IPlayerProfile
         {
             return Shared.pool.submit(() -> {
                 PlayerProfile newValue = load(key);
-                Shared.pool.execute(() -> {
-                    if (oldValue.getOriginal() != newValue.getOriginal())
-                        oldValue.set(newValue.getOriginal());
-                });
+                if (oldValue.getOriginal() != newValue.getOriginal())
+                    oldValue.set(newValue.getOriginal());
                 return newValue;
             });
         }
