@@ -91,7 +91,7 @@ public class Shared
      *
      * @param file            the file to read.
      * @param defaultContents a default value to return if failed during reading the file.
-     * @param receiver        a consumer that will receive a Throwable if failed or interrupted during reading the file.
+     * @param receiver        a consumer that will receive a Throwable if failed or interrupted during reading the file, null is acceptable.
      * @return the contents of the file or defaultContents if failed during reading the file.
      */
     public static byte[] blockyReadFile(File file, byte[] defaultContents, Consumer<Throwable> receiver)
