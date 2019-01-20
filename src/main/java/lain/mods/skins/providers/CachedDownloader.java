@@ -9,7 +9,6 @@ import java.net.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.channels.Channels;
-import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -36,15 +35,7 @@ public class CachedDownloader
     {
     }
 
-    private Map<String, String> parseField(String field)
-    {
-        return Pattern.compile(",").splitAsStream(field == null ? "" : field).map(String::trim).collect(HashMap::new, (m, s) -> {
-            String[] as = s.split("=", 2);
-            m.put(as[0], as.length == 2 ? as[1] : null);
-        }, HashMap::putAll);
-    }
-
-    public byte[] read()
+    private final byte[] doRead()
     {
         if (_local == null || _remote == null || _dataStore == null)
             return null;
@@ -156,8 +147,7 @@ public class CachedDownloader
                     _dataStore.remove(key);
                 }
 
-                if (_local.exists() && !_local.isDirectory() && _local.canRead())
-                    return Files.readAllBytes(_local.toPath());
+                return Shared.blockyReadFile(_local, null, null);
             }
             catch (IOException e)
             {
@@ -165,6 +155,21 @@ public class CachedDownloader
         }
 
         return null;
+    }
+
+    private Map<String, String> parseField(String field)
+    {
+        return Pattern.compile(",").splitAsStream(field == null ? "" : field).map(String::trim).collect(HashMap::new, (m, s) -> {
+            String[] as = s.split("=", 2);
+            m.put(as[0], as.length == 2 ? as[1] : null);
+        }, HashMap::putAll);
+    }
+
+    public byte[] read()
+    {
+        return Shared.blockyCall(() -> {
+            return doRead();
+        }, null, null);
     }
 
     public CachedDownloader setCacheMinTTL(int cacheMinTTL)

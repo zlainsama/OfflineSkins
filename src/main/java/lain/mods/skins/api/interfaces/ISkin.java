@@ -42,8 +42,7 @@ public interface ISkin
      * The returned buffer will be used instead of the original. <br>
      * Multiple filters will be applied one by one in a chain. <br>
      * Don't forget to {@link ByteBuffer#rewind() rewind()} before return it if you modified it's state. <br>
-     * <del> Make sure the final buffer is a direct buffer, see {@link org.lwjgl.BufferUtils BufferUtils}, otherwise the game will fail. </del> (happens in future) <br>
-     * These buffers will be converted to BufferedImage before pushed to the game.
+     * Make sure the final buffer is a direct buffer, see {@link org.lwjgl.BufferUtils BufferUtils}, otherwise the game will fail.
      *
      * @param filter the filter to set.
      * @return true if successful, null and duplicates will fail.
