@@ -1,7 +1,11 @@
 package lain.mods.skins.impl;
 
+import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.channels.Channels;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.concurrent.Callable;
@@ -71,6 +75,24 @@ public class Shared
             return defaultValue;
         }
         return (V) result[0];
+    }
+
+    public static byte[] blockyReadFile(File file, byte[] defaultContents, Consumer<Throwable> report)
+    {
+        return blockyCall(() -> {
+            FileInputStream fis = null;
+            ByteArrayOutputStream baos = null;
+            try
+            {
+                (fis = new FileInputStream(file)).getChannel().transferTo(0, Long.MAX_VALUE, Channels.newChannel(baos = new ByteArrayOutputStream()));
+                return baos.toByteArray();
+            }
+            finally
+            {
+                closeQuietly(baos);
+                closeQuietly(fis);
+            }
+        }, defaultContents, report);
     }
 
     public static void closeQuietly(Closeable c)
