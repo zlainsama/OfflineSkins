@@ -9,7 +9,6 @@ import java.net.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.channels.Channels;
-import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -148,8 +147,7 @@ public class CachedDownloader
                     _dataStore.remove(key);
                 }
 
-                if (_local.exists() && !_local.isDirectory() && _local.canRead())
-                    return Files.readAllBytes(_local.toPath());
+                return Shared.blockyReadFile(_local, null, null);
             }
             catch (IOException e)
             {

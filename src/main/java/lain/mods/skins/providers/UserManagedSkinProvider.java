@@ -1,9 +1,7 @@
 package lain.mods.skins.providers;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Function;
 import lain.mods.skins.api.interfaces.IPlayerProfile;
@@ -51,14 +49,7 @@ public class UserManagedSkinProvider implements ISkinProvider
 
     private byte[] readFile(File dir, String filename)
     {
-        try
-        {
-            return Files.readAllBytes(new File(dir, filename).toPath());
-        }
-        catch (IOException e)
-        {
-            return null;
-        }
+        return Shared.blockyReadFile(new File(dir, filename), null, null);
     }
 
     private byte[] readFile(File dir, String filename, Object... args)
