@@ -158,6 +158,8 @@ public class MojangService
      */
     public static ListenableFuture<GameProfile> fillProfile(GameProfile profile)
     {
+        if (profile == null)
+            return Futures.immediateFailedFuture(new NullPointerException("profile must not be null"));
         Optional<GameProfile> cachedResult;
         if ((cachedResult = filledProfiles.getIfPresent(profile)) != null)
             return Futures.immediateFuture(cachedResult.orElse(profile));
@@ -172,6 +174,8 @@ public class MojangService
      */
     public static ListenableFuture<GameProfile> getProfile(String username)
     {
+        if (username == null)
+            return Futures.immediateFailedFuture(new NullPointerException("username must not be null"));
         Optional<GameProfile> cachedResult;
         if ((cachedResult = resolvedProfiles.getIfPresent(username)) != null)
             return Futures.immediateFuture(cachedResult.orElse(Shared.DUMMY));

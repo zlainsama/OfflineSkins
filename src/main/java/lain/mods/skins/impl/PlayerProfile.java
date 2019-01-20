@@ -18,6 +18,8 @@ import lain.mods.skins.api.interfaces.IPlayerProfile;
 public class PlayerProfile implements IPlayerProfile
 {
 
+    private static final PlayerProfile DUMMY = new PlayerProfile(Shared.DUMMY);
+
     private static final LoadingCache<GameProfile, PlayerProfile> profiles = CacheBuilder.newBuilder().weakKeys().refreshAfterWrite(10, TimeUnit.MINUTES).build(new CacheLoader<GameProfile, PlayerProfile>()
     {
 
@@ -25,7 +27,7 @@ public class PlayerProfile implements IPlayerProfile
         public PlayerProfile load(GameProfile key) throws Exception
         {
             if (key.getProperties() == null || key == Shared.DUMMY) // bad profile
-                return new PlayerProfile(Shared.DUMMY);
+                return DUMMY;
 
             PlayerProfile profile = new PlayerProfile(key);
             if (Shared.isBlank(key.getName())) // an incomplete profile that needs filling
@@ -154,6 +156,8 @@ public class PlayerProfile implements IPlayerProfile
         @Override
         public ListenableFuture<PlayerProfile> reload(GameProfile key, PlayerProfile oldValue) throws Exception
         {
+            if (oldValue == DUMMY) // value for bad profile
+                return Futures.immediateFuture(DUMMY);
             return Shared.pool.submit(() -> {
                 PlayerProfile newValue = load(key);
                 if (oldValue.getOriginal() != newValue.getOriginal()) // updated
@@ -170,6 +174,8 @@ public class PlayerProfile implements IPlayerProfile
      */
     public static PlayerProfile wrapGameProfile(GameProfile profile)
     {
+        if (profile == null)
+            return DUMMY;
         return profiles.getUnchecked(profile);
     }
 
@@ -178,7 +184,9 @@ public class PlayerProfile implements IPlayerProfile
 
     private PlayerProfile(GameProfile profile)
     {
-        set(profile);
+        if (profile == null)
+            throw new IllegalArgumentException("profile must not be null");
+        _profile = new WeakReference<GameProfile>(profile);
     }
 
     @Override
@@ -230,6 +238,8 @@ public class PlayerProfile implements IPlayerProfile
 
     private synchronized void set(GameProfile profile)
     {
+        if (this == DUMMY)
+            return;
         if (profile == null)
             throw new IllegalArgumentException("profile must not be null");
         _profile = new WeakReference<GameProfile>(profile);
@@ -241,6 +251,8 @@ public class PlayerProfile implements IPlayerProfile
     @Override
     public boolean setUpdateListener(Consumer<IPlayerProfile> listener)
     {
+        if (this == DUMMY)
+            return false;
         if (listener == null || _listeners.contains(listener))
             return false;
         return _listeners.add(listener);

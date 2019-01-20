@@ -40,6 +40,46 @@ public class SkinProviderAPI
         return new ISkinProviderService()
         {
 
+            private final ISkin DUMMY = new ISkin()
+            {
+
+                @Override
+                public ByteBuffer getData()
+                {
+                    return null;
+                }
+
+                @Override
+                public String getSkinType()
+                {
+                    return null;
+                }
+
+                @Override
+                public boolean isDataReady()
+                {
+                    return false;
+                }
+
+                @Override
+                public void onRemoval()
+                {
+                }
+
+                @Override
+                public boolean setRemovalListener(Consumer<ISkin> listener)
+                {
+                    return false;
+                }
+
+                @Override
+                public boolean setSkinFilter(Function<ByteBuffer, ByteBuffer> filter)
+                {
+                    return false;
+                }
+
+            };
+
             private final LoadingCache<IPlayerProfile, ISkin> cache = CacheBuilder.newBuilder().expireAfterAccess(15, TimeUnit.SECONDS).removalListener(new RemovalListener<IPlayerProfile, ISkin>()
             {
 
@@ -139,6 +179,8 @@ public class SkinProviderAPI
             @Override
             public ISkin getSkin(IPlayerProfile profile)
             {
+                if (profile == null)
+                    return DUMMY;
                 return cache.getUnchecked(profile);
             }
 
