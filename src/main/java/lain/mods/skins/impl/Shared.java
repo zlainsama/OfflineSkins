@@ -27,7 +27,7 @@ public class Shared
     private static final Cache<UUID, Boolean> offlines = CacheBuilder.newBuilder().weakKeys().build();
 
     /**
-     * Call a possible blocking task in a ManagedBlocker to allow current Thread adjust if it is a ForkJoinWorkerThread.
+     * Call a possibly blocking task in a ManagedBlocker to allow current Thread adjust if it is a ForkJoinWorkerThread.
      *
      * @param task         the task to call.
      * @param defaultValue a default value to return if the task failed during the call.
