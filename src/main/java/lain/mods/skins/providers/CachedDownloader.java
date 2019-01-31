@@ -147,7 +147,9 @@ public class CachedDownloader
                     _dataStore.remove(key);
                 }
 
-                return Shared.blockyReadFile(_local, null, null);
+                byte[] contents;
+                if ((contents = Shared.blockyReadFile(_local, null, null)) != null)
+                    return contents;
             }
             catch (IOException e)
             {
