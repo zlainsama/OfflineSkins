@@ -9,7 +9,6 @@ import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.ForkJoinPool.ManagedBlocker;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import com.google.common.cache.Cache;
@@ -21,7 +20,7 @@ import com.mojang.authlib.GameProfile;
 public class Shared
 {
 
-    private static interface SupplierBlocker<T> extends Supplier<T>, ManagedBlocker
+    private static interface SupplierBlocker<T> extends Supplier<T>, ForkJoinPool.ManagedBlocker
     {
     }
 
