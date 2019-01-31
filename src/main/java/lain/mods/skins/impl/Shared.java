@@ -1,17 +1,17 @@
 package lain.mods.skins.impl;
 
 import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.nio.channels.Channels;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinPool.ManagedBlocker;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.util.concurrent.ListeningExecutorService;
@@ -20,6 +20,10 @@ import com.mojang.authlib.GameProfile;
 
 public class Shared
 {
+
+    private static interface SupplierBlocker<T> extends Supplier<T>, ManagedBlocker
+    {
+    }
 
     public static final GameProfile DUMMY = new GameProfile(UUID.fromString("ae9460f5-bf72-468e-89b6-4eead59001ad"), "");
     public static final ListeningExecutorService pool = MoreExecutors.listeningDecorator(Executors.newWorkStealingPool());
@@ -34,56 +38,53 @@ public class Shared
      * @param receiver     a consumer that will receive a Throwable if the task failed during the call, null is acceptable.
      * @return the result of the task or defaultValue if it failed during the call.
      */
-    @SuppressWarnings("unchecked")
     public static <V> V blockyCall(Callable<V> task, V defaultValue, Consumer<Throwable> receiver)
     {
         if (task == null)
             return defaultValue;
-        Object[] result = new Object[2];
-        try
+        return new SupplierBlocker<V>()
         {
-            ForkJoinPool.managedBlock(new ForkJoinPool.ManagedBlocker()
+
+            V result;
+
+            @Override
+            public boolean block() throws InterruptedException
             {
-
-                @Override
-                public boolean block() throws InterruptedException
+                try
                 {
-                    try
-                    {
-                        result[0] = task.call();
-                    }
-                    catch (Throwable t)
-                    {
-                        if (result[1] == null)
-                            result[1] = t;
-                        else
-                            ((Throwable) result[1]).addSuppressed(t);
-                    }
-                    return true;
+                    result = task.call();
                 }
-
-                @Override
-                public boolean isReleasable()
+                catch (Throwable t)
                 {
-                    return false;
+                    if (receiver != null)
+                        receiver.accept(t);
+                    result = defaultValue;
                 }
+                return true;
+            }
 
-            });
-        }
-        catch (Throwable t)
-        {
-            if (result[1] == null)
-                result[1] = t;
-            else
-                ((Throwable) result[1]).addSuppressed(t);
-        }
-        if (result[1] != null)
-        {
-            if (receiver != null)
-                receiver.accept((Throwable) result[1]);
-            return defaultValue;
-        }
-        return (V) result[0];
+            @Override
+            public V get()
+            {
+                try
+                {
+                    ForkJoinPool.managedBlock(this);
+                }
+                catch (InterruptedException e)
+                {
+                    if (receiver != null)
+                        receiver.accept(e);
+                }
+                return result;
+            }
+
+            @Override
+            public boolean isReleasable()
+            {
+                return false;
+            }
+
+        }.get();
     }
 
     /**
@@ -114,14 +115,14 @@ public class Shared
         }, defaultContents, receiver);
     }
 
-    public static void closeQuietly(Closeable c)
+    public static void closeQuietly(AutoCloseable c)
     {
         try
         {
             if (c != null)
                 c.close();
         }
-        catch (IOException ignored)
+        catch (Throwable ignored)
         {
         }
     }
