@@ -240,7 +240,7 @@ public class ForgeOfflineSkins
             boolean useMojang = config.getBoolean("useMojang", Configuration.CATEGORY_CLIENT, true, "");
             boolean useCrafatar = config.getBoolean("useCrafatar", Configuration.CATEGORY_CLIENT, true, "");
             boolean useCustomServer = config.getBoolean("useCustomServer", Configuration.CATEGORY_CLIENT, false, "");
-            String hostCustomServer = config.getString("hostCustomServer", Configuration.CATEGORY_CLIENT, "http://example.com", "only http/https are supported, /skins/(uuid|username) and /capes/(uuid|username) will be queried for respective resources");
+            String hostCustomServer = config.getString("hostCustomServer", Configuration.CATEGORY_CLIENT, "http://example.com", "/skins/(uuid|username) and /capes/(uuid|username) will be queried for respective resources");
             if (config.hasChanged())
                 config.save();
 
