@@ -3,9 +3,7 @@ package lain.mods.skins.providers;
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import lain.mods.skins.api.interfaces.IPlayerProfile;
 import lain.mods.skins.api.interfaces.ISkin;
@@ -21,7 +19,6 @@ public class CustomServerCachedCapeProvider implements ISkinProvider
     private File _dirU;
     private Function<ByteBuffer, ByteBuffer> _filter;
     private String _host;
-    private Map<String, String> _store = new ConcurrentHashMap<>();
 
     public CustomServerCachedCapeProvider(Path workDir, String host)
     {
@@ -50,9 +47,9 @@ public class CustomServerCachedCapeProvider implements ISkinProvider
             UUID uuid = profile.getPlayerID();
             String name = profile.getPlayerName();
             if (!Shared.isOfflinePlayer(profile.getPlayerID(), profile.getPlayerName()))
-                data = CachedDownloader.create().setLocal(_dirU, uuid.toString()).setRemote("%s/capes/%s", _host, uuid).setDataStore(_store).setProxy(MinecraftUtils.getProxy()).read();
+                data = CachedDownloader.create().setLocal(_dirU, uuid.toString()).setRemote("%s/capes/%s", _host, uuid).setDataStore(Shared.store).setProxy(MinecraftUtils.getProxy()).read();
             if (data == null && !Shared.isBlank(name))
-                data = CachedDownloader.create().setLocal(_dirN, name).setRemote("%s/capes/%s", _host, name).setDataStore(_store).setProxy(MinecraftUtils.getProxy()).read();
+                data = CachedDownloader.create().setLocal(_dirN, name).setRemote("%s/capes/%s", _host, name).setDataStore(Shared.store).setProxy(MinecraftUtils.getProxy()).read();
             if (data != null)
                 skin.put(data, "cape");
         });
