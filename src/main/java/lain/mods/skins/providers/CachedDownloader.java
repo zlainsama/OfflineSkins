@@ -67,18 +67,13 @@ public class CachedDownloader
         }
 
         int tries = 0;
-
-        URLConnection conn = null;
         while (tries++ < _maxTries)
         {
             try
             {
                 boolean expired = _local.exists() && size == _local.length() ? System.currentTimeMillis() > expire : true;
 
-                if (_proxy != null)
-                    conn = _remote.openConnection(_proxy);
-                else
-                    conn = _remote.openConnection();
+                URLConnection conn = _proxy == null ? _remote.openConnection() : _remote.openConnection(_proxy);
                 conn.setConnectTimeout(30000);
                 conn.setReadTimeout(10000);
                 if (!expired && !etag.isEmpty())
@@ -143,6 +138,8 @@ public class CachedDownloader
             catch (IOException e)
             {
             }
+            if (tries < _maxTries && !Shared.sleep(1000L)) // wait 1 second before retry
+                break; // interrupted
         }
 
         return null;
