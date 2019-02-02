@@ -102,31 +102,12 @@ public class Shared
         if (file == null)
             return defaultContents;
         return blockyCall(() -> {
-            FileInputStream fis = null;
-            ByteArrayOutputStream baos = null;
-            try
+            try (FileInputStream fis = new FileInputStream(file); ByteArrayOutputStream baos = new ByteArrayOutputStream())
             {
-                (fis = new FileInputStream(file)).getChannel().transferTo(0, Long.MAX_VALUE, Channels.newChannel(baos = new ByteArrayOutputStream()));
+                fis.getChannel().transferTo(0, Long.MAX_VALUE, Channels.newChannel(baos));
                 return baos.toByteArray();
             }
-            finally
-            {
-                closeQuietly(baos);
-                closeQuietly(fis);
-            }
         }, defaultContents, receiver);
-    }
-
-    public static void closeQuietly(AutoCloseable c)
-    {
-        try
-        {
-            if (c != null)
-                c.close();
-        }
-        catch (Throwable ignored)
-        {
-        }
     }
 
     public static boolean isBlank(CharSequence cs)

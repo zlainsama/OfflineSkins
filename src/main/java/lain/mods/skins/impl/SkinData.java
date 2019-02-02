@@ -1,6 +1,7 @@
 package lain.mods.skins.impl;
 
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -17,39 +18,50 @@ public class SkinData implements ISkin
 
     public static String judgeSkinType(byte[] data)
     {
-        return judgeSkinType(ByteBuffer.wrap(data)); // as it won't be used by the game, it's safe to use a normal buffer.
+        try (InputStream input = new ByteArrayInputStream(data))
+        {
+            BufferedImage image = ImageIO.read(input);
+            int w = image.getWidth();
+            int h = image.getHeight();
+            if (w == h * 2)
+                return "default"; // it's actually "legacy", but there will always be a filter to convert them into "default".
+            if (w == h)
+            {
+                int r = Math.max(w / 64, 1);
+                if (((image.getRGB(55 * r, 20 * r) & 0xFF000000) >>> 24) == 0)
+                    return "slim";
+                return "default";
+            }
+            return "unknown";
+        }
+        catch (Throwable t)
+        {
+            return "unknown";
+        }
     }
 
     public static String judgeSkinType(ByteBuffer data)
     {
-        try
+        try (InputStream input = wrapByteBufferAsInputStream(data))
         {
-            InputStream input = null;
-            try
+            BufferedImage image = ImageIO.read(input);
+            int w = image.getWidth();
+            int h = image.getHeight();
+            if (w == h * 2)
+                return "default"; // it's actually "legacy", but there will always be a filter to convert them into "default".
+            if (w == h)
             {
-                input = wrapByteBufferAsInputStream(data);
-                BufferedImage image = ImageIO.read(input);
-                int w = image.getWidth();
-                int h = image.getHeight();
-                if (w == h * 2)
-                    return "default"; // it's actually "legacy", but there will always be a filter to convert them into "default".
-                if (w == h)
-                {
-                    int r = Math.max(w / 64, 1);
-                    if (((image.getRGB(55 * r, 20 * r) & 0xFF000000) >>> 24) == 0)
-                        return "slim";
-                    return "default";
-                }
+                int r = Math.max(w / 64, 1);
+                if (((image.getRGB(55 * r, 20 * r) & 0xFF000000) >>> 24) == 0)
+                    return "slim";
+                return "default";
             }
-            finally
-            {
-                Shared.closeQuietly(input);
-            }
+            return "unknown";
         }
-        catch (Throwable ignored)
+        catch (Throwable t)
         {
+            return "unknown";
         }
-        return "unknown";
     }
 
     public static ByteBuffer toBuffer(byte[] data)
@@ -58,6 +70,18 @@ public class SkinData implements ISkin
         buf.put(data);
         buf.rewind();
         return buf;
+    }
+
+    public static boolean validateData(byte[] data)
+    {
+        try (InputStream input = new ByteArrayInputStream(data))
+        {
+            return ImageIO.read(input) != null;
+        }
+        catch (Throwable t)
+        {
+            return false;
+        }
     }
 
     public static InputStream wrapByteBufferAsInputStream(ByteBuffer original)

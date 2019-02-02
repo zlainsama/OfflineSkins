@@ -47,9 +47,9 @@ public class CustomServerCachedSkinProvider implements ISkinProvider
             UUID uuid = profile.getPlayerID();
             String name = profile.getPlayerName();
             if (!Shared.isOfflinePlayer(profile.getPlayerID(), profile.getPlayerName()))
-                data = CachedDownloader.create().setLocal(_dirU, uuid.toString()).setRemote("%s/skins/%s", _host, uuid).setDataStore(Shared.store).setProxy(MinecraftUtils.getProxy()).read();
+                data = CachedDownloader.create().setLocal(_dirU, uuid.toString()).setRemote("%s/skins/%s", _host, uuid).setDataStore(Shared.store).setProxy(MinecraftUtils.getProxy()).setValidator(SkinData::validateData).read();
             if (data == null && !Shared.isBlank(name))
-                data = CachedDownloader.create().setLocal(_dirN, name).setRemote("%s/skins/%s", _host, name).setDataStore(Shared.store).setProxy(MinecraftUtils.getProxy()).read();
+                data = CachedDownloader.create().setLocal(_dirN, name).setRemote("%s/skins/%s", _host, name).setDataStore(Shared.store).setProxy(MinecraftUtils.getProxy()).setValidator(SkinData::validateData).read();
             if (data != null)
                 skin.put(data, SkinData.judgeSkinType(data));
         });

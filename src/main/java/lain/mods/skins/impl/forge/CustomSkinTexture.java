@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import javax.imageio.ImageIO;
-import lain.mods.skins.impl.Shared;
 import lain.mods.skins.impl.SkinData;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.TextureUtil;
@@ -26,18 +25,13 @@ public class CustomSkinTexture extends AbstractTexture
 
         _location = location;
 
-        InputStream in = null;
-        try
+        try (InputStream in = SkinData.wrapByteBufferAsInputStream(data))
         {
-            _image = ImageIO.read(in = SkinData.wrapByteBufferAsInputStream(data));
+            _image = ImageIO.read(in);
         }
         catch (Throwable t)
         {
             _image = null;
-        }
-        finally
-        {
-            Shared.closeQuietly(in);
         }
     }
 
@@ -72,17 +66,9 @@ public class CustomSkinTexture extends AbstractTexture
     {
         deleteGlTexture();
 
-        InputStream in = null;
-        try
-        {
-            if (_image == null)
-                throw new FileNotFoundException(getLocation().toString());
-            TextureUtil.uploadTextureImageAllocate(getGlTextureId(), _image, false, false);
-        }
-        finally
-        {
-            Shared.closeQuietly(in);
-        }
+        if (_image == null)
+            throw new FileNotFoundException(getLocation().toString());
+        TextureUtil.uploadTextureImageAllocate(getGlTextureId(), _image, false, false);
     }
 
 }

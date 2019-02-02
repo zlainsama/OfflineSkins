@@ -6,7 +6,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.function.Function;
 import javax.imageio.ImageIO;
@@ -18,24 +17,14 @@ public class LegacyConversion
     {
         return data -> {
             ByteBuffer original = data;
-            try
+            try (InputStream in = SkinData.wrapByteBufferAsInputStream(data); ByteArrayOutputStream baos = new ByteArrayOutputStream())
             {
-                InputStream in = null;
-                OutputStream out = null;
-                try
+                BufferedImage image = new LegacyConversion().convert(ImageIO.read(in));
+                if (image != null)
                 {
-                    BufferedImage image = new LegacyConversion().convert(ImageIO.read(in = SkinData.wrapByteBufferAsInputStream(data)));
-                    if (image != null)
-                    {
-                        ImageIO.write(image, "png", out = new ByteArrayOutputStream());
-                        out.flush();
-                        data = SkinData.toBuffer(((ByteArrayOutputStream) out).toByteArray());
-                    }
-                }
-                finally
-                {
-                    Shared.closeQuietly(out);
-                    Shared.closeQuietly(in);
+                    ImageIO.write(image, "png", baos);
+                    baos.flush();
+                    data = SkinData.toBuffer(baos.toByteArray());
                 }
             }
             catch (Throwable t)

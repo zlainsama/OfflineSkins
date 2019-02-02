@@ -26,6 +26,7 @@ public class CachedDownloader
     private int _cacheMinTTL = 600;
     private Map<String, String> _dataStore;
     private Predicate<Integer> _handler = code -> true;
+    private Predicate<byte[]> _validator;
     private File _local;
     private int _maxTries = 5;
     private Proxy _proxy;
@@ -93,15 +94,9 @@ public class CachedDownloader
                         case 4:
                             return null;
                         case 2:
-                            FileOutputStream fos = null;
-                            try
+                            try (FileOutputStream fos = new FileOutputStream(_local))
                             {
-                                fos = new FileOutputStream(_local);
                                 fos.getChannel().transferFrom(Channels.newChannel(conn.getInputStream()), 0, Long.MAX_VALUE);
-                            }
-                            finally
-                            {
-                                Shared.closeQuietly(fos);
                             }
                             break;
                         default:
@@ -112,15 +107,9 @@ public class CachedDownloader
                 }
                 else
                 {
-                    FileOutputStream fos = null;
-                    try
+                    try (FileOutputStream fos = new FileOutputStream(_local))
                     {
-                        fos = new FileOutputStream(_local);
                         fos.getChannel().transferFrom(Channels.newChannel(conn.getInputStream()), 0, Long.MAX_VALUE);
-                    }
-                    finally
-                    {
-                        Shared.closeQuietly(fos);
                     }
                 }
 
@@ -148,7 +137,7 @@ public class CachedDownloader
                 }
 
                 byte[] contents;
-                if ((contents = Shared.blockyReadFile(_local, null, null)) != null)
+                if ((contents = Shared.blockyReadFile(_local, null, null)) != null && (_validator == null || _validator.test(contents)))
                     return contents;
             }
             catch (IOException e)
@@ -251,6 +240,12 @@ public class CachedDownloader
     public CachedDownloader setRemote(URL remote)
     {
         _remote = remote;
+        return this;
+    }
+
+    public CachedDownloader setValidator(Predicate<byte[]> validator)
+    {
+        _validator = validator;
         return this;
     }
 
