@@ -31,26 +31,18 @@ public class CustomSkinTexture extends ResourceTexture
     @Override
     public void load(ResourceManager resMan) throws IOException
     {
-        NativeImage image = null;
-        try
+        ByteBuffer buf;
+        if ((buf = _data.get()) == null) // gc
+            throw new FileNotFoundException(getLocation().toString());
+
+        try (NativeImage image = NativeImage.fromByteBuffer(buf.duplicate()))
         {
-            ByteBuffer buf;
-            if ((buf = _data.get()) == null) // gc
-                throw new FileNotFoundException(getLocation().toString());
-
-            image = NativeImage.fromByteBuffer(buf.duplicate());
-
             synchronized (this)
             {
                 bindTexture();
                 TextureUtil.prepareImage(this.getGlId(), image.getWidth(), image.getHeight());
                 image.upload(0, 0, 0, false);
             }
-        }
-        finally
-        {
-            if (image != null)
-                image.close();
         }
     }
 

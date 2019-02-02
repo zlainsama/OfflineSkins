@@ -44,7 +44,7 @@ public class CrafatarCachedCapeProvider implements ISkinProvider
             byte[] data = null;
             UUID uuid = profile.getPlayerID();
             if (!Shared.isOfflinePlayer(profile.getPlayerID(), profile.getPlayerName()))
-                data = CachedDownloader.create().setLocal(_dirU, uuid.toString()).setRemote("https://crafatar.com/capes/%s", uuid).setDataStore(Shared.store).setProxy(MinecraftUtils.getProxy()).read();
+                data = CachedDownloader.create().setLocal(_dirU, uuid.toString()).setRemote("https://crafatar.com/capes/%s", uuid).setDataStore(Shared.store).setProxy(MinecraftUtils.getProxy()).setValidator(SkinData::validateData).read();
             if (data != null)
                 skin.put(data, "cape");
         });

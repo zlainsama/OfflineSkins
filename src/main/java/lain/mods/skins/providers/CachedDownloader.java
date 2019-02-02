@@ -26,6 +26,7 @@ public class CachedDownloader
     private int _cacheMinTTL = 600;
     private Map<String, String> _dataStore;
     private Predicate<Integer> _handler = code -> true;
+    private Predicate<byte[]> _validator;
     private File _local;
     private int _maxTries = 5;
     private Proxy _proxy;
@@ -66,18 +67,13 @@ public class CachedDownloader
         }
 
         int tries = 0;
-
-        URLConnection conn = null;
         while (tries++ < _maxTries)
         {
             try
             {
                 boolean expired = _local.exists() && size == _local.length() ? System.currentTimeMillis() > expire : true;
 
-                if (_proxy != null)
-                    conn = _remote.openConnection(_proxy);
-                else
-                    conn = _remote.openConnection();
+                URLConnection conn = _proxy == null ? _remote.openConnection() : _remote.openConnection(_proxy);
                 conn.setConnectTimeout(30000);
                 conn.setReadTimeout(10000);
                 if (!expired && !etag.isEmpty())
@@ -93,15 +89,9 @@ public class CachedDownloader
                         case 4:
                             return null;
                         case 2:
-                            FileOutputStream fos = null;
-                            try
+                            try (FileOutputStream fos = new FileOutputStream(_local))
                             {
-                                fos = new FileOutputStream(_local);
                                 fos.getChannel().transferFrom(Channels.newChannel(conn.getInputStream()), 0, Long.MAX_VALUE);
-                            }
-                            finally
-                            {
-                                Shared.closeQuietly(fos);
                             }
                             break;
                         default:
@@ -112,15 +102,9 @@ public class CachedDownloader
                 }
                 else
                 {
-                    FileOutputStream fos = null;
-                    try
+                    try (FileOutputStream fos = new FileOutputStream(_local))
                     {
-                        fos = new FileOutputStream(_local);
                         fos.getChannel().transferFrom(Channels.newChannel(conn.getInputStream()), 0, Long.MAX_VALUE);
-                    }
-                    finally
-                    {
-                        Shared.closeQuietly(fos);
                     }
                 }
 
@@ -148,12 +132,14 @@ public class CachedDownloader
                 }
 
                 byte[] contents;
-                if ((contents = Shared.blockyReadFile(_local, null, null)) != null)
+                if ((contents = Shared.blockyReadFile(_local, null, null)) != null && (_validator == null || _validator.test(contents)))
                     return contents;
             }
             catch (IOException e)
             {
             }
+            if (tries < _maxTries && !Shared.sleep(1000L)) // wait 1 second before retry
+                break; // interrupted
         }
 
         return null;
@@ -251,6 +237,12 @@ public class CachedDownloader
     public CachedDownloader setRemote(URL remote)
     {
         _remote = remote;
+        return this;
+    }
+
+    public CachedDownloader setValidator(Predicate<byte[]> validator)
+    {
+        _validator = validator;
         return this;
     }
 

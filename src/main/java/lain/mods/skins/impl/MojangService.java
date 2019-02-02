@@ -17,7 +17,6 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
 import com.mojang.authlib.GameProfile;
 import com.mojang.util.UUIDTypeAdapter;
 import lain.mods.skins.impl.fabric.MinecraftUtils;
@@ -85,39 +84,16 @@ public class MojangService
                 return Shared.DUMMY;
             else if (code / 100 == 2)
             {
-                InputStream in = null;
-                try
+                try (InputStream in = conn.getInputStream())
                 {
-                    in = conn.getInputStream();
-                }
-                catch (IOException e)
-                {
-                    Shared.closeQuietly(in);
-                    in = conn.getErrorStream();
-                }
-                try
-                {
-                    if (in != null)
-                    {
-                        StringBuilder buf = new StringBuilder();
-                        readLines(in, buf);
-                        GameProfile constructed = gson.fromJson(buf.toString(), GameProfile.class);
-                        if (!constructed.isComplete()) // why does the server return an incomplete profile? treat it as not found.
-                            return Shared.DUMMY;
-                        if (Shared.isOfflinePlayer(constructed.getId(), constructed.getName())) // why does the server return an offline profile? treat it as not found.
-                            return Shared.DUMMY;
-                        return new GameProfile(constructed.getId(), constructed.getName()); // reconstruct it because default JsonDeserializer doesn't construct a GameProfile properly, can't use GameProfileSerializer because it's a private class.
-                    }
-                }
-                catch (JsonSyntaxException e)
-                {
-                }
-                catch (IOException e)
-                {
-                }
-                finally
-                {
-                    Shared.closeQuietly(in);
+                    StringBuilder buf = new StringBuilder();
+                    readLines(in, buf);
+                    GameProfile constructed = gson.fromJson(buf.toString(), GameProfile.class);
+                    if (!constructed.isComplete()) // why does the server return an incomplete profile? treat it as not found.
+                        return Shared.DUMMY;
+                    if (Shared.isOfflinePlayer(constructed.getId(), constructed.getName())) // why does the server return an offline profile? treat it as not found.
+                        return Shared.DUMMY;
+                    return new GameProfile(constructed.getId(), constructed.getName()); // reconstruct it because default JsonDeserializer doesn't construct a GameProfile properly, can't use GameProfileSerializer because it's a private class.
                 }
             }
             return null;

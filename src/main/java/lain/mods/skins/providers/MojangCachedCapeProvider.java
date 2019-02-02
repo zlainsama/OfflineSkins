@@ -3,6 +3,7 @@ package lain.mods.skins.providers;
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 import com.mojang.authlib.GameProfile;
@@ -51,7 +52,7 @@ public class MojangCachedCapeProvider implements ISkinProvider
                 if (textures != null && textures.containsKey(MinecraftProfileTexture.Type.CAPE))
                 {
                     MinecraftProfileTexture tex = textures.get(MinecraftProfileTexture.Type.CAPE);
-                    data = CachedDownloader.create().setLocal(_dirU, uuid.toString()).setRemote(tex.getUrl()).setDataStore(Shared.store).setProxy(MinecraftUtils.getProxy()).read();
+                    data = CachedDownloader.create().setLocal(_dirU, uuid.toString()).setRemote(tex.getUrl()).setDataStore(Shared.store).setProxy(MinecraftUtils.getProxy()).setValidator(SkinData::validateData).read();
                     if (data != null)
                         skin.put(data, "cape");
                 }

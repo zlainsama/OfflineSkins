@@ -45,7 +45,10 @@ public class UserManagedSkinProvider implements ISkinProvider
 
     private byte[] readFile(File dir, String filename)
     {
-        return Shared.blockyReadFile(new File(dir, filename), null, null);
+        byte[] contents;
+        if ((contents = Shared.blockyReadFile(new File(dir, filename), null, null)) != null && SkinData.validateData(contents))
+            return contents;
+        return null;
     }
 
     private byte[] readFile(File dir, String filename, Object... args)

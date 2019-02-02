@@ -20,7 +20,6 @@ import lain.mods.skins.api.interfaces.ISkin;
 import lain.mods.skins.impl.ConfigOptions;
 import lain.mods.skins.impl.LegacyConversion;
 import lain.mods.skins.impl.PlayerProfile;
-import lain.mods.skins.impl.Shared;
 import lain.mods.skins.impl.fabric.CustomSkinTexture;
 import lain.mods.skins.providers.CrafatarCachedCapeProvider;
 import lain.mods.skins.providers.CrafatarCachedSkinProvider;
@@ -145,28 +144,14 @@ public class FabricOfflineSkins implements ClientModInitializer
         pathToConfig.toFile().getParentFile().mkdirs();
         if (!pathToConfig.toFile().exists())
         {
-            Writer w = null;
-            try
+            try (Writer w = Files.newBufferedWriter(pathToConfig, StandardCharsets.UTF_8))
             {
-                w = Files.newBufferedWriter(pathToConfig, StandardCharsets.UTF_8);
                 gson.toJson(new ConfigOptions().defaultOptions(), w);
             }
             catch (Throwable t)
             {
                 t.printStackTrace();
                 System.err.println("[OfflineSkins] Failed to write default config file.");
-            }
-            finally
-            {
-                try
-                {
-                    Shared.closeQuietly(w);
-                }
-                catch (Throwable t)
-                {
-                    t.printStackTrace();
-                    System.err.println("[OfflineSkins] Failed to finish writing default config file.");
-                }
             }
         }
         ConfigOptions config = null;
