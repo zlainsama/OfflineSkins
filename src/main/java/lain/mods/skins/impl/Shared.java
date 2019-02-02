@@ -5,8 +5,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.nio.channels.Channels;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
 import java.util.function.Consumer;
@@ -26,6 +28,7 @@ public class Shared
 
     public static final GameProfile DUMMY = new GameProfile(UUID.fromString("ae9460f5-bf72-468e-89b6-4eead59001ad"), "");
     public static final ListeningExecutorService pool = MoreExecutors.listeningDecorator(Executors.newWorkStealingPool());
+    public static final Map<String, String> store = new ConcurrentHashMap<>();
 
     private static final Cache<UUID, Boolean> offlines = CacheBuilder.newBuilder().weakKeys().build();
 
