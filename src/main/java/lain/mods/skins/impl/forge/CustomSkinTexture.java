@@ -35,14 +35,6 @@ public class CustomSkinTexture extends AbstractTexture
         }
     }
 
-    public int getHeight()
-    {
-        BufferedImage image;
-        if ((image = getImage()) == null)
-            return 64; // default texture height
-        return image.getHeight();
-    }
-
     public BufferedImage getImage()
     {
         return _image;
@@ -51,14 +43,6 @@ public class CustomSkinTexture extends AbstractTexture
     public ResourceLocation getLocation()
     {
         return _location;
-    }
-
-    public int getWidth()
-    {
-        BufferedImage image;
-        if ((image = getImage()) == null)
-            return 64; // default texture width
-        return image.getWidth();
     }
 
     @Override
