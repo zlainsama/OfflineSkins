@@ -1,17 +1,11 @@
 package lain.mods.skins.init.forge;
 
-import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.WeakHashMap;
-import java.util.function.Predicate;
 import com.google.common.collect.ImmutableSet;
 import com.mojang.authlib.GameProfile;
 import lain.mods.skins.api.SkinProviderAPI;
@@ -29,14 +23,9 @@ import lain.mods.skins.providers.UserManagedCapeProvider;
 import lain.mods.skins.providers.UserManagedSkinProvider;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
-import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.model.ModelPlayer;
-import net.minecraft.client.model.ModelRenderer;
-import net.minecraft.client.renderer.texture.ITextureObject;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.client.FMLClientHandler;
@@ -136,15 +125,6 @@ public class ForgeOfflineSkins
     }
 
     @SideOnly(Side.CLIENT)
-    public static int getSkinHeight(ResourceLocation location)
-    {
-        ITextureObject texture = FMLClientHandler.instance().getClient().getTextureManager().getTexture(location);
-        if (texture instanceof CustomSkinTexture)
-            return ((CustomSkinTexture) texture).getHeight();
-        return -1;
-    }
-
-    @SideOnly(Side.CLIENT)
     public static String getSkinType(AbstractClientPlayer player, String result)
     {
         ResourceLocation location = getLocationSkin(player, null);
@@ -158,22 +138,10 @@ public class ForgeOfflineSkins
     }
 
     @SideOnly(Side.CLIENT)
-    public static int getSkinWidth(ResourceLocation location)
-    {
-        ITextureObject texture = FMLClientHandler.instance().getClient().getTextureManager().getTexture(location);
-        if (texture instanceof CustomSkinTexture)
-            return ((CustomSkinTexture) texture).getWidth();
-        return -1;
-    }
-
-    @SideOnly(Side.CLIENT)
     private static boolean isDefaultSkin(ResourceLocation location)
     {
         return "minecraft".equals(location.getResourceDomain()) && DefaultSkins.contains(location.getResourcePath());
     }
-
-    @SideOnly(Side.CLIENT)
-    private Map<Class<?>, Optional<Field[]>> allSubModelFields;
 
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
@@ -189,41 +157,6 @@ public class ForgeOfflineSkins
                     SkinProviderAPI.SKIN.getSkin(PlayerProfile.wrapGameProfile(player.getGameProfile()));
                     SkinProviderAPI.CAPE.getSkin(PlayerProfile.wrapGameProfile(player.getGameProfile()));
                 }
-            }
-        }
-    }
-
-    @SideOnly(Side.CLIENT)
-    @SubscribeEvent
-    public void handlePlayerRender_Post(RenderPlayerEvent.Post event)
-    {
-        ModelPlayer model = event.getRenderer().getMainModel();
-        setSubModelTextureSize_Main(model, 64, 64);
-        setSubModelTextureSize_Cape(model, 64, 32);
-    }
-
-    @SideOnly(Side.CLIENT)
-    @SubscribeEvent
-    public void handlePlayerRender_Pre(RenderPlayerEvent.Pre event)
-    {
-        EntityPlayer p = event.getEntityPlayer();
-        if (p instanceof AbstractClientPlayer)
-        {
-            AbstractClientPlayer player = (AbstractClientPlayer) p;
-            ModelPlayer model = event.getRenderer().getMainModel();
-            ResourceLocation locSkin = getLocationSkin(player, null);
-            ResourceLocation locCape = getLocationCape(player, null);
-            if (locSkin != null)
-            {
-                ITextureObject texture = FMLClientHandler.instance().getClient().getTextureManager().getTexture(locSkin);
-                if (texture instanceof CustomSkinTexture)
-                    setSubModelTextureSize_Main(model, ((CustomSkinTexture) texture).getWidth(), ((CustomSkinTexture) texture).getHeight());
-            }
-            if (locCape != null)
-            {
-                ITextureObject texture = FMLClientHandler.instance().getClient().getTextureManager().getTexture(locCape);
-                if (texture instanceof CustomSkinTexture)
-                    setSubModelTextureSize_Cape(model, ((CustomSkinTexture) texture).getWidth(), ((CustomSkinTexture) texture).getHeight());
             }
         }
     }
@@ -263,88 +196,8 @@ public class ForgeOfflineSkins
                 SkinProviderAPI.CAPE.registerProvider(new CrafatarCachedCapeProvider(Paths.get(".", "cachedImages", "crafatar")));
 
             OverrideVanilla = true;
-            allSubModelFields = new HashMap<Class<?>, Optional<Field[]>>();
             MinecraftForge.EVENT_BUS.register(this);
         }
-    }
-
-    @SideOnly(Side.CLIENT)
-    private void setSubModelTextureSize(ModelBase model, int width, int height, Predicate<ModelRenderer> filter)
-    {
-        if (allSubModelFields == null)
-            return;
-
-        Class<?> clazz = model.getClass();
-        if (!allSubModelFields.containsKey(clazz))
-        {
-            try
-            {
-                List<Field> fields = new ArrayList<Field>();
-                do
-                {
-                    for (Field f : clazz.getDeclaredFields())
-                    {
-                        try
-                        {
-                            if (ModelRenderer.class.isAssignableFrom(f.getType()))
-                            {
-                                f.setAccessible(true);
-                                fields.add(f);
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                        }
-                    }
-                    clazz = clazz.getSuperclass();
-                }
-                while (clazz != null);
-                if (fields.isEmpty())
-                    allSubModelFields.put(clazz, Optional.empty());
-                else
-                {
-                    Field[] found = new Field[fields.size()];
-                    fields.toArray(found);
-                    allSubModelFields.put(clazz, Optional.of(found));
-                }
-            }
-            catch (Exception e)
-            {
-                allSubModelFields.put(clazz, Optional.empty());
-            }
-        }
-
-        allSubModelFields.get(clazz).ifPresent(fields -> {
-            for (Field f : fields)
-            {
-                Object o = null;
-                try
-                {
-                    o = f.get(model);
-                }
-                catch (Exception e)
-                {
-                }
-                if (o != null)
-                {
-                    ModelRenderer m = (ModelRenderer) o;
-                    if (filter.test(m))
-                        m.setTextureSize(width, height);
-                }
-            }
-        });
-    }
-
-    @SideOnly(Side.CLIENT)
-    private void setSubModelTextureSize_Cape(ModelBase model, int width, int height)
-    {
-        setSubModelTextureSize(model, width, height, m -> m.textureWidth == m.textureHeight * 2);
-    }
-
-    @SideOnly(Side.CLIENT)
-    private void setSubModelTextureSize_Main(ModelBase model, int width, int height)
-    {
-        setSubModelTextureSize(model, width, height, m -> m.textureWidth == m.textureHeight);
     }
 
 }

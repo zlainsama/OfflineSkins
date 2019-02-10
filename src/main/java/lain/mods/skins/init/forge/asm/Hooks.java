@@ -31,16 +31,6 @@ public class Hooks
         return result;
     }
 
-    public static int getSkinHeight(ResourceLocation location)
-    {
-        if (DISABLED)
-            return 64;
-        int height = ForgeOfflineSkins.getSkinHeight(location);
-        if (height != -1)
-            return height;
-        return 64;
-    }
-
     public static String getSkinType(AbstractClientPlayer player, String result)
     {
         if (DISABLED)
@@ -49,16 +39,6 @@ public class Hooks
         if (type != null)
             return type;
         return result;
-    }
-
-    public static int getSkinWidth(ResourceLocation location)
-    {
-        if (DISABLED)
-            return 64;
-        int width = ForgeOfflineSkins.getSkinWidth(location);
-        if (width != -1)
-            return width;
-        return 64;
     }
 
     public static ResourceLocation GuiPlayerTabOverlay_bindTexture(GameProfile profile, ResourceLocation result)
