@@ -1,0 +1,21 @@
+modLoader="javafml"
+loaderVersion="[25,)"
+issueTrackerURL="https://github.com/zlainsama/OfflineSkins/issues"
+displayURL="https://github.com/zlainsama/OfflineSkins"
+#logoFile=""
+credits=""
+authors="zlainsama"
+[[mods]]
+modId="offlineskins"
+version="${file.jarVersion}"
+displayName="OfflineSkins"
+#updateJSONURL=""
+description='''
+made it possible to cache your skins for offline use.
+'''
+[[dependencies.offlineskins]]
+modId="forge"
+mandatory=true
+versionRange="[25,)"
+ordering="NONE"
+side="CLIENT"

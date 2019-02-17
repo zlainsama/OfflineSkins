@@ -1,94 +1,50 @@
 buildscript {
     repositories {
+        maven { url = 'https://files.minecraftforge.net/maven' }
         jcenter()
-        maven { url = "http://files.minecraftforge.net/maven" }
+        mavenCentral()
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
     }
 }
-apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'eclipse'
 
-version = "1.12.2-v5d"
+import net.minecraftforge.gradle.common.task.SignJar
+
+version = "1.13.2-v1"
 group= "lain.mods.skins"
 archivesBaseName = "OfflineSkins"
 
-sourceCompatibility = targetCompatibility = "1.8"
-compileJava {
-    sourceCompatibility = targetCompatibility = "1.8"
-}
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
 minecraft {
-    version = "1.12.2-14.23.0.2486"
-    runDir = "run"
-
-    mappings = "snapshot_20170624"
+    mappings channel: 'snapshot', version: '20180921-1.13'
+    accessTransformer = file("$rootDir/src/main/resources/META-INF/accesstransformer.cfg")
 }
 
-reobf {
-    coreJar {}
+dependencies {
+    minecraft 'net.minecraftforge:forge:1.13.2-25.0.13'
 }
 
-task coreJar(type: Jar) {
-    from(sourceSets.main.output) {
-        include '**/asm/**'
-    }
-    manifest {
-        attributes 'FMLCorePlugin': 'lain.mods.skins.init.forge.asm.Plugin'
-    }
-    classifier = 'core'
-    includeEmptyDirs = false
-}
-
-task signCoreJar(type: SignJar, dependsOn: reobfCoreJar) {
-    onlyIf {
-        project.hasProperty('mcModsStore')
-    }
-
-    if (project.hasProperty('mcModsStore')) {
-        keyStore = project.mcModsStore
-        alias = project.mcModsAlias
-        storePass = project.mcModsStorePass
-        keyPass = project.mcModsKeyPass
-        inputFile = coreJar.archivePath
-        outputFile = coreJar.archivePath
-    }
-}
-
-jar
-{
-    manifest {
-        attributes 'ContainedDeps': coreJar.archivePath.name
-    }
-    exclude '**/asm/**'
-    from(coreJar.archivePath.absolutePath) {
-        include '*'
-    }
-}
-
-jar.dependsOn signCoreJar
-
-processResources
-{
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
-
+processResources {
     from 'LICENSE.txt'
+}
 
-    from(sourceSets.main.resources.srcDirs)
-    {
-        include 'mcmod.info'
-
-        expand 'version':project.version, 'mcversion':project.minecraft.version
-    }
-
-    from(sourceSets.main.resources.srcDirs)
-    {
-        exclude 'mcmod.info'
+jar {
+    manifest {
+        attributes(["Specification-Title": "OfflineSkins",
+                    "Specification-Vendor": "zlainsama",
+                    "Specification-Version": "1",
+                    "Implementation-Title": project.name,
+                    "Implementation-Version": "${version}",
+                    "Implementation-Vendor" :"zlainsama",
+                    "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")],)
     }
 }
 
-task signJar(type: SignJar, dependsOn: reobfJar) {
+task signJar(type: SignJar, dependsOn: jar) {
     onlyIf {
         project.hasProperty('mcModsStore')
     }
