@@ -1,20 +1,18 @@
-var InsnNode = Java.type('org.objectweb.asm.tree.InsnNode');
-var VarInsnNode = Java.type('org.objectweb.asm.tree.VarInsnNode');
-var MethodInsnNode = Java.type('org.objectweb.asm.tree.MethodInsnNode');
-var InsnList = Java.type('org.objectweb.asm.tree.InsnList');
+var ASMAPI = Java.type('net.minecraftforge.coremod.api.ASMAPI');
+var OPCODES = Java.type('org.objectweb.asm.Opcodes');
 
 // net/minecraft/client/entity/AbstractClientPlayer/func_110303_q (getLocationCape)
 function transformMethod001(node) {
     for (var i = 0; i < node.instructions.size(); i++) {
         var insn = node.instructions.get(i);
-        if (176 === insn.getOpcode()) { // ARETURN
-            var toInsert = new InsnList();
-            toInsert.add(new VarInsnNode(58, 2)); // ASTORE
-            toInsert.add(new VarInsnNode(25, 0)); // ALOAD
-            toInsert.add(new VarInsnNode(25, 2)); // ALOAD
-            toInsert.add(new MethodInsnNode(184, 'lain/mods/skins/init/forge/Hooks', 'getLocationCape', '(Lnet/minecraft/client/entity/AbstractClientPlayer;Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/util/ResourceLocation;', false)); // INVOKESTATIC
-            i += toInsert.size();
-            node.instructions.insertBefore(insn, toInsert);
+        if (OPCODES.ARETURN === insn.getOpcode()) {
+            var tmp = ASMAPI.getMethodNode();
+            tmp.visitVarInsn(OPCODES.ASTORE, 2);
+            tmp.visitVarInsn(OPCODES.ALOAD, 0);
+            tmp.visitVarInsn(OPCODES.ALOAD, 2);
+            tmp.visitMethodInsn(OPCODES.INVOKESTATIC, 'lain/mods/skins/init/forge/Hooks', 'getLocationCape', '(Lnet/minecraft/client/entity/AbstractClientPlayer;Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/util/ResourceLocation;', false);
+            i += tmp.instructions.size();
+            node.instructions.insertBefore(insn, tmp.instructions);
         }
     }
 }
@@ -22,14 +20,14 @@ function transformMethod001(node) {
 function transformMethod002(node) {
     for (var i = 0; i < node.instructions.size(); i++) {
         var insn = node.instructions.get(i);
-        if (176 === insn.getOpcode()) { // ARETURN
-            var toInsert = new InsnList();
-            toInsert.add(new VarInsnNode(58, 2)); // ASTORE
-            toInsert.add(new VarInsnNode(25, 0)); // ALOAD
-            toInsert.add(new VarInsnNode(25, 2)); // ALOAD
-            toInsert.add(new MethodInsnNode(184, 'lain/mods/skins/init/forge/Hooks', 'getLocationSkin', '(Lnet/minecraft/client/entity/AbstractClientPlayer;Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/util/ResourceLocation;', false)); // INVOKESTATIC
-            i += toInsert.size();
-            node.instructions.insertBefore(insn, toInsert);
+        if (OPCODES.ARETURN === insn.getOpcode()) {
+            var tmp = ASMAPI.getMethodNode();
+            tmp.visitVarInsn(OPCODES.ASTORE, 2);
+            tmp.visitVarInsn(OPCODES.ALOAD, 0);
+            tmp.visitVarInsn(OPCODES.ALOAD, 2);
+            tmp.visitMethodInsn(OPCODES.INVOKESTATIC, 'lain/mods/skins/init/forge/Hooks', 'getLocationSkin', '(Lnet/minecraft/client/entity/AbstractClientPlayer;Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/util/ResourceLocation;', false);
+            i += tmp.instructions.size();
+            node.instructions.insertBefore(insn, tmp.instructions);
         }
     }
 }
@@ -37,14 +35,14 @@ function transformMethod002(node) {
 function transformMethod003(node) {
     for (var i = 0; i < node.instructions.size(); i++) {
         var insn = node.instructions.get(i);
-        if (176 === insn.getOpcode()) { // ARETURN
-            var toInsert = new InsnList();
-            toInsert.add(new VarInsnNode(58, 2)); // ASTORE
-            toInsert.add(new VarInsnNode(25, 0)); // ALOAD
-            toInsert.add(new VarInsnNode(25, 2)); // ALOAD
-            toInsert.add(new MethodInsnNode(184, 'lain/mods/skins/init/forge/Hooks', 'getSkinType', '(Lnet/minecraft/client/entity/AbstractClientPlayer;Ljava/lang/String;)Ljava/lang/String;', false)); // INVOKESTATIC
-            i += toInsert.size();
-            node.instructions.insertBefore(insn, toInsert);
+        if (OPCODES.ARETURN === insn.getOpcode()) {
+            var tmp = ASMAPI.getMethodNode();
+            tmp.visitVarInsn(OPCODES.ASTORE, 2);
+            tmp.visitVarInsn(OPCODES.ALOAD, 0);
+            tmp.visitVarInsn(OPCODES.ALOAD, 2);
+            tmp.visitMethodInsn(OPCODES.INVOKESTATIC, 'lain/mods/skins/init/forge/Hooks', 'getSkinType', '(Lnet/minecraft/client/entity/AbstractClientPlayer;Ljava/lang/String;)Ljava/lang/String;', false);
+            i += tmp.instructions.size();
+            node.instructions.insertBefore(insn, tmp.instructions);
         }
     }
 }
@@ -52,15 +50,15 @@ function transformMethod003(node) {
 function transformMethod004(node) {
     for (var i = 0; i < node.instructions.size(); i++) {
         var insn = node.instructions.get(i);
-        if (176 === insn.getOpcode()) { // ARETURN
-            var toInsert = new InsnList();
-            toInsert.add(new VarInsnNode(58, 3)); // ASTORE
-            toInsert.add(new VarInsnNode(25, 1)); // ALOAD
-            toInsert.add(new VarInsnNode(25, 2)); // ALOAD
-            toInsert.add(new VarInsnNode(25, 3)); // ALOAD
-            toInsert.add(new MethodInsnNode(184, 'lain/mods/skins/init/forge/Hooks', 'getLocationSkin_SkullRenderer', '(Lnet/minecraft/block/BlockSkull$ISkullType;Lcom/mojang/authlib/GameProfile;Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/util/ResourceLocation;', false)); // INVOKESTATIC
-            i += toInsert.size();
-            node.instructions.insertBefore(insn, toInsert);
+        if (OPCODES.ARETURN === insn.getOpcode()) {
+            var tmp = ASMAPI.getMethodNode();
+            tmp.visitVarInsn(OPCODES.ASTORE, 3);
+            tmp.visitVarInsn(OPCODES.ALOAD, 1);
+            tmp.visitVarInsn(OPCODES.ALOAD, 2);
+            tmp.visitVarInsn(OPCODES.ALOAD, 3);
+            tmp.visitMethodInsn(OPCODES.INVOKESTATIC, 'lain/mods/skins/init/forge/Hooks', 'getLocationSkin_SkullRenderer', '(Lnet/minecraft/block/BlockSkull$ISkullType;Lcom/mojang/authlib/GameProfile;Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/util/ResourceLocation;', false);
+            i += tmp.instructions.size();
+            node.instructions.insertBefore(insn, tmp.instructions);
         }
     }
 }
@@ -68,20 +66,20 @@ function transformMethod004(node) {
 function transformMethod005(node) {
     for (var i = 0; i < node.instructions.size(); i++) {
         var insn = node.instructions.get(i);
-        if (54 === insn.getOpcode() && 11 === insn.var) { // ISTORE
-            var toInsert = new InsnList();
-            toInsert.add(new InsnNode(87)); // POP
-            toInsert.add(new InsnNode(4)); // ICONST_1
-            i += toInsert.size();
-            node.instructions.insertBefore(insn, toInsert);
-        } else if (182 === insn.getOpcode() && 'func_110577_a' === insn.name) { // INVOKEVIRTUAL (bindTexture)
-            var toInsert = new InsnList();
-            toInsert.add(new VarInsnNode(58, 32)); // ASTORE
-            toInsert.add(new VarInsnNode(25, 25)); // ALOAD
-            toInsert.add(new VarInsnNode(25, 32)); // ALOAD
-            toInsert.add(new MethodInsnNode(184, 'lain/mods/skins/init/forge/Hooks', 'getLocationSkin_TabOverlay', '(Lcom/mojang/authlib/GameProfile;Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/util/ResourceLocation;', false)); // INVOKESTATIC
-            i += toInsert.size();
-            node.instructions.insertBefore(insn, toInsert);
+        if (OPCODES.ISTORE === insn.getOpcode() && 11 === insn.var) {
+            var tmp = ASMAPI.getMethodNode();
+            tmp.visitInsn(OPCODES.POP);
+            tmp.visitInsn(OPCODES.ICONST_1);
+            i += tmp.instructions.size();
+            node.instructions.insertBefore(insn, tmp.instructions);
+        } else if (OPCODES.INVOKEVIRTUAL === insn.getOpcode() && 'func_110577_a' === insn.name) { // bindTexture
+            var tmp = ASMAPI.getMethodNode();
+            tmp.visitVarInsn(OPCODES.ASTORE, 32);
+            tmp.visitVarInsn(OPCODES.ALOAD, 25);
+            tmp.visitVarInsn(OPCODES.ALOAD, 32);
+            tmp.visitMethodInsn(OPCODES.INVOKESTATIC, 'lain/mods/skins/init/forge/Hooks', 'getLocationSkin_TabOverlay', '(Lcom/mojang/authlib/GameProfile;Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/util/ResourceLocation;', false);
+            i += tmp.instructions.size();
+            node.instructions.insertBefore(insn, tmp.instructions);
         }
     }
 }
