@@ -127,7 +127,7 @@ public class FabricOfflineSkins implements ClientModInitializer
         ClientTickCallback.EVENT.register(mc -> {
             if (mc.world != null)
             {
-                for (PlayerEntity player : mc.world.players)
+                for (PlayerEntity player : mc.world.method_18456())
                 {
                     SkinProviderAPI.SKIN.getSkin(PlayerProfile.wrapGameProfile(player.getGameProfile()));
                     SkinProviderAPI.CAPE.getSkin(PlayerProfile.wrapGameProfile(player.getGameProfile()));

@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import com.mojang.authlib.GameProfile;
 import lain.mods.skins.init.fabric.FabricOfflineSkins;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Drawable;
+import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.hud.ScoreboardHud;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ScoreboardEntry;
@@ -23,7 +23,7 @@ import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.util.Identifier;
 
 @Mixin(ScoreboardHud.class)
-public abstract class ScoreboardHudMixin extends Drawable
+public abstract class ScoreboardHudMixin extends DrawableHelper
 {
 
     @Shadow
