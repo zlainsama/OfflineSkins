@@ -13,7 +13,7 @@ apply plugin: 'eclipse'
 
 import net.minecraftforge.gradle.common.task.SignJar
 
-version = "1.13.2-v1a"
+version = "1.13.2-v1b"
 group= "lain.mods.skins"
 archivesBaseName = "OfflineSkins"
 
