@@ -5,6 +5,7 @@ import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.util.UUID;
 import java.util.function.Function;
+import lain.lib.SharedPool;
 import lain.mods.skins.api.interfaces.IPlayerProfile;
 import lain.mods.skins.api.interfaces.ISkin;
 import lain.mods.skins.api.interfaces.ISkinProvider;
@@ -40,7 +41,7 @@ public class CrafatarCachedCapeProvider implements ISkinProvider
         SkinData skin = new SkinData();
         if (_filter != null)
             skin.setSkinFilter(_filter);
-        Shared.pool.execute(() -> {
+        SharedPool.execute(() -> {
             byte[] data = null;
             UUID uuid = profile.getPlayerID();
             if (!Shared.isOfflinePlayer(profile.getPlayerID(), profile.getPlayerName()))

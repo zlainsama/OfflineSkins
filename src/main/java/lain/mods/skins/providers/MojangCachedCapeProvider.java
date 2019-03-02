@@ -8,6 +8,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
+import lain.lib.SharedPool;
 import lain.mods.skins.api.interfaces.IPlayerProfile;
 import lain.mods.skins.api.interfaces.ISkin;
 import lain.mods.skins.api.interfaces.ISkinProvider;
@@ -43,7 +44,7 @@ public class MojangCachedCapeProvider implements ISkinProvider
         SkinData skin = new SkinData();
         if (_filter != null)
             skin.setSkinFilter(_filter);
-        Shared.pool.execute(() -> {
+        SharedPool.execute(() -> {
             byte[] data = null;
             UUID uuid = profile.getPlayerID();
             if (!Shared.isOfflinePlayer(profile.getPlayerID(), profile.getPlayerName()))
