@@ -49,7 +49,7 @@ public class MojangService
         {
             if (oldValue.isPresent()) // good result, doesn't need refresh.
                 return Futures.immediateFuture(oldValue);
-            return Shared.pool.submit(() -> {
+            return Shared.submitTask(() -> {
                 return load(key);
             });
         }
@@ -121,7 +121,7 @@ public class MojangService
                     return Futures.immediateFuture(Optional.empty()); // effectively schedule a refresh in next reload.
                 return Futures.immediateFuture(oldValue); // good result, doesn't need refresh.
             }
-            return Shared.pool.submit(() -> {
+            return Shared.submitTask(() -> {
                 return load(key);
             });
         }
@@ -139,7 +139,7 @@ public class MojangService
         Optional<GameProfile> cachedResult;
         if ((cachedResult = filledProfiles.getIfPresent(profile)) != null)
             return Futures.immediateFuture(cachedResult.orElse(profile));
-        return Shared.pool.submit(() -> {
+        return Shared.submitTask(() -> {
             return filledProfiles.getUnchecked(profile).orElse(profile);
         });
     }
@@ -155,7 +155,7 @@ public class MojangService
         Optional<GameProfile> cachedResult;
         if ((cachedResult = resolvedProfiles.getIfPresent(username)) != null)
             return Futures.immediateFuture(cachedResult.orElse(Shared.DUMMY));
-        return Shared.pool.submit(() -> {
+        return Shared.submitTask(() -> {
             return resolvedProfiles.getUnchecked(username).orElse(Shared.DUMMY);
         });
     }

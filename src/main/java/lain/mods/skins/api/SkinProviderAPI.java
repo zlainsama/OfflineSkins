@@ -4,7 +4,6 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinPool.ManagedBlocker;
@@ -21,6 +20,7 @@ import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import lain.lib.SharedPool;
 import lain.mods.skins.api.interfaces.IPlayerProfile;
 import lain.mods.skins.api.interfaces.ISkin;
 import lain.mods.skins.api.interfaces.ISkinProvider;
@@ -81,7 +81,7 @@ public class SkinProviderAPI
     /**
      * @return an empty ISkinProviderService with default implementation. <br>
      *         a SkinBundle will be created with all available ISkin objects for that IPlayerProfile. <br>
-     *         if the profile got updated during the lifetime of a SkinBundle, new ISkin objects will be gathered and a thread in ForkJoinPool.commonPool will be used to monitor those objects to wait their isDataReady for up to 10 seconds before updating the SkinBundle.
+     *         if the profile got updated during the lifetime of a SkinBundle, new ISkin objects will be gathered and a thread will be used to monitor those objects to wait their isDataReady for up to 10 seconds before updating the SkinBundle.
      */
     public static ISkinProviderService create()
     {
@@ -168,7 +168,7 @@ public class SkinProviderAPI
                             }
 
                         };
-                        CompletableFuture.runAsync(() -> {
+                        SharedPool.execute(() -> {
                             try
                             {
                                 ForkJoinPool.managedBlock(blocker);

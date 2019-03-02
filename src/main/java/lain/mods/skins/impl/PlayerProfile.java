@@ -158,7 +158,7 @@ public class PlayerProfile implements IPlayerProfile
         {
             if (oldValue == DUMMY) // value for bad profile
                 return Futures.immediateFuture(DUMMY);
-            return Shared.pool.submit(() -> {
+            return Shared.submitTask(() -> {
                 PlayerProfile newValue = load(key);
                 if (oldValue.getOriginal() != newValue.getOriginal()) // updated
                     oldValue.set(newValue.getOriginal()); // update old profile
