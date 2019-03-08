@@ -10,6 +10,7 @@ import lain.mods.skins.api.interfaces.ISkin;
 import lain.mods.skins.api.interfaces.ISkinProvider;
 import lain.mods.skins.impl.Shared;
 import lain.mods.skins.impl.SkinData;
+import lain.mods.skins.impl.forge.ImageUtils;
 
 public class UserManagedSkinProvider implements ISkinProvider
 {
@@ -39,7 +40,7 @@ public class UserManagedSkinProvider implements ISkinProvider
             if (data == null && !Shared.isBlank(profile.getPlayerName()))
                 data = readFile(_dirN, "%s.png", profile.getPlayerName());
             if (data != null)
-                skin.put(data, SkinData.judgeSkinType(data));
+                skin.put(data, ImageUtils.judgeSkinType(data));
         });
         return skin;
     }
@@ -47,7 +48,7 @@ public class UserManagedSkinProvider implements ISkinProvider
     private byte[] readFile(File dir, String filename)
     {
         byte[] contents;
-        if ((contents = Shared.blockyReadFile(new File(dir, filename), null, null)) != null && SkinData.validateData(contents))
+        if ((contents = Shared.blockyReadFile(new File(dir, filename), null, null)) != null && ImageUtils.validateData(contents))
             return contents;
         return null;
     }

@@ -14,6 +14,7 @@ import lain.mods.skins.api.interfaces.ISkin;
 import lain.mods.skins.api.interfaces.ISkinProvider;
 import lain.mods.skins.impl.Shared;
 import lain.mods.skins.impl.SkinData;
+import lain.mods.skins.impl.forge.ImageUtils;
 import lain.mods.skins.impl.forge.MinecraftUtils;
 
 public class MojangCachedCapeProvider implements ISkinProvider
@@ -53,7 +54,7 @@ public class MojangCachedCapeProvider implements ISkinProvider
                 if (textures != null && textures.containsKey(MinecraftProfileTexture.Type.CAPE))
                 {
                     MinecraftProfileTexture tex = textures.get(MinecraftProfileTexture.Type.CAPE);
-                    data = CachedDownloader.create().setLocal(_dirU, uuid.toString()).setRemote(tex.getUrl()).setDataStore(Shared.store).setProxy(MinecraftUtils.getProxy()).setValidator(SkinData::validateData).read();
+                    data = CachedDownloader.create().setLocal(_dirU, uuid.toString()).setRemote(tex.getUrl()).setDataStore(Shared.store).setProxy(MinecraftUtils.getProxy()).setValidator(ImageUtils::validateData).read();
                     if (data != null)
                         skin.put(data, "cape");
                 }

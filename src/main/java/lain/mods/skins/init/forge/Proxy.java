@@ -18,9 +18,9 @@ import com.mojang.authlib.GameProfile;
 import lain.mods.skins.api.SkinProviderAPI;
 import lain.mods.skins.api.interfaces.ISkin;
 import lain.mods.skins.impl.ConfigOptions;
-import lain.mods.skins.impl.LegacyConversion;
 import lain.mods.skins.impl.PlayerProfile;
 import lain.mods.skins.impl.forge.CustomSkinTexture;
+import lain.mods.skins.impl.forge.ImageUtils;
 import lain.mods.skins.providers.CrafatarCachedCapeProvider;
 import lain.mods.skins.providers.CrafatarCachedSkinProvider;
 import lain.mods.skins.providers.CustomServerCachedCapeProvider;
@@ -146,13 +146,13 @@ enum Proxy
         config.validate();
 
         SkinProviderAPI.SKIN.clearProviders();
-        SkinProviderAPI.SKIN.registerProvider(new UserManagedSkinProvider(Paths.get(".", "cachedImages")).withFilter(LegacyConversion.createFilter()));
+        SkinProviderAPI.SKIN.registerProvider(new UserManagedSkinProvider(Paths.get(".", "cachedImages")).withFilter(ImageUtils::legacyFilter));
         if (config.useCustomServer)
-            SkinProviderAPI.SKIN.registerProvider(new CustomServerCachedSkinProvider(Paths.get(".", "cachedImages", "custom"), config.hostCustomServer).withFilter(LegacyConversion.createFilter()));
+            SkinProviderAPI.SKIN.registerProvider(new CustomServerCachedSkinProvider(Paths.get(".", "cachedImages", "custom"), config.hostCustomServer).withFilter(ImageUtils::legacyFilter));
         if (config.useMojang)
-            SkinProviderAPI.SKIN.registerProvider(new MojangCachedSkinProvider(Paths.get(".", "cachedImages", "mojang")).withFilter(LegacyConversion.createFilter()));
+            SkinProviderAPI.SKIN.registerProvider(new MojangCachedSkinProvider(Paths.get(".", "cachedImages", "mojang")).withFilter(ImageUtils::legacyFilter));
         if (config.useCrafatar)
-            SkinProviderAPI.SKIN.registerProvider(new CrafatarCachedSkinProvider(Paths.get(".", "cachedImages", "crafatar")).withFilter(LegacyConversion.createFilter()));
+            SkinProviderAPI.SKIN.registerProvider(new CrafatarCachedSkinProvider(Paths.get(".", "cachedImages", "crafatar")).withFilter(ImageUtils::legacyFilter));
 
         SkinProviderAPI.CAPE.clearProviders();
         SkinProviderAPI.CAPE.registerProvider(new UserManagedCapeProvider(Paths.get(".", "cachedImages")));
