@@ -11,6 +11,7 @@ import lain.mods.skins.api.interfaces.ISkin;
 import lain.mods.skins.api.interfaces.ISkinProvider;
 import lain.mods.skins.impl.Shared;
 import lain.mods.skins.impl.SkinData;
+import lain.mods.skins.impl.fabric.ImageUtils;
 import lain.mods.skins.impl.fabric.MinecraftUtils;
 
 public class CustomServerCachedSkinProvider implements ISkinProvider
@@ -48,11 +49,11 @@ public class CustomServerCachedSkinProvider implements ISkinProvider
             UUID uuid = profile.getPlayerID();
             String name = profile.getPlayerName();
             if (!Shared.isOfflinePlayer(profile.getPlayerID(), profile.getPlayerName()))
-                data = CachedDownloader.create().setLocal(_dirU, uuid.toString()).setRemote("%s/skins/%s", _host, uuid).setDataStore(Shared.store).setProxy(MinecraftUtils.getProxy()).setValidator(SkinData::validateData).read();
+                data = CachedDownloader.create().setLocal(_dirU, uuid.toString()).setRemote("%s/skins/%s", _host, uuid).setDataStore(Shared.store).setProxy(MinecraftUtils.getProxy()).setValidator(ImageUtils::validateData).read();
             if (data == null && !Shared.isBlank(name))
-                data = CachedDownloader.create().setLocal(_dirN, name).setRemote("%s/skins/%s", _host, name).setDataStore(Shared.store).setProxy(MinecraftUtils.getProxy()).setValidator(SkinData::validateData).read();
+                data = CachedDownloader.create().setLocal(_dirN, name).setRemote("%s/skins/%s", _host, name).setDataStore(Shared.store).setProxy(MinecraftUtils.getProxy()).setValidator(ImageUtils::validateData).read();
             if (data != null)
-                skin.put(data, SkinData.judgeSkinType(data));
+                skin.put(data, ImageUtils.judgeSkinType(data));
         });
         return skin;
     }

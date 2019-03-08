@@ -10,6 +10,7 @@ import lain.mods.skins.api.interfaces.ISkin;
 import lain.mods.skins.api.interfaces.ISkinProvider;
 import lain.mods.skins.impl.Shared;
 import lain.mods.skins.impl.SkinData;
+import lain.mods.skins.impl.fabric.ImageUtils;
 
 public class UserManagedCapeProvider implements ISkinProvider
 {
@@ -47,7 +48,7 @@ public class UserManagedCapeProvider implements ISkinProvider
     private byte[] readFile(File dir, String filename)
     {
         byte[] contents;
-        if ((contents = Shared.blockyReadFile(new File(dir, filename), null, null)) != null && SkinData.validateData(contents))
+        if ((contents = Shared.blockyReadFile(new File(dir, filename), null, null)) != null && ImageUtils.validateData(contents))
             return contents;
         return null;
     }

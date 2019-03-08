@@ -11,6 +11,7 @@ import lain.mods.skins.api.interfaces.ISkin;
 import lain.mods.skins.api.interfaces.ISkinProvider;
 import lain.mods.skins.impl.Shared;
 import lain.mods.skins.impl.SkinData;
+import lain.mods.skins.impl.fabric.ImageUtils;
 import lain.mods.skins.impl.fabric.MinecraftUtils;
 
 public class CustomServerCachedCapeProvider implements ISkinProvider
@@ -48,9 +49,9 @@ public class CustomServerCachedCapeProvider implements ISkinProvider
             UUID uuid = profile.getPlayerID();
             String name = profile.getPlayerName();
             if (!Shared.isOfflinePlayer(profile.getPlayerID(), profile.getPlayerName()))
-                data = CachedDownloader.create().setLocal(_dirU, uuid.toString()).setRemote("%s/capes/%s", _host, uuid).setDataStore(Shared.store).setProxy(MinecraftUtils.getProxy()).setValidator(SkinData::validateData).read();
+                data = CachedDownloader.create().setLocal(_dirU, uuid.toString()).setRemote("%s/capes/%s", _host, uuid).setDataStore(Shared.store).setProxy(MinecraftUtils.getProxy()).setValidator(ImageUtils::validateData).read();
             if (data == null && !Shared.isBlank(name))
-                data = CachedDownloader.create().setLocal(_dirN, name).setRemote("%s/capes/%s", _host, name).setDataStore(Shared.store).setProxy(MinecraftUtils.getProxy()).setValidator(SkinData::validateData).read();
+                data = CachedDownloader.create().setLocal(_dirN, name).setRemote("%s/capes/%s", _host, name).setDataStore(Shared.store).setProxy(MinecraftUtils.getProxy()).setValidator(ImageUtils::validateData).read();
             if (data != null)
                 skin.put(data, "cape");
         });

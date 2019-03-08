@@ -136,6 +136,12 @@ public class Shared
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public static <T extends Throwable> void rethrow(Throwable throwable) throws T
+    {
+        throw (T) throwable;
+    }
+
     public static boolean sleep(long millis)
     {
         try

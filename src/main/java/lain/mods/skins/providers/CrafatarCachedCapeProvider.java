@@ -11,6 +11,7 @@ import lain.mods.skins.api.interfaces.ISkin;
 import lain.mods.skins.api.interfaces.ISkinProvider;
 import lain.mods.skins.impl.Shared;
 import lain.mods.skins.impl.SkinData;
+import lain.mods.skins.impl.fabric.ImageUtils;
 import lain.mods.skins.impl.fabric.MinecraftUtils;
 
 public class CrafatarCachedCapeProvider implements ISkinProvider
@@ -45,7 +46,7 @@ public class CrafatarCachedCapeProvider implements ISkinProvider
             byte[] data = null;
             UUID uuid = profile.getPlayerID();
             if (!Shared.isOfflinePlayer(profile.getPlayerID(), profile.getPlayerName()))
-                data = CachedDownloader.create().setLocal(_dirU, uuid.toString()).setRemote("https://crafatar.com/capes/%s", uuid).setDataStore(Shared.store).setProxy(MinecraftUtils.getProxy()).setValidator(SkinData::validateData).read();
+                data = CachedDownloader.create().setLocal(_dirU, uuid.toString()).setRemote("https://crafatar.com/capes/%s", uuid).setDataStore(Shared.store).setProxy(MinecraftUtils.getProxy()).setValidator(ImageUtils::validateData).read();
             if (data != null)
                 skin.put(data, "cape");
         });

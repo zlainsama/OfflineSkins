@@ -14,6 +14,7 @@ import lain.mods.skins.api.interfaces.ISkin;
 import lain.mods.skins.api.interfaces.ISkinProvider;
 import lain.mods.skins.impl.Shared;
 import lain.mods.skins.impl.SkinData;
+import lain.mods.skins.impl.fabric.ImageUtils;
 import lain.mods.skins.impl.fabric.MinecraftUtils;
 
 public class MojangCachedSkinProvider implements ISkinProvider
@@ -53,7 +54,7 @@ public class MojangCachedSkinProvider implements ISkinProvider
                 if (textures != null && textures.containsKey(MinecraftProfileTexture.Type.SKIN))
                 {
                     MinecraftProfileTexture tex = textures.get(MinecraftProfileTexture.Type.SKIN);
-                    data = CachedDownloader.create().setLocal(_dirU, uuid.toString()).setRemote(tex.getUrl()).setDataStore(Shared.store).setProxy(MinecraftUtils.getProxy()).setValidator(SkinData::validateData).read();
+                    data = CachedDownloader.create().setLocal(_dirU, uuid.toString()).setRemote(tex.getUrl()).setDataStore(Shared.store).setProxy(MinecraftUtils.getProxy()).setValidator(ImageUtils::validateData).read();
                     if (data != null)
                         skin.put(data, "slim".equals(tex.getMetadata("model")) ? "slim" : "default");
                 }
