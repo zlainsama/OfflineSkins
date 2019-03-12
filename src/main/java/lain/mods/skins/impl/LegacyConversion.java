@@ -58,7 +58,7 @@ public class LegacyConversion
         if (legacy)
         {
             g.setColor(new Color(0, 0, 0, 0));
-            g.fillRect(0, 32, 64, 32);
+            g.fillRect(0 * r, 32 * r, 64 * r, 32 * r);
             g.drawImage(i, 24 * r, 48 * r, 20 * r, 52 * r, 4 * r, 16 * r, 8 * r, 20 * r, null);
             g.drawImage(i, 28 * r, 48 * r, 24 * r, 52 * r, 8 * r, 16 * r, 12 * r, 20 * r, null);
             g.drawImage(i, 20 * r, 52 * r, 16 * r, 64 * r, 8 * r, 20 * r, 12 * r, 32 * r, null);
