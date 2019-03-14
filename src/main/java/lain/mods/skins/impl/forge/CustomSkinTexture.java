@@ -4,40 +4,46 @@ import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import javax.imageio.ImageIO;
+import lain.mods.skins.api.interfaces.ISkinTexture;
 import lain.mods.skins.impl.SkinData;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 
-public class CustomSkinTexture extends AbstractTexture
+public class CustomSkinTexture extends AbstractTexture implements ISkinTexture
 {
 
-    private final ResourceLocation _location;
-    private BufferedImage _image;
-
-    public CustomSkinTexture(ResourceLocation location, ByteBuffer data)
+    private static BufferedImage loadImage(ByteBuffer buf)
     {
-        if (data == null)
-            throw new IllegalArgumentException("buffer must not be null");
-
-        _location = location;
-
-        try (InputStream in = SkinData.wrapByteBufferAsInputStream(data))
+        try (InputStream in = SkinData.wrapByteBufferAsInputStream(buf))
         {
-            _image = ImageIO.read(in);
+            return ImageIO.read(in);
         }
         catch (Throwable t)
         {
-            _image = null;
+            return null;
         }
     }
 
-    public BufferedImage getImage()
+    private final ResourceLocation _location;
+    private WeakReference<ByteBuffer> _data;
+
+    public CustomSkinTexture(ResourceLocation location, ByteBuffer data)
     {
-        return _image;
+        _location = location;
+        if (data == null)
+            throw new IllegalArgumentException("buffer must not be null");
+        _data = new WeakReference<ByteBuffer>(data);
+    }
+
+    @Override
+    public ByteBuffer getData()
+    {
+        return _data.get();
     }
 
     public ResourceLocation getLocation()
@@ -50,9 +56,14 @@ public class CustomSkinTexture extends AbstractTexture
     {
         deleteGlTexture();
 
-        if (_image == null)
+        ByteBuffer buf;
+        if ((buf = _data.get()) == null) // gc
             throw new FileNotFoundException(getLocation().toString());
-        TextureUtil.uploadTextureImageAllocate(getGlTextureId(), _image, false, false);
+        BufferedImage image;
+        if ((image = loadImage(buf)) == null)
+            throw new FileNotFoundException(getLocation().toString());
+
+        TextureUtil.uploadTextureImageAllocate(getGlTextureId(), image, false, false);
     }
 
 }

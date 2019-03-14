@@ -13,12 +13,12 @@ import lain.mods.skins.api.interfaces.ISkin;
 import lain.mods.skins.impl.LegacyConversion;
 import lain.mods.skins.impl.PlayerProfile;
 import lain.mods.skins.impl.forge.CustomSkinTexture;
-import lain.mods.skins.providers.CrafatarCachedCapeProvider;
-import lain.mods.skins.providers.CrafatarCachedSkinProvider;
-import lain.mods.skins.providers.CustomServerCachedCapeProvider;
-import lain.mods.skins.providers.CustomServerCachedSkinProvider;
-import lain.mods.skins.providers.MojangCachedCapeProvider;
-import lain.mods.skins.providers.MojangCachedSkinProvider;
+import lain.mods.skins.providers.CrafatarCapeProvider;
+import lain.mods.skins.providers.CrafatarSkinProvider;
+import lain.mods.skins.providers.CustomServerCapeProvider;
+import lain.mods.skins.providers.CustomServerSkinProvider;
+import lain.mods.skins.providers.MojangCapeProvider;
+import lain.mods.skins.providers.MojangSkinProvider;
 import lain.mods.skins.providers.UserManagedCapeProvider;
 import lain.mods.skins.providers.UserManagedSkinProvider;
 import net.minecraft.client.Minecraft;
@@ -180,20 +180,20 @@ public class ForgeOfflineSkins
             SkinProviderAPI.SKIN.clearProviders();
             SkinProviderAPI.SKIN.registerProvider(new UserManagedSkinProvider(Paths.get(".", "cachedImages")).withFilter(LegacyConversion.createFilter()));
             if (useCustomServer)
-                SkinProviderAPI.SKIN.registerProvider(new CustomServerCachedSkinProvider(Paths.get(".", "cachedImages", "custom"), hostCustomServer).withFilter(LegacyConversion.createFilter()));
+                SkinProviderAPI.SKIN.registerProvider(new CustomServerSkinProvider().setHost(hostCustomServer).withFilter(LegacyConversion.createFilter()));
             if (useMojang)
-                SkinProviderAPI.SKIN.registerProvider(new MojangCachedSkinProvider(Paths.get(".", "cachedImages", "mojang")).withFilter(LegacyConversion.createFilter()));
+                SkinProviderAPI.SKIN.registerProvider(new MojangSkinProvider().withFilter(LegacyConversion.createFilter()));
             if (useCrafatar)
-                SkinProviderAPI.SKIN.registerProvider(new CrafatarCachedSkinProvider(Paths.get(".", "cachedImages", "crafatar")).withFilter(LegacyConversion.createFilter()));
+                SkinProviderAPI.SKIN.registerProvider(new CrafatarSkinProvider().withFilter(LegacyConversion.createFilter()));
 
             SkinProviderAPI.CAPE.clearProviders();
             SkinProviderAPI.CAPE.registerProvider(new UserManagedCapeProvider(Paths.get(".", "cachedImages")));
             if (useCustomServer)
-                SkinProviderAPI.CAPE.registerProvider(new CustomServerCachedCapeProvider(Paths.get(".", "cachedImages", "custom"), hostCustomServer));
+                SkinProviderAPI.CAPE.registerProvider(new CustomServerCapeProvider().setHost(hostCustomServer));
             if (useMojang)
-                SkinProviderAPI.CAPE.registerProvider(new MojangCachedCapeProvider(Paths.get(".", "cachedImages", "mojang")));
+                SkinProviderAPI.CAPE.registerProvider(new MojangCapeProvider());
             if (useCrafatar)
-                SkinProviderAPI.CAPE.registerProvider(new CrafatarCachedCapeProvider(Paths.get(".", "cachedImages", "crafatar")));
+                SkinProviderAPI.CAPE.registerProvider(new CrafatarCapeProvider());
 
             OverrideVanilla = true;
             MinecraftForge.EVENT_BUS.register(this);

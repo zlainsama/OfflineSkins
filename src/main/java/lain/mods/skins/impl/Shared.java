@@ -2,13 +2,20 @@ package lain.mods.skins.impl;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URLConnection;
 import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -17,7 +24,10 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListenableFutureTask;
 import com.mojang.authlib.GameProfile;
+import lain.lib.Retries;
 import lain.lib.SharedPool;
+import lain.lib.SimpleDownloader;
+import lain.mods.skins.impl.forge.MinecraftUtils;
 
 public class Shared
 {
@@ -27,7 +37,6 @@ public class Shared
     }
 
     public static final GameProfile DUMMY = new GameProfile(UUID.fromString("ae9460f5-bf72-468e-89b6-4eead59001ad"), "");
-    public static final Map<String, String> store = new ConcurrentHashMap<>();
 
     private static final Cache<UUID, Boolean> offlines = CacheBuilder.newBuilder().weakKeys().build();
 
@@ -101,12 +110,19 @@ public class Shared
         if (file == null)
             return defaultContents;
         return blockyCall(() -> {
-            try (FileInputStream fis = new FileInputStream(file); ByteArrayOutputStream baos = new ByteArrayOutputStream())
+            try (FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.READ); ByteArrayOutputStream baos = new ByteArrayOutputStream())
             {
-                fis.getChannel().transferTo(0, Long.MAX_VALUE, Channels.newChannel(baos));
+                channel.transferTo(0L, Long.MAX_VALUE, Channels.newChannel(baos));
                 return baos.toByteArray();
             }
         }, defaultContents, consumer);
+    }
+
+    public static CompletableFuture<Optional<byte[]>> downloadSkin(String resource, Executor executor)
+    {
+        return SimpleDownloader
+                .start(resource, null, MinecraftUtils.getProxy(), 2, null, executor, null, null, Shared::stopIfHttpClientError)
+                .thenApply(Shared::readAndDelete);
     }
 
     public static boolean isBlank(CharSequence cs)
@@ -136,6 +152,19 @@ public class Shared
         }
     }
 
+    private static Optional<byte[]> readAndDelete(Optional<Path> path)
+    {
+        try (FileChannel channel = FileChannel.open(path.orElseThrow(FileNotFoundException::new), StandardOpenOption.READ, StandardOpenOption.DELETE_ON_CLOSE); ByteArrayOutputStream baos = new ByteArrayOutputStream())
+        {
+            channel.transferTo(0L, Long.MAX_VALUE, Channels.newChannel(baos));
+            return Optional.of(baos.toByteArray());
+        }
+        catch (IOException e)
+        {
+            return Optional.empty();
+        }
+    }
+
     public static boolean sleep(long millis)
     {
         try
@@ -147,6 +176,21 @@ public class Shared
         {
             return false;
         }
+    }
+
+    private static boolean stopIfHttpClientError(URLConnection conn)
+    {
+        if (conn instanceof HttpURLConnection)
+            try
+            {
+                if (((HttpURLConnection) conn).getResponseCode() / 100 == 4)
+                    return false;
+            }
+            catch (IOException e)
+            {
+                Retries.rethrow(e);
+            }
+        return true;
     }
 
     public static <T> ListenableFuture<T> submitTask(Callable<T> callable)
