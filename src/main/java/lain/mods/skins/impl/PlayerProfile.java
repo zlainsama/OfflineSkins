@@ -50,7 +50,7 @@ public class PlayerProfile implements IPlayerProfile
                             profile.set(filled);
                         }
 
-                    });
+                    }, Runnable::run);
                 }
             }
             else if (Shared.isOfflinePlayer(key.getId(), key.getName())) // an offline profile that needs resolving
@@ -86,10 +86,10 @@ public class PlayerProfile implements IPlayerProfile
                                 profile.set(filled);
                             }
 
-                        });
+                        }, Runnable::run);
                     }
 
-                });
+                }, Runnable::run);
             }
             else if (key.getProperties().isEmpty()) // an assumed online profile that needs filling
             {
@@ -141,13 +141,13 @@ public class PlayerProfile implements IPlayerProfile
                                         profile.set(filled);
                                     }
 
-                                });
+                                }, Runnable::run);
                             }
 
-                        });
+                        }, Runnable::run);
                     }
 
-                });
+                }, Runnable::run);
             }
 
             return profile;

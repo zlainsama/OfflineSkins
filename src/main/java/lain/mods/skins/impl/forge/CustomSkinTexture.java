@@ -4,13 +4,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
+import lain.mods.skins.api.interfaces.ISkinTexture;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.NativeImage;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 
-public class CustomSkinTexture extends AbstractTexture
+public class CustomSkinTexture extends AbstractTexture implements ISkinTexture
 {
 
     private final ResourceLocation _location;
@@ -23,6 +24,12 @@ public class CustomSkinTexture extends AbstractTexture
 
         _location = location;
         _data = new WeakReference<>(data);
+    }
+
+    @Override
+    public ByteBuffer getData()
+    {
+        return _data.get();
     }
 
     public ResourceLocation getLocation()
