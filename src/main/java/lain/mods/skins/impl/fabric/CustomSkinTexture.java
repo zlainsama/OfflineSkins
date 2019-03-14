@@ -5,12 +5,13 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import com.mojang.blaze3d.platform.TextureUtil;
+import lain.mods.skins.api.interfaces.ISkinTexture;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.ResourceTexture;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 
-public class CustomSkinTexture extends ResourceTexture
+public class CustomSkinTexture extends ResourceTexture implements ISkinTexture
 {
 
     private WeakReference<ByteBuffer> _data;
@@ -21,6 +22,12 @@ public class CustomSkinTexture extends ResourceTexture
         if (data == null)
             throw new IllegalArgumentException("buffer must not be null");
         _data = new WeakReference<ByteBuffer>(data);
+    }
+
+    @Override
+    public ByteBuffer getData()
+    {
+        return _data.get();
     }
 
     public Identifier getLocation()

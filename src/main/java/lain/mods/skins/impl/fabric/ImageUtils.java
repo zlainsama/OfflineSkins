@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
+import lain.lib.Retries;
 import lain.mods.skins.impl.Shared;
 import lain.mods.skins.impl.SkinData;
 import net.minecraft.client.texture.NativeImage;
@@ -68,7 +69,7 @@ public class ImageUtils
             try
             {
                 output.writeFile(tmp = Files.createTempFile(null, null).toFile());
-                return SkinData.toBuffer(Shared.blockyReadFile(tmp, null, Shared::rethrow));
+                return SkinData.toBuffer(Shared.blockyReadFile(tmp, null, Retries::rethrow));
             }
             finally
             {

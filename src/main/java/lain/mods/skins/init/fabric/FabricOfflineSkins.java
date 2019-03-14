@@ -21,12 +21,12 @@ import lain.mods.skins.impl.ConfigOptions;
 import lain.mods.skins.impl.PlayerProfile;
 import lain.mods.skins.impl.fabric.CustomSkinTexture;
 import lain.mods.skins.impl.fabric.ImageUtils;
-import lain.mods.skins.providers.CrafatarCachedCapeProvider;
-import lain.mods.skins.providers.CrafatarCachedSkinProvider;
-import lain.mods.skins.providers.CustomServerCachedCapeProvider;
-import lain.mods.skins.providers.CustomServerCachedSkinProvider;
-import lain.mods.skins.providers.MojangCachedCapeProvider;
-import lain.mods.skins.providers.MojangCachedSkinProvider;
+import lain.mods.skins.providers.CrafatarCapeProvider;
+import lain.mods.skins.providers.CrafatarSkinProvider;
+import lain.mods.skins.providers.CustomServerCapeProvider;
+import lain.mods.skins.providers.CustomServerSkinProvider;
+import lain.mods.skins.providers.MojangCapeProvider;
+import lain.mods.skins.providers.MojangSkinProvider;
 import lain.mods.skins.providers.UserManagedCapeProvider;
 import lain.mods.skins.providers.UserManagedSkinProvider;
 import net.fabricmc.api.ClientModInitializer;
@@ -170,20 +170,20 @@ public class FabricOfflineSkins implements ClientModInitializer
         SkinProviderAPI.SKIN.clearProviders();
         SkinProviderAPI.SKIN.registerProvider(new UserManagedSkinProvider(Paths.get(".", "cachedImages")).withFilter(ImageUtils::legacyFilter));
         if (config.useCustomServer)
-            SkinProviderAPI.SKIN.registerProvider(new CustomServerCachedSkinProvider(Paths.get(".", "cachedImages", "custom"), config.hostCustomServer).withFilter(ImageUtils::legacyFilter));
+            SkinProviderAPI.SKIN.registerProvider(new CustomServerSkinProvider().setHost(config.hostCustomServer).withFilter(ImageUtils::legacyFilter));
         if (config.useMojang)
-            SkinProviderAPI.SKIN.registerProvider(new MojangCachedSkinProvider(Paths.get(".", "cachedImages", "mojang")).withFilter(ImageUtils::legacyFilter));
+            SkinProviderAPI.SKIN.registerProvider(new MojangSkinProvider().withFilter(ImageUtils::legacyFilter));
         if (config.useCrafatar)
-            SkinProviderAPI.SKIN.registerProvider(new CrafatarCachedSkinProvider(Paths.get(".", "cachedImages", "crafatar")).withFilter(ImageUtils::legacyFilter));
+            SkinProviderAPI.SKIN.registerProvider(new CrafatarSkinProvider().withFilter(ImageUtils::legacyFilter));
 
         SkinProviderAPI.CAPE.clearProviders();
         SkinProviderAPI.CAPE.registerProvider(new UserManagedCapeProvider(Paths.get(".", "cachedImages")));
         if (config.useCustomServer)
-            SkinProviderAPI.CAPE.registerProvider(new CustomServerCachedCapeProvider(Paths.get(".", "cachedImages", "custom"), config.hostCustomServer));
+            SkinProviderAPI.CAPE.registerProvider(new CustomServerCapeProvider().setHost(config.hostCustomServer));
         if (config.useMojang)
-            SkinProviderAPI.CAPE.registerProvider(new MojangCachedCapeProvider(Paths.get(".", "cachedImages", "mojang")));
+            SkinProviderAPI.CAPE.registerProvider(new MojangCapeProvider());
         if (config.useCrafatar)
-            SkinProviderAPI.CAPE.registerProvider(new CrafatarCachedCapeProvider(Paths.get(".", "cachedImages", "crafatar")));
+            SkinProviderAPI.CAPE.registerProvider(new CrafatarCapeProvider());
     }
 
 }

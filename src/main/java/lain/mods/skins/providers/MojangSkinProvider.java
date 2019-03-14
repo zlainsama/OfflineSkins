@@ -1,10 +1,8 @@
 package lain.mods.skins.providers;
 
-import java.io.File;
 import java.nio.ByteBuffer;
-import java.nio.file.Path;
 import java.util.Map;
-import java.util.UUID;
+import java.util.Optional;
 import java.util.function.Function;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
@@ -17,27 +15,10 @@ import lain.mods.skins.impl.SkinData;
 import lain.mods.skins.impl.fabric.ImageUtils;
 import lain.mods.skins.impl.fabric.MinecraftUtils;
 
-public class MojangCachedSkinProvider implements ISkinProvider
+public class MojangSkinProvider implements ISkinProvider
 {
 
-    private File _dirN;
-    private File _dirU;
     private Function<ByteBuffer, ByteBuffer> _filter;
-
-    public MojangCachedSkinProvider(Path workDir)
-    {
-        _dirN = new File(workDir.toFile(), "skins");
-        _dirN.mkdirs();
-        _dirU = new File(_dirN, "uuid");
-        _dirU.mkdirs();
-
-        for (File file : _dirN.listFiles())
-            if (file.isFile())
-                file.delete();
-        for (File file : _dirU.listFiles())
-            if (file.isFile())
-                file.delete();
-    }
 
     @Override
     public ISkin getSkin(IPlayerProfile profile)
@@ -46,24 +27,23 @@ public class MojangCachedSkinProvider implements ISkinProvider
         if (_filter != null)
             skin.setSkinFilter(_filter);
         SharedPool.execute(() -> {
-            byte[] data = null;
-            UUID uuid = profile.getPlayerID();
             if (!Shared.isOfflinePlayer(profile.getPlayerID(), profile.getPlayerName()))
             {
                 Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> textures = MinecraftUtils.getSessionService().getTextures((GameProfile) profile.getOriginal(), false);
                 if (textures != null && textures.containsKey(MinecraftProfileTexture.Type.SKIN))
                 {
                     MinecraftProfileTexture tex = textures.get(MinecraftProfileTexture.Type.SKIN);
-                    data = CachedDownloader.create().setLocal(_dirU, uuid.toString()).setRemote(tex.getUrl()).setDataStore(Shared.store).setProxy(MinecraftUtils.getProxy()).setValidator(ImageUtils::validateData).read();
-                    if (data != null)
-                        skin.put(data, "slim".equals(tex.getMetadata("model")) ? "slim" : "default");
+                    Shared.downloadSkin(tex.getUrl(), Runnable::run).thenApply(Optional::get).thenAccept(data -> {
+                        if (ImageUtils.validateData(data))
+                            skin.put(data, "slim".equals(tex.getMetadata("model")) ? "slim" : "default");
+                    });
                 }
             }
         });
         return skin;
     }
 
-    public MojangCachedSkinProvider withFilter(Function<ByteBuffer, ByteBuffer> filter)
+    public MojangSkinProvider withFilter(Function<ByteBuffer, ByteBuffer> filter)
     {
         _filter = filter;
         return this;
