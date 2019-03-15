@@ -24,14 +24,24 @@ public class CustomServerSkinProvider implements ISkinProvider
         if (_filter != null)
             skin.setSkinFilter(_filter);
         SharedPool.execute(() -> {
-            Shared.downloadSkin(String.format("%s/skins/%s", _host, profile.getPlayerID()), Runnable::run).handle((r, t) -> {
-                if (r != null && r.isPresent())
-                    return CompletableFuture.completedFuture(r);
-                return Shared.downloadSkin(String.format("%s/skins/%s", _host, profile.getPlayerName()), Runnable::run);
-            }).thenCompose(Function.identity()).thenApply(Optional::get).thenAccept(data -> {
-                if (SkinData.validateData(data))
-                    skin.put(data, SkinData.judgeSkinType(data));
-            });
+            if (Shared.isOfflinePlayer(profile.getPlayerID(), profile.getPlayerName()))
+            {
+                Shared.downloadSkin(String.format("%s/skins/%s", _host, profile.getPlayerName()), Runnable::run).thenApply(Optional::get).thenAccept(data -> {
+                    if (SkinData.validateData(data))
+                        skin.put(data, SkinData.judgeSkinType(data));
+                });
+            }
+            else
+            {
+                Shared.downloadSkin(String.format("%s/skins/%s", _host, profile.getPlayerID()), Runnable::run).handle((r, t) -> {
+                    if (r != null && r.isPresent())
+                        return CompletableFuture.completedFuture(r);
+                    return Shared.downloadSkin(String.format("%s/skins/%s", _host, profile.getPlayerName()), Runnable::run);
+                }).thenCompose(Function.identity()).thenApply(Optional::get).thenAccept(data -> {
+                    if (SkinData.validateData(data))
+                        skin.put(data, SkinData.judgeSkinType(data));
+                });
+            }
         });
         return skin;
     }
