@@ -41,21 +41,23 @@ public final class SimpleDownloader
         }
     }
 
-    private static boolean deleteIfExists(Path path)
+    private static boolean deleteIfExists(Path path, Consumer<Throwable> onException)
     {
         try
         {
             return Files.deleteIfExists(path);
         }
-        catch (IOException e)
+        catch (Throwable e)
         {
+            if (onException != null)
+                onException.accept(e);
             return false;
         }
     }
 
-    private static Consumer<Throwable> deleteOnExceptionDecor(Path path, Consumer<Throwable> onException)
+    private static <T extends Throwable> Consumer<T> deleteOnExceptionDecor(Path path, Consumer<T> onException)
     {
-        Consumer<Throwable> deleteOnException = e -> deleteIfExists(path);
+        Consumer<T> deleteOnException = e -> deleteIfExists(path, SimpleDownloader::rethrowIfNonIOException);
         return onException == null ? deleteOnException : deleteOnException.andThen(onException);
     }
 
@@ -66,7 +68,7 @@ public final class SimpleDownloader
         return t -> {
             if (predicate.test(t))
                 return true;
-            deleteIfExists(path);
+            deleteIfExists(path, SimpleDownloader::rethrowIfNonIOException);
             return false;
         };
     }
@@ -107,6 +109,13 @@ public final class SimpleDownloader
         }
     }
 
+    private static void rethrowIfNonIOException(Throwable throwable)
+    {
+        if (throwable instanceof IOException)
+            return;
+        Retries.rethrow(throwable);
+    }
+
     private static void runAsync(Runnable runnable, Executor executor)
     {
         if (executor == null)
@@ -144,15 +153,17 @@ public final class SimpleDownloader
         }
     }
 
-    private static boolean sleep(long millis)
+    private static boolean sleep(long millis, Consumer<Throwable> onException)
     {
         try
         {
             Thread.sleep(millis);
             return true;
         }
-        catch (InterruptedException e)
+        catch (Throwable e)
         {
+            if (onException != null)
+                onException.accept(e);
             return false;
         }
     }
@@ -179,7 +190,7 @@ public final class SimpleDownloader
                                     download(local, conn, digest, deleteOnFalseDecor(local, shouldTransfer), deleteOnExceptionDecor(local, Retries::rethrow)).ifPresent(result -> future.complete(Optional.of(result)));
                                 });
                             });
-                        }, IOException.class::isInstance, retries -> sleep(1000L), maxRetries).toRunnable(future::completeExceptionally).run();
+                        }, IOException.class::isInstance, retries -> sleep(1000L, Retries::rethrow), maxRetries).toRunnable(future::completeExceptionally).run();
                     });
                 }, future::completeExceptionally);
             }
