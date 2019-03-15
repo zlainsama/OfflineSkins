@@ -180,19 +180,25 @@ public final class SimpleDownloader
         runAsync(() -> {
             try
             {
-                if (preExecute != null)
-                    preExecute.accept(Thread.currentThread());
-                runBlocky(() -> {
-                    resource(resource, future::completeExceptionally).ifPresent(remote -> {
-                        Retries.retrying(() -> {
-                            connect(remote, proxy, preConnect, Retries::rethrow).ifPresent(conn -> {
-                                tempFile(tempDir, future::completeExceptionally).ifPresent(local -> {
-                                    download(local, conn, digest, deleteOnFalseDecor(local, shouldTransfer), deleteOnExceptionDecor(local, Retries::rethrow)).ifPresent(result -> future.complete(Optional.of(result)));
-                                });
-                            });
-                        }, IOException.class::isInstance, retries -> sleep(1000L, Retries::rethrow), maxRetries).toRunnable(future::completeExceptionally).run();
-                    });
-                }, future::completeExceptionally);
+                if (!future.isDone())
+                {
+                    if (preExecute != null)
+                        preExecute.accept(Thread.currentThread());
+                    runBlocky(() -> {
+                        resource(resource, future::completeExceptionally).ifPresent(remote -> {
+                            Retries.retrying(() -> {
+                                if (!future.isDone())
+                                {
+                                    connect(remote, proxy, preConnect, Retries::rethrow).ifPresent(conn -> {
+                                        tempFile(tempDir, future::completeExceptionally).ifPresent(local -> {
+                                            download(local, conn, digest, deleteOnFalseDecor(local, shouldTransfer), deleteOnExceptionDecor(local, Retries::rethrow)).ifPresent(result -> future.complete(Optional.of(result)));
+                                        });
+                                    });
+                                }
+                            }, IOException.class::isInstance, retries -> sleep(1000L, Retries::rethrow), maxRetries).toRunnable(future::completeExceptionally).run();
+                        });
+                    }, future::completeExceptionally);
+                }
             }
             finally
             {
