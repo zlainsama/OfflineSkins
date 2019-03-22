@@ -1,3 +1,3 @@
 @echo off
 cd ..
-start gradle setupDecompWorkspace
+start gradlew setupDecompWorkspace

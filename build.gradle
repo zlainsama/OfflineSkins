@@ -12,12 +12,12 @@ buildscript {
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "1.8.9-v3c"
+version = "1.8.9-v4"
 group= "lain.mods.skins"
 archivesBaseName = "OfflineSkins"
 
 minecraft {
-    version = "1.8.9-11.15.1.1722"
+    version = "1.8.9-11.15.1.2318-1.8.9"
     runDir = "run"
 
     mappings = "stable_20"
@@ -51,11 +51,5 @@ processResources
     }
 }
 
-sourceCompatibility = '1.7'
-targetCompatibility = '1.7'
-
-tasks.withType(JavaCompile) {
-    options.compilerArgs += [ '-Xlint:all', '-Xlint:-path' ]
-    options.deprecation = true
-    options.encoding = 'utf8'
-}
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'

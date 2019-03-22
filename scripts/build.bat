@@ -1,3 +1,3 @@
 @echo off
 cd ..
-start gradle build
+start gradlew build
