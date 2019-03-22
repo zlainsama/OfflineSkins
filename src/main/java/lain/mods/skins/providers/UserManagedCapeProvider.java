@@ -1,54 +1,66 @@
 package lain.mods.skins.providers;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
-import javax.imageio.ImageIO;
-import lain.mods.skins.SkinData;
-import lain.mods.skins.api.ISkin;
-import lain.mods.skins.api.ISkinProvider;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.AbstractClientPlayer;
-import org.apache.commons.lang3.ObjectUtils;
+import java.nio.ByteBuffer;
+import java.nio.file.Path;
+import java.util.function.Function;
+import lain.lib.SharedPool;
+import lain.mods.skins.api.interfaces.IPlayerProfile;
+import lain.mods.skins.api.interfaces.ISkin;
+import lain.mods.skins.api.interfaces.ISkinProvider;
+import lain.mods.skins.impl.Shared;
+import lain.mods.skins.impl.SkinData;
 
 public class UserManagedCapeProvider implements ISkinProvider
 {
 
-    public UserManagedCapeProvider()
+    private File _dirN;
+    private File _dirU;
+    private Function<ByteBuffer, ByteBuffer> _filter;
+
+    public UserManagedCapeProvider(Path workDir)
     {
-        File file1 = new File(Minecraft.getMinecraft().mcDataDir, "cachedImages");
-        if (!file1.exists())
-            file1.mkdirs();
-        File file2 = new File(file1, "capes");
-        if (!file2.exists())
-            file2.mkdirs();
-        File file3 = new File(file2, "uuid");
-        if (!file3.exists())
-            file3.mkdirs();
+        _dirN = new File(workDir.toFile(), "capes");
+        _dirN.mkdirs();
+        _dirU = new File(_dirN, "uuid");
+        _dirU.mkdirs();
     }
 
     @Override
-    public ISkin getSkin(AbstractClientPlayer player)
+    public ISkin getSkin(IPlayerProfile profile)
     {
-        BufferedImage image = readImage(String.format("capes/uuid/%s.png", ObjectUtils.defaultIfNull(player.getGameProfile().getId(), player.getUniqueID()).toString().replaceAll("-", "")));
-        if (image == null)
-            image = readImage(String.format("capes/%s.png", ObjectUtils.defaultIfNull(player.getGameProfile().getName(), "")));
-        if (image == null)
-            return null;
-        SkinData data = new SkinData();
-        data.put(image, "cape");
-        return data;
+        SkinData skin = new SkinData();
+        if (_filter != null)
+            skin.setSkinFilter(_filter);
+        SharedPool.execute(() -> {
+            byte[] data = null;
+            if (!Shared.isOfflinePlayer(profile.getPlayerID(), profile.getPlayerName()))
+                data = readFile(_dirU, "%s.png", profile.getPlayerID().toString().replaceAll("-", ""));
+            if (data == null && !Shared.isBlank(profile.getPlayerName()))
+                data = readFile(_dirN, "%s.png", profile.getPlayerName());
+            if (data != null)
+                skin.put(data, "cape");
+        });
+        return skin;
     }
 
-    private BufferedImage readImage(String name)
+    private byte[] readFile(File dir, String filename)
     {
-        try
-        {
-            return ImageIO.read(new File(new File(Minecraft.getMinecraft().mcDataDir, "cachedImages"), name));
-        }
-        catch (Exception e)
-        {
-        }
+        byte[] contents;
+        if ((contents = Shared.blockyReadFile(new File(dir, filename), null, null)) != null && SkinData.validateData(contents))
+            return contents;
         return null;
+    }
+
+    private byte[] readFile(File dir, String filename, Object... args)
+    {
+        return readFile(dir, String.format(filename, args));
+    }
+
+    public UserManagedCapeProvider withFilter(Function<ByteBuffer, ByteBuffer> filter)
+    {
+        _filter = filter;
+        return this;
     }
 
 }

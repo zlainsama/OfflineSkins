@@ -26,7 +26,7 @@ minecraft {
 jar
 {
     manifest {
-        attributes 'FMLCorePlugin': 'lain.mods.skins.asm.Plugin',
+        attributes 'FMLCorePlugin': 'lain.mods.skins.init.forge.asm.Plugin',
 		           'FMLCorePluginContainsFMLMod': 'true'
     }
 }

@@ -1,81 +1,219 @@
 package lain.mods.skins.api;
 
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinPool.ManagedBlocker;
 import java.util.concurrent.TimeUnit;
-import net.minecraft.client.entity.AbstractClientPlayer;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
-import com.google.common.collect.Lists;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+import lain.lib.SharedPool;
+import lain.mods.skins.api.interfaces.IPlayerProfile;
+import lain.mods.skins.api.interfaces.ISkin;
+import lain.mods.skins.api.interfaces.ISkinProvider;
+import lain.mods.skins.api.interfaces.ISkinProviderService;
 
 public class SkinProviderAPI
 {
 
-    public static ISkinProviderService createService()
+    public static final ISkin DUMMY = new ISkin()
+    {
+
+        @Override
+        public ByteBuffer getData()
+        {
+            return null;
+        }
+
+        @Override
+        public String getSkinType()
+        {
+            return null;
+        }
+
+        @Override
+        public boolean isDataReady()
+        {
+            return false;
+        }
+
+        @Override
+        public void onRemoval()
+        {
+        }
+
+        @Override
+        public boolean setRemovalListener(Consumer<ISkin> listener)
+        {
+            return false;
+        }
+
+        @Override
+        public boolean setSkinFilter(Function<ByteBuffer, ByteBuffer> filter)
+        {
+            return false;
+        }
+
+    };
+
+    /**
+     * The service for skins.
+     */
+    public static final ISkinProviderService SKIN = create();
+    /**
+     * The service for capes.
+     */
+    public static final ISkinProviderService CAPE = create();
+
+    /**
+     * @return an empty ISkinProviderService with default implementation. <br>
+     *         a SkinBundle will be created with all available ISkin objects for that IPlayerProfile. <br>
+     *         if the profile got updated during the lifetime of a SkinBundle, new ISkin objects will be gathered and a thread will be used to monitor those objects to wait their isDataReady for up to 10 seconds before updating the SkinBundle.
+     */
+    public static ISkinProviderService create()
     {
         return new ISkinProviderService()
         {
 
-            private final List<ISkinProvider> providers = Lists.newArrayList();
-            private final LoadingCache<AbstractClientPlayer, List<ISkin>> cache = CacheBuilder.newBuilder().expireAfterAccess(15, TimeUnit.SECONDS).removalListener(new RemovalListener<AbstractClientPlayer, List<ISkin>>()
+            private final LoadingCache<SkinBundle, AtomicReference<Object>> reloading = CacheBuilder.newBuilder().weakKeys().build(new CacheLoader<SkinBundle, AtomicReference<Object>>()
             {
 
                 @Override
-                public void onRemoval(RemovalNotification<AbstractClientPlayer, List<ISkin>> notification)
+                public AtomicReference<Object> load(SkinBundle key) throws Exception
                 {
-                    List<ISkin> list = notification.getValue();
-                    if (list != null)
-                    {
-                        for (ISkin skin : list)
-                            skin.onRemoval();
-                    }
+                    return new AtomicReference<>();
                 }
 
-            }).build(new CacheLoader<AbstractClientPlayer, List<ISkin>>()
+            });
+            private final LoadingCache<IPlayerProfile, SkinBundle> cache = CacheBuilder.newBuilder().expireAfterAccess(15, TimeUnit.SECONDS).removalListener(new RemovalListener<IPlayerProfile, SkinBundle>()
             {
 
                 @Override
-                public List<ISkin> load(AbstractClientPlayer key) throws Exception
+                public void onRemoval(RemovalNotification<IPlayerProfile, SkinBundle> notification)
                 {
-                    List<ISkin> list = Lists.newArrayList();
-                    for (ISkinProvider p : providers)
+                    SkinBundle skin = notification.getValue();
+                    if (skin != null)
+                        skin.onRemoval();
+                }
+
+            }).build(new CacheLoader<IPlayerProfile, SkinBundle>()
+            {
+
+                @Override
+                public SkinBundle load(IPlayerProfile key) throws Exception
+                {
+                    key.setUpdateListener(profileChangeListener);
+
+                    return new SkinBundle().set(providers.stream().map(provider -> {
+                        return provider.getSkin(key);
+                    }).filter(skin -> {
+                        return skin != null;
+                    }).collect(Collectors.toCollection(ArrayList::new)));
+                }
+
+                @Override
+                public ListenableFuture<SkinBundle> reload(IPlayerProfile key, SkinBundle oldValue) throws Exception
+                {
+                    // Gather new ISkin objects.
+                    Collection<ISkin> skins = providers.stream().map(provider -> {
+                        return provider.getSkin(key);
+                    }).filter(skin -> {
+                        return skin != null;
+                    }).collect(Collectors.toCollection(ArrayList::new));
+                    // Prepare for monitoring.
+                    Object token;
+                    reloading.getUnchecked(oldValue).set(token = new Object());
+                    long deadline = System.currentTimeMillis() + 10000; // 10 seconds
+                    Supplier<Boolean> ready = () -> {
+                        return System.currentTimeMillis() - deadline > 0L || reloading.getUnchecked(oldValue).get() != token || skins.stream().filter(ISkin::isDataReady).findAny().isPresent();
+                    };
+                    Runnable update = () -> {
+                        if (reloading.getUnchecked(oldValue).compareAndSet(token, null))
+                            oldValue.set(skins);
+                    };
+
+                    if (skins.isEmpty())
                     {
-                        ISkin s = p.getSkin(key);
-                        if (s != null)
-                            list.add(s);
+                        update.run();
                     }
-                    return list;
+                    else
+                    {
+                        ManagedBlocker blocker = new ManagedBlocker()
+                        {
+
+                            @Override
+                            public boolean block() throws InterruptedException
+                            {
+                                Thread.sleep(1000); // 1 second
+                                return ready.get();
+                            }
+
+                            @Override
+                            public boolean isReleasable()
+                            {
+                                return ready.get();
+                            }
+
+                        };
+                        SharedPool.execute(() -> {
+                            try
+                            {
+                                ForkJoinPool.managedBlock(blocker);
+                            }
+                            catch (InterruptedException e)
+                            {
+                            }
+                            finally
+                            {
+                                update.run();
+                            }
+                        });
+                    }
+                    return Futures.immediateFuture(oldValue);
                 }
 
             });
 
+            private final List<ISkinProvider> providers = new CopyOnWriteArrayList<>();
+            private final Consumer<IPlayerProfile> profileChangeListener = profile -> {
+                if (cache.getIfPresent(profile) != null)
+                    cache.refresh(profile);
+            };
+
             @Override
-            public void clear()
+            public void clearProviders()
             {
                 providers.clear();
                 cache.invalidateAll();
             }
 
             @Override
-            public ISkin getSkin(AbstractClientPlayer player)
+            public ISkin getSkin(IPlayerProfile profile)
             {
-                List<ISkin> list = cache.getUnchecked(player);
-                for (ISkin skin : list)
-                {
-                    if (skin.isSkinReady())
-                        return skin;
-                }
-                return null;
+                if (profile == null)
+                    return DUMMY;
+                return cache.getUnchecked(profile);
             }
 
             @Override
-            public void register(ISkinProvider provider)
+            public boolean registerProvider(ISkinProvider provider)
             {
                 if (provider == null || provider == this)
-                    throw new UnsupportedOperationException();
-                providers.add(provider);
+                    return false;
+                return providers.add(provider);
             }
 
         };

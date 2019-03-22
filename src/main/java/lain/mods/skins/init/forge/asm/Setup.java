@@ -1,11 +1,9 @@
-package lain.mods.skins.asm;
+package lain.mods.skins.init.forge.asm;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
-import net.minecraftforge.fml.relauncher.IFMLCallHook;
-import LZMA.LzmaInputStream;
 import com.google.common.base.Charsets;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -13,6 +11,8 @@ import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.ByteSource;
 import com.google.common.io.LineProcessor;
+import LZMA.LzmaInputStream;
+import net.minecraftforge.fml.relauncher.IFMLCallHook;
 
 public class Setup implements IFMLCallHook
 {
