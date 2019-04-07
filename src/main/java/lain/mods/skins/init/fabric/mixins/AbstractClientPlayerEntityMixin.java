@@ -28,7 +28,7 @@ public abstract class AbstractClientPlayerEntityMixin extends PlayerEntity
             info.setReturnValue(loc);
     }
 
-    @Inject(method = "method_3117()Lnet/minecraft/util/Identifier;", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "getSkinTexture()Lnet/minecraft/util/Identifier;", at = @At("RETURN"), cancellable = true)
     private void getLocationSkin_nBXjeY(CallbackInfoReturnable<Identifier> info)
     {
         Identifier loc = FabricOfflineSkins.getLocationSkin(getGameProfile(), info.getReturnValue());

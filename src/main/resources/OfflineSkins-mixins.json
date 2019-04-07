@@ -2,7 +2,7 @@
   "required": true,
   "package": "lain.mods.skins.init.fabric.mixins",
   "compatibilityLevel": "JAVA_8",
-  "mixins": [
+  "client": [
     "AbstractClientPlayerEntityMixin",
     "SkullBlockEntityRendererMixin",
     "ScoreboardHudMixin"
@@ -10,5 +10,6 @@
   "injectors": {
     "defaultRequire": 1
   },
-  "refmap": "OfflineSkins-refmap.json"
+  "refmap": "OfflineSkins-refmap.json",
+  "minVersion": "0.7.11-SNAPSHOT"
 }

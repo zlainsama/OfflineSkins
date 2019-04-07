@@ -1,14 +1,31 @@
 {
+  "schemaVersion": 1,
   "id": "offlineskins",
-  "name": "offlineskins",
-  "version": "v1-fabric",
-  "side": "universal",
+  "version": "${version}",
+
+  "name": "OfflineSkins",
   "description": "made it possible to cache your skins for offline use",
-  "license": "MIT",
-  "initializers": [
-    "lain.mods.skins.init.fabric.FabricOfflineSkins"
+  "authors": [
+    "zlainsama"
   ],
-  "mixins": {
-    "client": "OfflineSkins-mixins.client.json"
+  "contact": {
+    "sources": "https://github.com/zlainsama/OfflineSkins"
+  },
+
+  "license": "MIT",
+
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "lain.mods.skins.init.fabric.FabricOfflineSkins"
+    ]
+  },
+  "mixins": [
+    "OfflineSkins-mixins.json"
+  ],
+
+  "requires": {
+    "fabricloader": ">=0.4.0",
+    "fabric": "*"
   }
 }
