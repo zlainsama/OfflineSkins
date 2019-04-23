@@ -20,7 +20,7 @@ public abstract class AbstractClientPlayerEntityMixin extends PlayerEntity
         super(world, profile);
     }
 
-    @Inject(method = "method_3119()Lnet/minecraft/util/Identifier;", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "getCapeTexture()Lnet/minecraft/util/Identifier;", at = @At("RETURN"), cancellable = true)
     private void getLocationCape_nBXjeY(CallbackInfoReturnable<Identifier> info)
     {
         Identifier loc = FabricOfflineSkins.getLocationCape(getGameProfile(), info.getReturnValue());
@@ -36,7 +36,7 @@ public abstract class AbstractClientPlayerEntityMixin extends PlayerEntity
             info.setReturnValue(loc);
     }
 
-    @Inject(method = "method_3121()Ljava/lang/String;", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "getModel()Ljava/lang/String;", at = @At("RETURN"), cancellable = true)
     private void getSkinType_nBXjeY(CallbackInfoReturnable<String> info)
     {
         String type = FabricOfflineSkins.getSkinType(getGameProfile(), info.getReturnValue());

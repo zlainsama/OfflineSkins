@@ -5,7 +5,7 @@
   "client": [
     "AbstractClientPlayerEntityMixin",
     "SkullBlockEntityRendererMixin",
-    "ScoreboardHudMixin"
+    "PlayerListHudMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -41,7 +41,7 @@ public class ImageUtils
         {
             int r = Math.max(input.getWidth() / 64, 1);
             boolean f = input.getWidth() == input.getHeight() * 2;
-            output.method_4317(input);
+            output.copyFrom(input);
             if (f)
             {
                 output.fillRGBA(0 * r, 32 * r, 64 * r, 32 * r, 0);
