@@ -30,7 +30,7 @@ import lain.mods.skins.providers.MojangSkinProvider;
 import lain.mods.skins.providers.UserManagedCapeProvider;
 import lain.mods.skins.providers.UserManagedSkinProvider;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
@@ -77,7 +77,7 @@ enum Proxy
                 skin.setRemovalListener(s -> {
                     if (data == s.getData())
                     {
-                        Minecraft.getInstance().addScheduledTask(() -> {
+                        Minecraft.getInstance().execute(() -> {
                             Minecraft.getInstance().getTextureManager().deleteTexture(texture.getLocation());
                             textures.remove(data);
                         });
@@ -107,7 +107,7 @@ enum Proxy
             World world = Minecraft.getInstance().world;
             if (world != null)
             {
-                for (EntityPlayer player : world.playerEntities)
+                for (PlayerEntity player : world.getPlayers())
                 {
                     SkinProviderAPI.SKIN.getSkin(PlayerProfile.wrapGameProfile(player.getGameProfile()));
                     SkinProviderAPI.CAPE.getSkin(PlayerProfile.wrapGameProfile(player.getGameProfile()));

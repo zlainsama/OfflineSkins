@@ -1,7 +1,7 @@
 var ASMAPI = Java.type('net.minecraftforge.coremod.api.ASMAPI');
 var OPCODES = Java.type('org.objectweb.asm.Opcodes');
 
-// net/minecraft/client/entity/AbstractClientPlayer/func_110303_q (getLocationCape)
+// net/minecraft/client/entity/player/AbstractClientPlayerEntity/func_110303_q (getLocationCape)
 function transformMethod001(node) {
     for (var i = 0; i < node.instructions.size(); i++) {
         var insn = node.instructions.get(i);
@@ -10,13 +10,13 @@ function transformMethod001(node) {
             tmp.visitVarInsn(OPCODES.ASTORE, 2);
             tmp.visitVarInsn(OPCODES.ALOAD, 0);
             tmp.visitVarInsn(OPCODES.ALOAD, 2);
-            tmp.visitMethodInsn(OPCODES.INVOKESTATIC, 'lain/mods/skins/init/forge/Hooks', 'getLocationCape', '(Lnet/minecraft/client/entity/AbstractClientPlayer;Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/util/ResourceLocation;', false);
+            tmp.visitMethodInsn(OPCODES.INVOKESTATIC, 'lain/mods/skins/init/forge/Hooks', 'getLocationCape', '(Lnet/minecraft/client/entity/player/AbstractClientPlayerEntity;Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/util/ResourceLocation;', false);
             i += tmp.instructions.size();
             node.instructions.insertBefore(insn, tmp.instructions);
         }
     }
 }
-// net/minecraft/client/entity/AbstractClientPlayer/func_110306_p (getLocationSkin)
+// net/minecraft/client/entity/player/AbstractClientPlayerEntity/func_110306_p (getLocationSkin)
 function transformMethod002(node) {
     for (var i = 0; i < node.instructions.size(); i++) {
         var insn = node.instructions.get(i);
@@ -25,13 +25,13 @@ function transformMethod002(node) {
             tmp.visitVarInsn(OPCODES.ASTORE, 2);
             tmp.visitVarInsn(OPCODES.ALOAD, 0);
             tmp.visitVarInsn(OPCODES.ALOAD, 2);
-            tmp.visitMethodInsn(OPCODES.INVOKESTATIC, 'lain/mods/skins/init/forge/Hooks', 'getLocationSkin', '(Lnet/minecraft/client/entity/AbstractClientPlayer;Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/util/ResourceLocation;', false);
+            tmp.visitMethodInsn(OPCODES.INVOKESTATIC, 'lain/mods/skins/init/forge/Hooks', 'getLocationSkin', '(Lnet/minecraft/client/entity/player/AbstractClientPlayerEntity;Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/util/ResourceLocation;', false);
             i += tmp.instructions.size();
             node.instructions.insertBefore(insn, tmp.instructions);
         }
     }
 }
-// net/minecraft/client/entity/AbstractClientPlayer/func_175154_l (getSkinType)
+// net/minecraft/client/entity/player/AbstractClientPlayerEntity/func_175154_l (getSkinType)
 function transformMethod003(node) {
     for (var i = 0; i < node.instructions.size(); i++) {
         var insn = node.instructions.get(i);
@@ -40,13 +40,13 @@ function transformMethod003(node) {
             tmp.visitVarInsn(OPCODES.ASTORE, 2);
             tmp.visitVarInsn(OPCODES.ALOAD, 0);
             tmp.visitVarInsn(OPCODES.ALOAD, 2);
-            tmp.visitMethodInsn(OPCODES.INVOKESTATIC, 'lain/mods/skins/init/forge/Hooks', 'getSkinType', '(Lnet/minecraft/client/entity/AbstractClientPlayer;Ljava/lang/String;)Ljava/lang/String;', false);
+            tmp.visitMethodInsn(OPCODES.INVOKESTATIC, 'lain/mods/skins/init/forge/Hooks', 'getSkinType', '(Lnet/minecraft/client/entity/player/AbstractClientPlayerEntity;Ljava/lang/String;)Ljava/lang/String;', false);
             i += tmp.instructions.size();
             node.instructions.insertBefore(insn, tmp.instructions);
         }
     }
 }
-// net/minecraft/client/renderer/tileentity/TileEntitySkullRenderer/func_199356_a
+// net/minecraft/client/renderer/tileentity/SkullTileEntityRenderer/func_199356_a
 function transformMethod004(node) {
     for (var i = 0; i < node.instructions.size(); i++) {
         var insn = node.instructions.get(i);
@@ -56,13 +56,13 @@ function transformMethod004(node) {
             tmp.visitVarInsn(OPCODES.ALOAD, 1);
             tmp.visitVarInsn(OPCODES.ALOAD, 2);
             tmp.visitVarInsn(OPCODES.ALOAD, 3);
-            tmp.visitMethodInsn(OPCODES.INVOKESTATIC, 'lain/mods/skins/init/forge/Hooks', 'getLocationSkin_SkullRenderer', '(Lnet/minecraft/block/BlockSkull$ISkullType;Lcom/mojang/authlib/GameProfile;Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/util/ResourceLocation;', false);
+            tmp.visitMethodInsn(OPCODES.INVOKESTATIC, 'lain/mods/skins/init/forge/Hooks', 'getLocationSkin_SkullRenderer', '(Lnet/minecraft/block/SkullBlock$ISkullType;Lcom/mojang/authlib/GameProfile;Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/util/ResourceLocation;', false);
             i += tmp.instructions.size();
             node.instructions.insertBefore(insn, tmp.instructions);
         }
     }
 }
-// net/minecraft/client/gui/GuiPlayerTabOverlay/func_175249_a (renderPlayerlist)
+// net/minecraft/client/gui/overlay/PlayerTabOverlayGui/func_175249_a (render)
 function transformMethod005(node) {
     for (var i = 0; i < node.instructions.size(); i++) {
         var insn = node.instructions.get(i);
@@ -74,9 +74,9 @@ function transformMethod005(node) {
             node.instructions.insertBefore(insn, tmp.instructions);
         } else if (OPCODES.INVOKEVIRTUAL === insn.getOpcode() && 'func_110577_a' === insn.name) { // bindTexture
             var tmp = ASMAPI.getMethodNode();
-            tmp.visitVarInsn(OPCODES.ASTORE, 32);
-            tmp.visitVarInsn(OPCODES.ALOAD, 25);
-            tmp.visitVarInsn(OPCODES.ALOAD, 32);
+            tmp.visitVarInsn(OPCODES.ASTORE, 33);
+            tmp.visitVarInsn(OPCODES.ALOAD, 26);
+            tmp.visitVarInsn(OPCODES.ALOAD, 33);
             tmp.visitMethodInsn(OPCODES.INVOKESTATIC, 'lain/mods/skins/init/forge/Hooks', 'getLocationSkin_TabOverlay', '(Lcom/mojang/authlib/GameProfile;Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/util/ResourceLocation;', false);
             i += tmp.instructions.size();
             node.instructions.insertBefore(insn, tmp.instructions);
@@ -89,7 +89,7 @@ function initializeCoreMod() {
         'Transformer001': {
             'target': {
                 'type': 'CLASS',
-                'name': 'net/minecraft/client/entity/AbstractClientPlayer'
+                'name': 'net/minecraft/client/entity/player/AbstractClientPlayerEntity'
             },
             'transformer': function(node) {
                 node.methods.forEach(function(method) {
@@ -106,7 +106,7 @@ function initializeCoreMod() {
         'Transformer002': {
             'target': {
                 'type': 'CLASS',
-                'name': 'net/minecraft/client/renderer/tileentity/TileEntitySkullRenderer'
+                'name': 'net/minecraft/client/renderer/tileentity/SkullTileEntityRenderer'
             },
             'transformer': function(node) {
                 node.methods.forEach(function(method) {
@@ -119,7 +119,7 @@ function initializeCoreMod() {
         'Transformer003': {
             'target': {
                 'type': 'CLASS',
-                'name': 'net/minecraft/client/gui/GuiPlayerTabOverlay'
+                'name': 'net/minecraft/client/gui/overlay/PlayerTabOverlayGui'
             },
             'transformer': function(node) {
                 node.methods.forEach(function(method) {
