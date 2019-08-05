@@ -13,18 +13,18 @@ apply plugin: 'eclipse'
 
 import net.minecraftforge.gradle.common.task.SignJar
 
-version = "1.14.2-v1"
+version = "1.14.4-v1"
 group= "lain.mods.skins"
 archivesBaseName = "OfflineSkins"
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
 minecraft {
-    mappings channel: 'snapshot', version: '20190608-1.14.2'
+    mappings channel: 'snapshot', version: '20190719-1.14.3'
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.14.2-26.0.33'
+    minecraft 'net.minecraftforge:forge:1.14.4-28.0.45'
 }
 
 processResources {
