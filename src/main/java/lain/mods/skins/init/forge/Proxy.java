@@ -34,7 +34,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.event.TickEvent;
 
 enum Proxy
 {
