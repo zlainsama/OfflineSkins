@@ -46,16 +46,16 @@ function transformMethod003(node) {
         }
     }
 }
-// net/minecraft/client/renderer/tileentity/SkullTileEntityRenderer/func_199356_a
+// net/minecraft/client/renderer/tileentity/SkullTileEntityRenderer/func_228878_a_
 function transformMethod004(node) {
     for (var i = 0; i < node.instructions.size(); i++) {
         var insn = node.instructions.get(i);
-        if (OPCODES.ARETURN === insn.getOpcode()) {
+        if (OPCODES.INVOKESTATIC === insn.getOpcode() && ('func_228644_e_' === insn.name || 'func_228640_c_' === insn.name)) {
             var tmp = ASMAPI.getMethodNode();
-            tmp.visitVarInsn(OPCODES.ASTORE, 3);
+            tmp.visitVarInsn(OPCODES.ASTORE, 2);
+            tmp.visitVarInsn(OPCODES.ALOAD, 0);
             tmp.visitVarInsn(OPCODES.ALOAD, 1);
             tmp.visitVarInsn(OPCODES.ALOAD, 2);
-            tmp.visitVarInsn(OPCODES.ALOAD, 3);
             tmp.visitMethodInsn(OPCODES.INVOKESTATIC, 'lain/mods/skins/init/forge/Hooks', 'getLocationSkin_SkullRenderer', '(Lnet/minecraft/block/SkullBlock$ISkullType;Lcom/mojang/authlib/GameProfile;Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/util/ResourceLocation;', false);
             i += tmp.instructions.size();
             node.instructions.insertBefore(insn, tmp.instructions);
@@ -110,7 +110,7 @@ function initializeCoreMod() {
             },
             'transformer': function(node) {
                 node.methods.forEach(function(method) {
-                    if ('func_199356_a' === method.name)
+                    if ('func_228878_a_' === method.name)
                         transformMethod004(method);
                 });
                 return node;

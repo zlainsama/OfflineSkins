@@ -4,10 +4,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
-import com.mojang.blaze3d.platform.TextureUtil;
 import lain.mods.skins.api.interfaces.ISkinTexture;
 import net.minecraft.client.renderer.texture.NativeImage;
 import net.minecraft.client.renderer.texture.Texture;
+import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 
@@ -50,7 +50,7 @@ public class CustomSkinTexture extends Texture implements ISkinTexture
         {
             synchronized (this)
             {
-                TextureUtil.prepareImage(getGlTextureId(), 0, image.getWidth(), image.getHeight());
+                TextureUtil.func_225681_a_(getGlTextureId(), 0, image.getWidth(), image.getHeight());
                 image.uploadTextureSub(0, 0, 0, false);
             }
         }
