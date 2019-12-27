@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLConnection;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
@@ -121,8 +123,20 @@ public class Shared
     public static CompletableFuture<Optional<byte[]>> downloadSkin(String resource, Executor executor)
     {
         return SimpleDownloader
-                .start(resource, null, MinecraftUtils.getProxy(), 2, null, executor, null, null, Shared::stopIfHttpClientError)
+                .start(encodeURL(resource), null, MinecraftUtils.getProxy(), 2, null, executor, null, null, Shared::stopIfHttpClientError)
                 .thenApply(Shared::readAndDelete);
+    }
+
+    private static String encodeURL(String url)
+    {
+        try
+        {
+            return new URI(url).toASCIIString();
+        }
+        catch (NullPointerException | URISyntaxException e)
+        {
+            return url;
+        }
     }
 
     public static boolean isBlank(CharSequence cs)
