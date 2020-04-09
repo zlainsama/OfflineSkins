@@ -24,7 +24,7 @@
     "OfflineSkins-mixins.json"
   ],
 
-  "requires": {
+  "depends": {
     "fabricloader": ">=0.7.2",
     "fabric": "*"
   }
