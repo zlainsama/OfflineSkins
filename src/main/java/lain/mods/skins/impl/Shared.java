@@ -123,7 +123,7 @@ public class Shared
     public static CompletableFuture<Optional<byte[]>> downloadSkin(String resource, Executor executor)
     {
         return SimpleDownloader
-                .start(encodeURL(resource), null, MinecraftUtils.getProxy(), 2, null, executor, null, null, Shared::stopIfHttpClientError)
+                .start(encodeURL(resource), null, MinecraftUtils.getProxy(), 2, null, executor, null, Shared::preConnect, Shared::stopIfHttpClientError)
                 .thenApply(Shared::readAndDelete);
     }
 
@@ -164,6 +164,15 @@ public class Shared
         {
             return true;
         }
+    }
+
+    private static void preConnect(URLConnection conn)
+    {
+        conn.setConnectTimeout(10000);
+        conn.setReadTimeout(30000);
+        conn.setUseCaches(true);
+        conn.setDoInput(true);
+        conn.setDoOutput(false);
     }
 
     private static Optional<byte[]> readAndDelete(Optional<Path> path)
