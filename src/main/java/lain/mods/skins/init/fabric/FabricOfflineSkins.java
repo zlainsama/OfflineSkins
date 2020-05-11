@@ -24,7 +24,9 @@ import lain.mods.skins.impl.fabric.ImageUtils;
 import lain.mods.skins.providers.CrafatarCapeProvider;
 import lain.mods.skins.providers.CrafatarSkinProvider;
 import lain.mods.skins.providers.CustomServerCapeProvider;
+import lain.mods.skins.providers.CustomServerCapeProvider2;
 import lain.mods.skins.providers.CustomServerSkinProvider;
+import lain.mods.skins.providers.CustomServerSkinProvider2;
 import lain.mods.skins.providers.MojangCapeProvider;
 import lain.mods.skins.providers.MojangSkinProvider;
 import lain.mods.skins.providers.UserManagedCapeProvider;
@@ -171,6 +173,8 @@ public class FabricOfflineSkins implements ClientModInitializer
         SkinProviderAPI.SKIN.registerProvider(new UserManagedSkinProvider(Paths.get(".", "cachedImages")).withFilter(ImageUtils::legacyFilter));
         if (config.useCustomServer)
             SkinProviderAPI.SKIN.registerProvider(new CustomServerSkinProvider().setHost(config.hostCustomServer).withFilter(ImageUtils::legacyFilter));
+        if (config.useCustomServer2)
+            SkinProviderAPI.SKIN.registerProvider(new CustomServerSkinProvider2().setHost(config.hostCustomServer2Skin).withFilter(ImageUtils::legacyFilter));
         if (config.useMojang)
             SkinProviderAPI.SKIN.registerProvider(new MojangSkinProvider().withFilter(ImageUtils::legacyFilter));
         if (config.useCrafatar)
@@ -180,6 +184,8 @@ public class FabricOfflineSkins implements ClientModInitializer
         SkinProviderAPI.CAPE.registerProvider(new UserManagedCapeProvider(Paths.get(".", "cachedImages")));
         if (config.useCustomServer)
             SkinProviderAPI.CAPE.registerProvider(new CustomServerCapeProvider().setHost(config.hostCustomServer));
+        if (config.useCustomServer2)
+            SkinProviderAPI.CAPE.registerProvider(new CustomServerCapeProvider2().setHost(config.hostCustomServer2Cape));
         if (config.useMojang)
             SkinProviderAPI.CAPE.registerProvider(new MojangCapeProvider());
         if (config.useCrafatar)
