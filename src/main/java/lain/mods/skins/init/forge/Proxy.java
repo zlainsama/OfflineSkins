@@ -71,7 +71,7 @@ enum Proxy
         if (!textures.containsKey(data))
         {
             CustomSkinTexture texture = new CustomSkinTexture(generateRandomLocation(), data);
-            Minecraft.getInstance().getTextureManager().func_229263_a_(texture.getLocation(), texture);
+            Minecraft.getInstance().getTextureManager().loadTexture(texture.getLocation(), texture);
             textures.put(data, texture);
 
             if (skin != null)

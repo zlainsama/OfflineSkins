@@ -62,11 +62,11 @@ function transformMethod004(node) {
         }
     }
 }
-// net/minecraft/client/gui/overlay/PlayerTabOverlayGui/func_175249_a (render)
+// net/minecraft/client/gui/overlay/PlayerTabOverlayGui/func_238523_a_
 function transformMethod005(node) {
     for (var i = 0; i < node.instructions.size(); i++) {
         var insn = node.instructions.get(i);
-        if (OPCODES.ISTORE === insn.getOpcode() && 11 === insn.var) {
+        if (OPCODES.ISTORE === insn.getOpcode() && 12 === insn.var) {
             var tmp = ASMAPI.getMethodNode();
             tmp.visitInsn(OPCODES.POP);
             tmp.visitInsn(OPCODES.ICONST_1);
@@ -74,9 +74,9 @@ function transformMethod005(node) {
             node.instructions.insertBefore(insn, tmp.instructions);
         } else if (OPCODES.INVOKEVIRTUAL === insn.getOpcode() && 'func_110577_a' === insn.name) { // bindTexture
             var tmp = ASMAPI.getMethodNode();
-            tmp.visitVarInsn(OPCODES.ASTORE, 33);
-            tmp.visitVarInsn(OPCODES.ALOAD, 26);
-            tmp.visitVarInsn(OPCODES.ALOAD, 33);
+            tmp.visitVarInsn(OPCODES.ASTORE, 35);
+            tmp.visitVarInsn(OPCODES.ALOAD, 27);
+            tmp.visitVarInsn(OPCODES.ALOAD, 35);
             tmp.visitMethodInsn(OPCODES.INVOKESTATIC, 'lain/mods/skins/init/forge/Hooks', 'getLocationSkin_TabOverlay', '(Lcom/mojang/authlib/GameProfile;Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/util/ResourceLocation;', false);
             i += tmp.instructions.size();
             node.instructions.insertBefore(insn, tmp.instructions);
@@ -123,7 +123,7 @@ function initializeCoreMod() {
             },
             'transformer': function(node) {
                 node.methods.forEach(function(method) {
-                    if ('func_175249_a' === method.name)
+                    if ('func_238523_a_' === method.name)
                         transformMethod005(method);
                 });
                 return node;
