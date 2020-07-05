@@ -7,17 +7,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.mojang.authlib.GameProfile;
 import lain.mods.skins.init.fabric.FabricOfflineSkins;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
 
 @Mixin(AbstractClientPlayerEntity.class)
 public abstract class AbstractClientPlayerEntityMixin extends PlayerEntity
 {
 
-    public AbstractClientPlayerEntityMixin(World world, GameProfile profile)
+    public AbstractClientPlayerEntityMixin(ClientWorld world, GameProfile profile)
     {
-        super(world, profile);
+        super(world, world.getSpawnPos(), profile);
     }
 
     @Inject(method = "getCapeTexture()Lnet/minecraft/util/Identifier;", at = @At("RETURN"), cancellable = true)

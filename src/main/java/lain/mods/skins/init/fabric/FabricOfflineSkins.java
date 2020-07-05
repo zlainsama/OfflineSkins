@@ -32,7 +32,7 @@ import lain.mods.skins.providers.MojangSkinProvider;
 import lain.mods.skins.providers.UserManagedCapeProvider;
 import lain.mods.skins.providers.UserManagedSkinProvider;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.event.client.ClientTickCallback;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
@@ -126,7 +126,7 @@ public class FabricOfflineSkins implements ClientModInitializer
     @Override
     public void onInitializeClient()
     {
-        ClientTickCallback.EVENT.register(mc -> {
+        ClientTickEvents.END_CLIENT_TICK.register(mc -> {
             if (mc.world != null)
             {
                 for (PlayerEntity player : mc.world.getPlayers())

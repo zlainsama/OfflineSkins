@@ -23,7 +23,7 @@ public class ImageUtils
             if (w == h)
             {
                 int r = Math.max(w / 64, 1);
-                if (((image.getPixelRgba(55 * r, 20 * r) & 0xFF000000) >>> 24) == 0)
+                if (((image.getPixelColor(55 * r, 20 * r) & 0xFF000000) >>> 24) == 0)
                     return "slim";
                 return "default";
             }
@@ -87,19 +87,19 @@ public class ImageUtils
     {
         for (int i = x; i < width; ++i)
             for (int j = y; j < height; ++j)
-                image.setPixelRgba(i, j, image.getPixelRgba(i, j) | -16777216);
+                image.setPixelColor(i, j, image.getPixelColor(i, j) | -16777216);
     }
 
     private static void setAreaTransparent(NativeImage image, int x, int y, int width, int height)
     {
         for (int i = x; i < width; ++i)
             for (int j = y; j < height; ++j)
-                if ((image.getPixelRgba(i, j) >> 24 & 255) < 128)
+                if ((image.getPixelColor(i, j) >> 24 & 255) < 128)
                     return;
 
         for (int l = x; l < width; ++l)
             for (int i1 = y; i1 < height; ++i1)
-                image.setPixelRgba(l, i1, image.getPixelRgba(l, i1) & 16777215);
+                image.setPixelColor(l, i1, image.getPixelColor(l, i1) & 16777215);
     }
 
     public static boolean validateData(byte[] data)
