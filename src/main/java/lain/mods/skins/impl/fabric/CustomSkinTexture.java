@@ -19,7 +19,7 @@ public class CustomSkinTexture extends ResourceTexture implements ISkinTexture
     public CustomSkinTexture(Identifier location, ByteBuffer data)
     {
         super(location);
-    	if (data == null)
+        if (data == null)
             throw new IllegalArgumentException("buffer must not be null");
 
         _data = new WeakReference<>(data);
