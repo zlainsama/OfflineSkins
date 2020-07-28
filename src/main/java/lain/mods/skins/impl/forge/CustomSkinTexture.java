@@ -6,23 +6,22 @@ import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import lain.mods.skins.api.interfaces.ISkinTexture;
 import net.minecraft.client.renderer.texture.NativeImage;
-import net.minecraft.client.renderer.texture.Texture;
+import net.minecraft.client.renderer.texture.SimpleTexture;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 
-public class CustomSkinTexture extends Texture implements ISkinTexture
+public class CustomSkinTexture extends SimpleTexture implements ISkinTexture
 {
 
-    private final ResourceLocation _location;
     private WeakReference<ByteBuffer> _data;
 
     public CustomSkinTexture(ResourceLocation location, ByteBuffer data)
     {
+        super(location);
         if (data == null)
             throw new IllegalArgumentException("buffer must not be null");
 
-        _location = location;
         _data = new WeakReference<>(data);
     }
 
@@ -34,7 +33,7 @@ public class CustomSkinTexture extends Texture implements ISkinTexture
 
     public ResourceLocation getLocation()
     {
-        return _location;
+        return textureLocation;
     }
 
     @Override
