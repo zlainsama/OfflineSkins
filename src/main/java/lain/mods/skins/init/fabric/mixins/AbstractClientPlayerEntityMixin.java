@@ -17,7 +17,7 @@ public abstract class AbstractClientPlayerEntityMixin extends PlayerEntity
 
     public AbstractClientPlayerEntityMixin(ClientWorld world, GameProfile profile)
     {
-        super(world, world.getSpawnPos(), profile);
+        super(world, world.getSpawnPos(), world.method_30671(), profile);
     }
 
     @Inject(method = "getCapeTexture()Lnet/minecraft/util/Identifier;", at = @At("RETURN"), cancellable = true)
