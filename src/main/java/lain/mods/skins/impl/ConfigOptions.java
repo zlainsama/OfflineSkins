@@ -1,7 +1,6 @@
 package lain.mods.skins.impl;
 
-public class ConfigOptions
-{
+public class ConfigOptions {
 
     public boolean useMojang;
     public boolean useCrafatar;
@@ -14,8 +13,7 @@ public class ConfigOptions
     /**
      * @return self with all options revert to default.
      */
-    public ConfigOptions defaultOptions()
-    {
+    public ConfigOptions defaultOptions() {
         useMojang = true;
         useCrafatar = true;
         useCustomServer = false;
@@ -29,22 +27,18 @@ public class ConfigOptions
     /**
      * @return true if changed.
      */
-    public boolean validate()
-    {
+    public boolean validate() {
         boolean any = false;
 
-        if (hostCustomServer == null)
-        {
+        if (hostCustomServer == null) {
             hostCustomServer = "http://example.com";
             any = true;
         }
-        if (hostCustomServer2Skin == null)
-        {
+        if (hostCustomServer2Skin == null) {
             hostCustomServer2Skin = "http://example.com/skins/%auto%";
             any = true;
         }
-        if (hostCustomServer2Cape == null)
-        {
+        if (hostCustomServer2Cape == null) {
             hostCustomServer2Cape = "http://example.com/capes/%auto%";
             any = true;
         }

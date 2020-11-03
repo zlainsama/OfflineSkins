@@ -1,7 +1,6 @@
 package lain.mods.skins.api.interfaces;
 
-public interface ISkinProviderService extends ISkinProvider
-{
+public interface ISkinProviderService extends ISkinProvider {
 
     /**
      * Clears all registered providers.

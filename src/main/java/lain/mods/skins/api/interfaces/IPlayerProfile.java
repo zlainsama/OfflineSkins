@@ -3,8 +3,7 @@ package lain.mods.skins.api.interfaces;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public interface IPlayerProfile
-{
+public interface IPlayerProfile {
 
     /**
      * @return the actual profile object.

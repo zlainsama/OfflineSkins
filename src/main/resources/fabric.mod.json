@@ -2,7 +2,6 @@
   "schemaVersion": 1,
   "id": "offlineskins",
   "version": "${version}",
-
   "name": "OfflineSkins",
   "description": "made it possible to cache your skins for offline use",
   "authors": [
@@ -11,9 +10,7 @@
   "contact": {
     "sources": "https://github.com/zlainsama/OfflineSkins"
   },
-
   "license": "MIT",
-
   "environment": "*",
   "entrypoints": {
     "client": [
@@ -23,7 +20,6 @@
   "mixins": [
     "OfflineSkins-mixins.json"
   ],
-
   "depends": {
     "fabricloader": ">=0.7.2",
     "fabric": ">=0.14.1"
