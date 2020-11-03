@@ -1,7 +1,6 @@
 package lain.mods.skins.api.interfaces;
 
-public interface ISkinProvider
-{
+public interface ISkinProvider {
 
     /**
      * This must not be a heavy blocking task as this will be run from main thread.

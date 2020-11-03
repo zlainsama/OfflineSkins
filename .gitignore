@@ -6,3 +6,6 @@
 /gradle.properties
 /build/
 /*.launch
+/.idea/
+/*.iml
+/logs/

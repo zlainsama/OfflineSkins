@@ -1,5 +1,24 @@
 package lain.mods.skins.init.forge;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.mojang.authlib.GameProfile;
+import lain.mods.skins.api.SkinProviderAPI;
+import lain.mods.skins.api.interfaces.ISkin;
+import lain.mods.skins.impl.ConfigOptions;
+import lain.mods.skins.impl.PlayerProfile;
+import lain.mods.skins.impl.forge.CustomSkinTexture;
+import lain.mods.skins.impl.forge.ImageUtils;
+import lain.mods.skins.providers.*;
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.TickEvent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.Writer;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -10,75 +29,40 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.WeakHashMap;
 import java.util.stream.Collectors;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.mojang.authlib.GameProfile;
-import lain.mods.skins.api.SkinProviderAPI;
-import lain.mods.skins.api.interfaces.ISkin;
-import lain.mods.skins.impl.ConfigOptions;
-import lain.mods.skins.impl.PlayerProfile;
-import lain.mods.skins.impl.forge.CustomSkinTexture;
-import lain.mods.skins.impl.forge.ImageUtils;
-import lain.mods.skins.providers.CrafatarCapeProvider;
-import lain.mods.skins.providers.CrafatarSkinProvider;
-import lain.mods.skins.providers.CustomServerCapeProvider;
-import lain.mods.skins.providers.CustomServerCapeProvider2;
-import lain.mods.skins.providers.CustomServerSkinProvider;
-import lain.mods.skins.providers.CustomServerSkinProvider2;
-import lain.mods.skins.providers.MojangCapeProvider;
-import lain.mods.skins.providers.MojangSkinProvider;
-import lain.mods.skins.providers.UserManagedCapeProvider;
-import lain.mods.skins.providers.UserManagedSkinProvider;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.TickEvent;
 
-enum Proxy
-{
+enum Proxy {
 
     INSTANCE;
 
     Map<ByteBuffer, CustomSkinTexture> textures = new WeakHashMap<>();
 
-    ResourceLocation generateRandomLocation()
-    {
+    ResourceLocation generateRandomLocation() {
         return new ResourceLocation("offlineskins", String.format("textures/generated/%s", UUID.randomUUID().toString()));
     }
 
-    ResourceLocation getLocationCape(GameProfile profile)
-    {
+    ResourceLocation getLocationCape(GameProfile profile) {
         ISkin skin = SkinProviderAPI.CAPE.getSkin(PlayerProfile.wrapGameProfile(profile));
         if (skin != null && skin.isDataReady())
             return getOrCreateTexture(skin.getData(), skin).getLocation();
         return null;
     }
 
-    ResourceLocation getLocationSkin(GameProfile profile)
-    {
+    ResourceLocation getLocationSkin(GameProfile profile) {
         ISkin skin = SkinProviderAPI.SKIN.getSkin(PlayerProfile.wrapGameProfile(profile));
         if (skin != null && skin.isDataReady())
             return getOrCreateTexture(skin.getData(), skin).getLocation();
         return null;
     }
 
-    CustomSkinTexture getOrCreateTexture(ByteBuffer data, ISkin skin)
-    {
-        if (!textures.containsKey(data))
-        {
+    CustomSkinTexture getOrCreateTexture(ByteBuffer data, ISkin skin) {
+        if (!textures.containsKey(data)) {
             CustomSkinTexture texture = new CustomSkinTexture(generateRandomLocation(), data);
             Minecraft.getInstance().getTextureManager().loadTexture(texture.getLocation(), texture);
             textures.put(data, texture);
 
-            if (skin != null)
-            {
+            if (skin != null) {
                 skin.setRemovalListener(s -> {
-                    if (data == s.getData())
-                    {
+                    if (data == s.getData()) {
                         Minecraft.getInstance().execute(() -> {
                             Minecraft.getInstance().getTextureManager().deleteTexture(texture.getLocation());
                             textures.remove(data);
@@ -90,11 +74,9 @@ enum Proxy
         return textures.get(data);
     }
 
-    String getSkinType(GameProfile profile)
-    {
+    String getSkinType(GameProfile profile) {
         ResourceLocation location = getLocationSkin(profile);
-        if (location != null)
-        {
+        if (location != null) {
             ISkin skin = SkinProviderAPI.SKIN.getSkin(PlayerProfile.wrapGameProfile(profile));
             if (skin != null && skin.isDataReady())
                 return skin.getSkinType();
@@ -102,15 +84,11 @@ enum Proxy
         return null;
     }
 
-    void handleClientTickEvent(TickEvent.ClientTickEvent event)
-    {
-        if (event.phase == TickEvent.Phase.START)
-        {
+    void handleClientTickEvent(TickEvent.ClientTickEvent event) {
+        if (event.phase == TickEvent.Phase.START) {
             World world = Minecraft.getInstance().world;
-            if (world != null)
-            {
-                for (PlayerEntity player : world.getPlayers())
-                {
+            if (world != null) {
+                for (PlayerEntity player : world.getPlayers()) {
                     SkinProviderAPI.SKIN.getSkin(PlayerProfile.wrapGameProfile(player.getGameProfile()));
                     SkinProviderAPI.CAPE.getSkin(PlayerProfile.wrapGameProfile(player.getGameProfile()));
                 }
@@ -118,30 +96,22 @@ enum Proxy
         }
     }
 
-    void init()
-    {
+    void init() {
         Logger logger = LogManager.getLogger(ForgeOfflineSkins.class);
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         Path pathToConfig = Paths.get(".", "config", "offlineskins.json");
         pathToConfig.toFile().getParentFile().mkdirs();
-        if (!pathToConfig.toFile().exists())
-        {
-            try (Writer w = Files.newBufferedWriter(pathToConfig, StandardCharsets.UTF_8))
-            {
+        if (!pathToConfig.toFile().exists()) {
+            try (Writer w = Files.newBufferedWriter(pathToConfig, StandardCharsets.UTF_8)) {
                 gson.toJson(new ConfigOptions().defaultOptions(), w);
-            }
-            catch (Throwable t)
-            {
+            } catch (Throwable t) {
                 logger.error("[OfflineSkins] Failed to write default config file.", t);
             }
         }
         ConfigOptions config = null;
-        try
-        {
+        try {
             config = gson.fromJson(Files.lines(pathToConfig, StandardCharsets.UTF_8).collect(Collectors.joining(System.getProperty("line.separator"))), ConfigOptions.class);
-        }
-        catch (Throwable t)
-        {
+        } catch (Throwable t) {
             logger.error("[OfflineSkins] Failed to read config file.", t);
             config = new ConfigOptions();
         }

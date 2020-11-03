@@ -1,15 +1,5 @@
 package lain.mods.skins.impl;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -21,15 +11,23 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.util.UUIDTypeAdapter;
 import lain.mods.skins.impl.forge.MinecraftUtils;
 
-public class MojangService
-{
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
-    private static final LoadingCache<GameProfile, Optional<GameProfile>> filledProfiles = CacheBuilder.newBuilder().expireAfterAccess(3, TimeUnit.HOURS).refreshAfterWrite(30, TimeUnit.MINUTES).build(new CacheLoader<GameProfile, Optional<GameProfile>>()
-    {
+public class MojangService {
+
+    private static final LoadingCache<GameProfile, Optional<GameProfile>> filledProfiles = CacheBuilder.newBuilder().expireAfterAccess(3, TimeUnit.HOURS).refreshAfterWrite(30, TimeUnit.MINUTES).build(new CacheLoader<GameProfile, Optional<GameProfile>>() {
 
         @Override
-        public Optional<GameProfile> load(GameProfile key) throws Exception
-        {
+        public Optional<GameProfile> load(GameProfile key) throws Exception {
             if (key.getId() == null || key.getProperties() == null || key == Shared.DUMMY) // bad profile
                 return Optional.empty();
             if (key.isComplete() && !key.getProperties().isEmpty()) // already filled
@@ -45,8 +43,7 @@ public class MojangService
         }
 
         @Override
-        public ListenableFuture<Optional<GameProfile>> reload(GameProfile key, Optional<GameProfile> oldValue) throws Exception
-        {
+        public ListenableFuture<Optional<GameProfile>> reload(GameProfile key, Optional<GameProfile> oldValue) throws Exception {
             if (oldValue.isPresent()) // good result, doesn't need refresh.
                 return Futures.immediateFuture(oldValue);
             return Shared.submitTask(() -> {
@@ -56,14 +53,12 @@ public class MojangService
 
     });
 
-    private static final LoadingCache<String, Optional<GameProfile>> resolvedProfiles = CacheBuilder.newBuilder().expireAfterAccess(3, TimeUnit.HOURS).refreshAfterWrite(30, TimeUnit.MINUTES).build(new CacheLoader<String, Optional<GameProfile>>()
-    {
+    private static final LoadingCache<String, Optional<GameProfile>> resolvedProfiles = CacheBuilder.newBuilder().expireAfterAccess(3, TimeUnit.HOURS).refreshAfterWrite(30, TimeUnit.MINUTES).build(new CacheLoader<String, Optional<GameProfile>>() {
 
         private final Gson gson = new GsonBuilder().registerTypeAdapter(UUID.class, new UUIDTypeAdapter()).create();
 
         @Override
-        public Optional<GameProfile> load(String key) throws Exception
-        {
+        public Optional<GameProfile> load(String key) throws Exception {
             if (Shared.isBlank(key)) // can't resolve this
                 return Optional.of(Shared.DUMMY);
             return Optional.ofNullable(Shared.blockyCall(() -> {
@@ -71,8 +66,7 @@ public class MojangService
             }, null, null));
         }
 
-        private GameProfile makeRequest(String request) throws IOException
-        {
+        private GameProfile makeRequest(String request) throws IOException {
             HttpURLConnection conn = (HttpURLConnection) new URL(request).openConnection(MinecraftUtils.getProxy());
             conn.setConnectTimeout(30000);
             conn.setReadTimeout(10000);
@@ -82,10 +76,8 @@ public class MojangService
             int code = conn.getResponseCode();
             if (code == 204 || code == 404) // not found
                 return Shared.DUMMY;
-            else if (code / 100 == 2)
-            {
-                try (InputStream in = conn.getInputStream())
-                {
+            else if (code / 100 == 2) {
+                try (InputStream in = conn.getInputStream()) {
                     StringBuilder buf = new StringBuilder();
                     readLines(in, buf);
                     GameProfile constructed = gson.fromJson(buf.toString(), GameProfile.class);
@@ -99,13 +91,11 @@ public class MojangService
             return null;
         }
 
-        private void readLines(InputStream in, StringBuilder buf) throws IOException
-        {
+        private void readLines(InputStream in, StringBuilder buf) throws IOException {
             BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
             String line;
             String newLine = System.getProperty("line.separator");
-            while ((line = reader.readLine()) != null)
-            {
+            while ((line = reader.readLine()) != null) {
                 if (buf.length() > 0)
                     buf.append(newLine);
                 buf.append(line);
@@ -113,10 +103,8 @@ public class MojangService
         }
 
         @Override
-        public ListenableFuture<Optional<GameProfile>> reload(String key, Optional<GameProfile> oldValue) throws Exception
-        {
-            if (oldValue.isPresent())
-            {
+        public ListenableFuture<Optional<GameProfile>> reload(String key, Optional<GameProfile> oldValue) throws Exception {
+            if (oldValue.isPresent()) {
                 if (oldValue.get() == Shared.DUMMY)
                     return Futures.immediateFuture(Optional.empty()); // effectively schedule a refresh in next reload.
                 return Futures.immediateFuture(oldValue); // good result, doesn't need refresh.
@@ -132,8 +120,7 @@ public class MojangService
      * @param profile the profile to fill, requires an ID to actually fill.
      * @return a ListenableFuture of a filled profile, otherwise previous profile.
      */
-    public static ListenableFuture<GameProfile> fillProfile(GameProfile profile)
-    {
+    public static ListenableFuture<GameProfile> fillProfile(GameProfile profile) {
         if (profile == null)
             return Futures.immediateFailedFuture(new NullPointerException("profile must not be null"));
         Optional<GameProfile> cachedResult;
@@ -148,8 +135,7 @@ public class MojangService
      * @param username the username to query about, requires non-blank to actually resolve.
      * @return a ListenableFuture of a resolved profile, otherwise {@link Shared#DUMMY DUMMY}.
      */
-    public static ListenableFuture<GameProfile> getProfile(String username)
-    {
+    public static ListenableFuture<GameProfile> getProfile(String username) {
         if (username == null)
             return Futures.immediateFailedFuture(new NullPointerException("username must not be null"));
         Optional<GameProfile> cachedResult;

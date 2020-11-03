@@ -1,11 +1,5 @@
 package lain.mods.skins.impl;
 
-import java.lang.ref.WeakReference;
-import java.util.Collection;
-import java.util.UUID;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -15,17 +9,21 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.mojang.authlib.GameProfile;
 import lain.mods.skins.api.interfaces.IPlayerProfile;
 
-public class PlayerProfile implements IPlayerProfile
-{
+import java.lang.ref.WeakReference;
+import java.util.Collection;
+import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+
+public class PlayerProfile implements IPlayerProfile {
 
     private static final PlayerProfile DUMMY = new PlayerProfile(Shared.DUMMY);
 
-    private static final LoadingCache<GameProfile, PlayerProfile> profiles = CacheBuilder.newBuilder().weakKeys().refreshAfterWrite(10, TimeUnit.MINUTES).build(new CacheLoader<GameProfile, PlayerProfile>()
-    {
+    private static final LoadingCache<GameProfile, PlayerProfile> profiles = CacheBuilder.newBuilder().weakKeys().refreshAfterWrite(10, TimeUnit.MINUTES).build(new CacheLoader<GameProfile, PlayerProfile>() {
 
         @Override
-        public PlayerProfile load(GameProfile key) throws Exception
-        {
+        public PlayerProfile load(GameProfile key) throws Exception {
             if (key.getProperties() == null || key == Shared.DUMMY) // bad profile
                 return DUMMY;
 
@@ -38,13 +36,11 @@ public class PlayerProfile implements IPlayerProfile
                     {
 
                         @Override
-                        public void onFailure(Throwable t)
-                        {
+                        public void onFailure(Throwable t) {
                         }
 
                         @Override
-                        public void onSuccess(GameProfile filled)
-                        {
+                        public void onSuccess(GameProfile filled) {
                             if (filled == key) // failed
                                 return;
                             profile.set(filled);
@@ -52,20 +48,17 @@ public class PlayerProfile implements IPlayerProfile
 
                     }, Runnable::run);
                 }
-            }
-            else if (Shared.isOfflinePlayer(key.getId(), key.getName())) // an offline profile that needs resolving
+            } else if (Shared.isOfflinePlayer(key.getId(), key.getName())) // an offline profile that needs resolving
             {
                 Futures.addCallback(MojangService.getProfile(key.getName()), new FutureCallback<GameProfile>() // resolve it
                 {
 
                     @Override
-                    public void onFailure(Throwable t)
-                    {
+                    public void onFailure(Throwable t) {
                     }
 
                     @Override
-                    public void onSuccess(GameProfile resolved)
-                    {
+                    public void onSuccess(GameProfile resolved) {
                         if (resolved == Shared.DUMMY) // failed
                             return;
                         profile.set(resolved);
@@ -74,13 +67,11 @@ public class PlayerProfile implements IPlayerProfile
                         {
 
                             @Override
-                            public void onFailure(Throwable t)
-                            {
+                            public void onFailure(Throwable t) {
                             }
 
                             @Override
-                            public void onSuccess(GameProfile filled)
-                            {
+                            public void onSuccess(GameProfile filled) {
                                 if (filled == resolved) // failed or already filled
                                     return;
                                 profile.set(filled);
@@ -90,20 +81,17 @@ public class PlayerProfile implements IPlayerProfile
                     }
 
                 }, Runnable::run);
-            }
-            else if (key.getProperties().isEmpty()) // an assumed online profile that needs filling
+            } else if (key.getProperties().isEmpty()) // an assumed online profile that needs filling
             {
                 Futures.addCallback(MojangService.fillProfile(key), new FutureCallback<GameProfile>() // fill it
                 {
 
                     @Override
-                    public void onFailure(Throwable t)
-                    {
+                    public void onFailure(Throwable t) {
                     }
 
                     @Override
-                    public void onSuccess(GameProfile filled)
-                    {
+                    public void onSuccess(GameProfile filled) {
                         if (filled != key) // success
                         {
                             profile.set(filled);
@@ -114,13 +102,11 @@ public class PlayerProfile implements IPlayerProfile
                         {
 
                             @Override
-                            public void onFailure(Throwable t)
-                            {
+                            public void onFailure(Throwable t) {
                             }
 
                             @Override
-                            public void onSuccess(GameProfile resolved)
-                            {
+                            public void onSuccess(GameProfile resolved) {
                                 if (resolved == Shared.DUMMY) // failed
                                     return;
                                 profile.set(resolved);
@@ -129,13 +115,11 @@ public class PlayerProfile implements IPlayerProfile
                                 {
 
                                     @Override
-                                    public void onFailure(Throwable t)
-                                    {
+                                    public void onFailure(Throwable t) {
                                     }
 
                                     @Override
-                                    public void onSuccess(GameProfile filled)
-                                    {
+                                    public void onSuccess(GameProfile filled) {
                                         if (filled == resolved) // failed or already filled
                                             return;
                                         profile.set(filled);
@@ -154,8 +138,7 @@ public class PlayerProfile implements IPlayerProfile
         }
 
         @Override
-        public ListenableFuture<PlayerProfile> reload(GameProfile key, PlayerProfile oldValue) throws Exception
-        {
+        public ListenableFuture<PlayerProfile> reload(GameProfile key, PlayerProfile oldValue) throws Exception {
             if (oldValue == DUMMY) // value for bad profile
                 return Futures.immediateFuture(DUMMY);
             return Shared.submitTask(() -> {
@@ -167,31 +150,27 @@ public class PlayerProfile implements IPlayerProfile
         }
 
     });
-
-    /**
-     * @param profile the profile to wrap.
-     * @return a PlayerProfile with a GameProfile wrapped in it, this profile will receive updates later if applicable.
-     */
-    public static PlayerProfile wrapGameProfile(GameProfile profile)
-    {
-        if (profile == null)
-            return DUMMY;
-        return profiles.getUnchecked(profile);
-    }
-
-    private WeakReference<GameProfile> _profile;
     private final Collection<Consumer<IPlayerProfile>> _listeners = new CopyOnWriteArrayList<>();
+    private WeakReference<GameProfile> _profile;
 
-    private PlayerProfile(GameProfile profile)
-    {
+    private PlayerProfile(GameProfile profile) {
         if (profile == null)
             throw new IllegalArgumentException("profile must not be null");
         _profile = new WeakReference<GameProfile>(profile);
     }
 
+    /**
+     * @param profile the profile to wrap.
+     * @return a PlayerProfile with a GameProfile wrapped in it, this profile will receive updates later if applicable.
+     */
+    public static PlayerProfile wrapGameProfile(GameProfile profile) {
+        if (profile == null)
+            return DUMMY;
+        return profiles.getUnchecked(profile);
+    }
+
     @Override
-    public boolean equals(Object o)
-    {
+    public boolean equals(Object o) {
         GameProfile p;
         if ((p = _profile.get()) == null) // gc
             return false;
@@ -201,8 +180,7 @@ public class PlayerProfile implements IPlayerProfile
     }
 
     @Override
-    public GameProfile getOriginal()
-    {
+    public GameProfile getOriginal() {
         GameProfile p;
         if ((p = _profile.get()) == null) // gc
             return Shared.DUMMY;
@@ -210,8 +188,7 @@ public class PlayerProfile implements IPlayerProfile
     }
 
     @Override
-    public UUID getPlayerID()
-    {
+    public UUID getPlayerID() {
         GameProfile p;
         if ((p = _profile.get()) == null) // gc
             return Shared.DUMMY.getId();
@@ -219,8 +196,7 @@ public class PlayerProfile implements IPlayerProfile
     }
 
     @Override
-    public String getPlayerName()
-    {
+    public String getPlayerName() {
         GameProfile p;
         if ((p = _profile.get()) == null) // gc
             return Shared.DUMMY.getName();
@@ -228,16 +204,14 @@ public class PlayerProfile implements IPlayerProfile
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         GameProfile p;
         if ((p = _profile.get()) == null) // gc
             return 0;
         return p.hashCode();
     }
 
-    private synchronized void set(GameProfile profile)
-    {
+    private synchronized void set(GameProfile profile) {
         if (this == DUMMY)
             return;
         if (profile == null)
@@ -249,8 +223,7 @@ public class PlayerProfile implements IPlayerProfile
     }
 
     @Override
-    public boolean setUpdateListener(Consumer<IPlayerProfile> listener)
-    {
+    public boolean setUpdateListener(Consumer<IPlayerProfile> listener) {
         if (this == DUMMY)
             return false;
         if (listener == null || _listeners.contains(listener))
