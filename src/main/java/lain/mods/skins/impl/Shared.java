@@ -182,7 +182,7 @@ public class Shared {
         return future;
     }
 
-    private static interface SupplierBlocker<T> extends Supplier<T>, ForkJoinPool.ManagedBlocker {
+    private interface SupplierBlocker<T> extends Supplier<T>, ForkJoinPool.ManagedBlocker {
     }
 
 }
