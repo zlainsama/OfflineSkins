@@ -36,9 +36,9 @@ public class FabricOfflineSkins implements ClientModInitializer {
 
     private static final Map<ByteBuffer, CustomSkinTexture> textures = new WeakHashMap<>();
 
-    private static boolean skinPass = false;
-    private static boolean capePass = false;
-    private static boolean overwrite = true;
+    private static final boolean skinPass = false;
+    private static final boolean capePass = false;
+    private static final boolean overwrite = true;
 
     private static Identifier generateRandomLocation() {
         return new Identifier("offlineskins", String.format("textures/generated/%s", UUID.randomUUID().toString()));

@@ -14,7 +14,7 @@ import java.nio.ByteBuffer;
 
 public class CustomSkinTexture extends ResourceTexture implements ISkinTexture {
 
-    private WeakReference<ByteBuffer> _data;
+    private final WeakReference<ByteBuffer> _data;
 
     public CustomSkinTexture(Identifier location, ByteBuffer data) {
         super(location);

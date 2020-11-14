@@ -15,8 +15,8 @@ import java.util.function.Function;
 
 public class UserManagedCapeProvider implements ISkinProvider {
 
-    private File _dirN;
-    private File _dirU;
+    private final File _dirN;
+    private final File _dirU;
     private Function<ByteBuffer, ByteBuffer> _filter;
 
     public UserManagedCapeProvider(Path workDir) {
