@@ -11,9 +11,7 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 
-import net.minecraftforge.gradle.common.task.SignJar
-
-version = "1.16.4-v1"
+version = "1.16.5-v1"
 group = "lain.mods.skins"
 archivesBaseName = "OfflineSkins"
 
@@ -23,8 +21,10 @@ minecraft {
     mappings channel: 'snapshot', version: '20201028-1.16.3'
 }
 
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.16.4-35.0.1'
+    minecraft 'net.minecraftforge:forge:1.16.5-36.0.0'
 }
 
 processResources {
@@ -43,19 +43,4 @@ jar {
     }
 }
 
-task signJar(type: SignJar, dependsOn: jar) {
-    onlyIf {
-        project.hasProperty('mcModsStore')
-    }
-
-    if (project.hasProperty('mcModsStore')) {
-        keyStore = project.mcModsStore
-        alias = project.mcModsAlias
-        storePass = project.mcModsStorePass
-        keyPass = project.mcModsKeyPass
-        inputFile = jar.archivePath
-        outputFile = jar.archivePath
-    }
-}
-
-build.dependsOn signJar
+jar.finalizedBy('reobfJar') 
