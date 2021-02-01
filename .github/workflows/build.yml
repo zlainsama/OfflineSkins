@@ -15,6 +15,11 @@ jobs:
         with:
           java-version: 1.8
       - name: Build
+        env:
+          SIGNJAR_KEYSTORE: ${{ secrets.SIGNJAR_KEYSTORE }}
+          SIGNJAR_ALIAS: ${{ secrets.SIGNJAR_ALIAS }}
+          SIGNJAR_STOREPASS: ${{ secrets.SIGNJAR_STOREPASS }}
+          SIGNJAR_KEYPASS: ${{ secrets.SIGNJAR_KEYPASS }}
         run: |
           chmod +x gradlew
           ./gradlew --no-daemon build
