@@ -11,7 +11,11 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 
-version = "1.16.5-v1"
+import net.minecraftforge.gradle.common.task.SignJar
+
+import java.nio.file.Files
+
+version = "1.16.5-v1a"
 group = "lain.mods.skins"
 archivesBaseName = "OfflineSkins"
 
@@ -43,4 +47,28 @@ jar {
     }
 }
 
-jar.finalizedBy('reobfJar') 
+jar.finalizedBy('reobfJar')
+
+task signJar(type: SignJar, dependsOn: jar) {
+    onlyIf {
+        System.getenv('SIGNJAR_KEYSTORE') != null
+    }
+
+    if (System.getenv('SIGNJAR_KEYSTORE') != null) {
+        keyStore = Files.createTempFile(getTemporaryDir().toPath(), 'keystore-', '.jks').toString()
+        file(keyStore).withOutputStream { output ->
+            output.write(Base64.getDecoder().decode(System.getenv('SIGNJAR_KEYSTORE')))
+        }
+        alias = System.getenv('SIGNJAR_ALIAS')
+        storePass = System.getenv('SIGNJAR_STOREPASS')
+        keyPass = System.getenv('SIGNJAR_KEYPASS')
+        inputFile = jar.archivePath
+        outputFile = jar.archivePath
+    }
+
+    doLast {
+        delete keyStore
+    }
+}
+
+build.dependsOn signJar
