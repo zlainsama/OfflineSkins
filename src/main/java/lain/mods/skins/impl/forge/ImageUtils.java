@@ -34,21 +34,21 @@ public class ImageUtils {
         try (NativeImage input = NativeImage.read(buffer); NativeImage output = new NativeImage(input.getWidth(), input.getWidth(), true)) {
             int r = Math.max(input.getWidth() / 64, 1);
             boolean f = input.getWidth() == input.getHeight() * 2;
-            output.copyImageData(input);
+            output.copyFrom(input);
             if (f) {
-                output.fillAreaRGBA(0 * r, 32 * r, 64 * r, 32 * r, 0);
-                output.copyAreaRGBA(4 * r, 16 * r, 16 * r, 32 * r, 4 * r, 4 * r, true, false);
-                output.copyAreaRGBA(8 * r, 16 * r, 16 * r, 32 * r, 4 * r, 4 * r, true, false);
-                output.copyAreaRGBA(0 * r, 20 * r, 24 * r, 32 * r, 4 * r, 12 * r, true, false);
-                output.copyAreaRGBA(4 * r, 20 * r, 16 * r, 32 * r, 4 * r, 12 * r, true, false);
-                output.copyAreaRGBA(8 * r, 20 * r, 8 * r, 32 * r, 4 * r, 12 * r, true, false);
-                output.copyAreaRGBA(12 * r, 20 * r, 16 * r, 32 * r, 4 * r, 12 * r, true, false);
-                output.copyAreaRGBA(44 * r, 16 * r, -8 * r, 32 * r, 4 * r, 4 * r, true, false);
-                output.copyAreaRGBA(48 * r, 16 * r, -8 * r, 32 * r, 4 * r, 4 * r, true, false);
-                output.copyAreaRGBA(40 * r, 20 * r, 0 * r, 32 * r, 4 * r, 12 * r, true, false);
-                output.copyAreaRGBA(44 * r, 20 * r, -8 * r, 32 * r, 4 * r, 12 * r, true, false);
-                output.copyAreaRGBA(48 * r, 20 * r, -16 * r, 32 * r, 4 * r, 12 * r, true, false);
-                output.copyAreaRGBA(52 * r, 20 * r, -8 * r, 32 * r, 4 * r, 12 * r, true, false);
+                output.fillRect(0 * r, 32 * r, 64 * r, 32 * r, 0);
+                output.copyRect(4 * r, 16 * r, 16 * r, 32 * r, 4 * r, 4 * r, true, false);
+                output.copyRect(8 * r, 16 * r, 16 * r, 32 * r, 4 * r, 4 * r, true, false);
+                output.copyRect(0 * r, 20 * r, 24 * r, 32 * r, 4 * r, 12 * r, true, false);
+                output.copyRect(4 * r, 20 * r, 16 * r, 32 * r, 4 * r, 12 * r, true, false);
+                output.copyRect(8 * r, 20 * r, 8 * r, 32 * r, 4 * r, 12 * r, true, false);
+                output.copyRect(12 * r, 20 * r, 16 * r, 32 * r, 4 * r, 12 * r, true, false);
+                output.copyRect(44 * r, 16 * r, -8 * r, 32 * r, 4 * r, 4 * r, true, false);
+                output.copyRect(48 * r, 16 * r, -8 * r, 32 * r, 4 * r, 4 * r, true, false);
+                output.copyRect(40 * r, 20 * r, 0 * r, 32 * r, 4 * r, 12 * r, true, false);
+                output.copyRect(44 * r, 20 * r, -8 * r, 32 * r, 4 * r, 12 * r, true, false);
+                output.copyRect(48 * r, 20 * r, -16 * r, 32 * r, 4 * r, 12 * r, true, false);
+                output.copyRect(52 * r, 20 * r, -8 * r, 32 * r, 4 * r, 12 * r, true, false);
             }
 
             setAreaOpaque(output, 0 * r, 0 * r, 32 * r, 16 * r);
@@ -59,7 +59,7 @@ public class ImageUtils {
 
             File tmp = null;
             try {
-                output.write(tmp = Files.createTempFile(null, null).toFile());
+                output.writeToFile(tmp = Files.createTempFile(null, null).toFile());
                 return SkinData.toBuffer(Shared.blockyReadFile(tmp, null, Retries::rethrow));
             } finally {
                 if (tmp != null && tmp.exists() && !tmp.delete())

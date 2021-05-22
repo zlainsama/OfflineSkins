@@ -30,12 +30,12 @@ public class CustomSkinTexture extends SimpleTexture implements ISkinTexture {
     }
 
     public ResourceLocation getLocation() {
-        return textureLocation;
+        return location;
     }
 
     @Override
-    public void loadTexture(IResourceManager resMan) throws IOException {
-        deleteGlTexture();
+    public void load(IResourceManager resMan) throws IOException {
+        releaseId();
 
         ByteBuffer buf;
         if ((buf = _data.get()) == null) // gc
@@ -43,8 +43,8 @@ public class CustomSkinTexture extends SimpleTexture implements ISkinTexture {
 
         try (NativeImage image = NativeImage.read(buf)) {
             synchronized (this) {
-                TextureUtil.prepareImage(getGlTextureId(), 0, image.getWidth(), image.getHeight());
-                image.uploadTextureSub(0, 0, 0, false);
+                TextureUtil.prepareImage(getId(), 0, image.getWidth(), image.getHeight());
+                image.upload(0, 0, 0, false);
             }
         }
     }

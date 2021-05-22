@@ -37,7 +37,7 @@ enum Proxy {
     Map<ByteBuffer, CustomSkinTexture> textures = new WeakHashMap<>();
 
     ResourceLocation generateRandomLocation() {
-        return new ResourceLocation("offlineskins", String.format("textures/generated/%s", UUID.randomUUID().toString()));
+        return new ResourceLocation("offlineskins", String.format("textures/generated/%s", UUID.randomUUID()));
     }
 
     ResourceLocation getLocationCape(GameProfile profile) {
@@ -57,14 +57,14 @@ enum Proxy {
     CustomSkinTexture getOrCreateTexture(ByteBuffer data, ISkin skin) {
         if (!textures.containsKey(data)) {
             CustomSkinTexture texture = new CustomSkinTexture(generateRandomLocation(), data);
-            Minecraft.getInstance().getTextureManager().loadTexture(texture.getLocation(), texture);
+            Minecraft.getInstance().getTextureManager().register(texture.getLocation(), texture);
             textures.put(data, texture);
 
             if (skin != null) {
                 skin.setRemovalListener(s -> {
                     if (data == s.getData()) {
                         Minecraft.getInstance().execute(() -> {
-                            Minecraft.getInstance().getTextureManager().deleteTexture(texture.getLocation());
+                            Minecraft.getInstance().getTextureManager().release(texture.getLocation());
                             textures.remove(data);
                         });
                     }
@@ -86,9 +86,9 @@ enum Proxy {
 
     void handleClientTickEvent(TickEvent.ClientTickEvent event) {
         if (event.phase == TickEvent.Phase.START) {
-            World world = Minecraft.getInstance().world;
+            World world = Minecraft.getInstance().level;
             if (world != null) {
-                for (PlayerEntity player : world.getPlayers()) {
+                for (PlayerEntity player : world.players()) {
                     SkinProviderAPI.SKIN.getSkin(PlayerProfile.wrapGameProfile(player.getGameProfile()));
                     SkinProviderAPI.CAPE.getSkin(PlayerProfile.wrapGameProfile(player.getGameProfile()));
                 }

@@ -1,7 +1,7 @@
 var ASMAPI = Java.type('net.minecraftforge.coremod.api.ASMAPI');
 var OPCODES = Java.type('org.objectweb.asm.Opcodes');
 
-// net/minecraft/client/entity/player/AbstractClientPlayerEntity/func_110303_q (getLocationCape)
+// net/minecraft/client/entity/player/AbstractClientPlayerEntity/func_110303_q (getCloakTextureLocation)
 function transformMethod001(node) {
     for (var i = 0; i < node.instructions.size(); i++) {
         var insn = node.instructions.get(i);
@@ -16,7 +16,7 @@ function transformMethod001(node) {
         }
     }
 }
-// net/minecraft/client/entity/player/AbstractClientPlayerEntity/func_110306_p (getLocationSkin)
+// net/minecraft/client/entity/player/AbstractClientPlayerEntity/func_110306_p (getSkinTextureLocation)
 function transformMethod002(node) {
     for (var i = 0; i < node.instructions.size(); i++) {
         var insn = node.instructions.get(i);
@@ -31,7 +31,7 @@ function transformMethod002(node) {
         }
     }
 }
-// net/minecraft/client/entity/player/AbstractClientPlayerEntity/func_175154_l (getSkinType)
+// net/minecraft/client/entity/player/AbstractClientPlayerEntity/func_175154_l (getModelName)
 function transformMethod003(node) {
     for (var i = 0; i < node.instructions.size(); i++) {
         var insn = node.instructions.get(i);
@@ -46,7 +46,7 @@ function transformMethod003(node) {
         }
     }
 }
-// net/minecraft/client/renderer/tileentity/SkullTileEntityRenderer/func_228878_a_
+// net/minecraft/client/renderer/tileentity/SkullTileEntityRenderer/func_228878_a_ (getRenderType)
 function transformMethod004(node) {
     for (var i = 0; i < node.instructions.size(); i++) {
         var insn = node.instructions.get(i);
@@ -62,7 +62,7 @@ function transformMethod004(node) {
         }
     }
 }
-// net/minecraft/client/gui/overlay/PlayerTabOverlayGui/func_238523_a_
+// net/minecraft/client/gui/overlay/PlayerTabOverlayGui/func_238523_a_ (render)
 function transformMethod005(node) {
     for (var i = 0; i < node.instructions.size(); i++) {
         var insn = node.instructions.get(i);
