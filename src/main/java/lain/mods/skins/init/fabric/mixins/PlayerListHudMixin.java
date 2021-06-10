@@ -1,6 +1,7 @@
 package lain.mods.skins.init.fabric.mixins;
 
 import com.mojang.authlib.GameProfile;
+import com.mojang.blaze3d.systems.RenderSystem;
 import lain.mods.skins.init.fabric.FabricOfflineSkins;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
@@ -8,7 +9,6 @@ import net.minecraft.client.gui.hud.PlayerListHud;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.util.Identifier;
@@ -31,11 +31,11 @@ public abstract class PlayerListHudMixin extends DrawableHelper {
     private MinecraftClient client;
 
     // (CallbackInfo info, PlayerListEntry entry, GameProfile profile)
-    @Inject(method = "render(Lnet/minecraft/client/util/math/MatrixStack;ILnet/minecraft/scoreboard/Scoreboard;Lnet/minecraft/scoreboard/ScoreboardObjective;)V", at = @At(value = "INVOKE", target = "net.minecraft.client.texture.TextureManager.bindTexture(Lnet/minecraft/util/Identifier;)V", shift = Shift.AFTER), locals = LocalCapture.CAPTURE_FAILSOFT, require = 0)
-    private void onRenderBindTexture_nBXjeY(MatrixStack var1, int var2, Scoreboard var3, ScoreboardObjective var4, CallbackInfo info, ClientPlayNetworkHandler var5, List<?> var6, int var7, int var8, int var9, int var10, int var11, boolean var12, int var13, int var14, int var15, int var16, int var17, List<?> var18, List<?> var19, int var20, int var21, int var22, int var23, int var24, int var25, PlayerListEntry entry, GameProfile profile, PlayerEntity var28, boolean var29) {
+    @Inject(method = "render(Lnet/minecraft/client/util/math/MatrixStack;ILnet/minecraft/scoreboard/Scoreboard;Lnet/minecraft/scoreboard/ScoreboardObjective;)V", at = @At(value = "INVOKE", target = "net.minecraft.client.gui.DrawableHelper.drawTexture(Lnet/minecraft/client/util/math/MatrixStack;IIIIFFIIII)V", shift = Shift.BEFORE, ordinal = 0), locals = LocalCapture.CAPTURE_FAILSOFT, require = 0)
+    private void onRenderBindTexture_nBXjeY(MatrixStack var1, int var2, Scoreboard var3, ScoreboardObjective var4, CallbackInfo info, ClientPlayNetworkHandler var5, List<?> var6, int var7, int var8, int var9, int var10, int var11, boolean var12, int var13, int var14, int var15, int var16, int var17, List<?> var18, List<?> var19, int var20, int var21, int var22, int var23, int var24, int var25, PlayerListEntry entry, GameProfile profile) {
         Identifier loc = FabricOfflineSkins.getLocationSkin(profile, entry.getSkinTexture());
         if (loc != null)
-            client.getTextureManager().bindTexture(loc);
+            RenderSystem.setShaderTexture(0, loc);
     }
 
     @ModifyVariable(method = "render(Lnet/minecraft/client/util/math/MatrixStack;ILnet/minecraft/scoreboard/Scoreboard;Lnet/minecraft/scoreboard/ScoreboardObjective;)V", at = @At(value = "STORE", opcode = Opcodes.ISTORE, ordinal = 0), require = 0)

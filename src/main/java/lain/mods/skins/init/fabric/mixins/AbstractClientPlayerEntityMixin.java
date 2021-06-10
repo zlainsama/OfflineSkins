@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class AbstractClientPlayerEntityMixin extends PlayerEntity {
 
     public AbstractClientPlayerEntityMixin(ClientWorld world, GameProfile profile) {
-        super(world, world.getSpawnPos(), world.method_30671(), profile);
+        super(world, world.getSpawnPos(), world.getSpawnAngle(), profile);
     }
 
     @Inject(method = "getCapeTexture()Lnet/minecraft/util/Identifier;", at = @At("RETURN"), cancellable = true)

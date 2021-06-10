@@ -41,7 +41,7 @@ public class FabricOfflineSkins implements ClientModInitializer {
     private static final boolean overwrite = true;
 
     private static Identifier generateRandomLocation() {
-        return new Identifier("offlineskins", String.format("textures/generated/%s", UUID.randomUUID().toString()));
+        return new Identifier("offlineskins", String.format("textures/generated/%s", UUID.randomUUID()));
     }
 
     public static Identifier getLocationCape(GameProfile profile, Identifier result) {

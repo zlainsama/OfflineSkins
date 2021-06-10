@@ -1,9 +1,9 @@
 package lain.mods.skins.impl.fabric;
 
+import com.mojang.blaze3d.platform.TextureUtil;
 import lain.mods.skins.api.interfaces.ISkinTexture;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.ResourceTexture;
-import net.minecraft.client.texture.TextureUtil;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 
@@ -43,7 +43,7 @@ public class CustomSkinTexture extends ResourceTexture implements ISkinTexture {
 
         try (NativeImage image = NativeImage.read(buf.duplicate())) {
             synchronized (this) {
-                TextureUtil.allocate(getGlId(), 0, image.getWidth(), image.getHeight());
+                TextureUtil.prepareImage(getGlId(), 0, image.getWidth(), image.getHeight());
                 image.upload(0, 0, 0, false);
             }
         }
