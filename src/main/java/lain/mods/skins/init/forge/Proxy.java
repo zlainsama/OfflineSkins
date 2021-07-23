@@ -11,9 +11,9 @@ import lain.mods.skins.impl.forge.CustomSkinTexture;
 import lain.mods.skins.impl.forge.ImageUtils;
 import lain.mods.skins.providers.*;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import org.apache.logging.log4j.LogManager;
@@ -86,9 +86,9 @@ enum Proxy {
 
     void handleClientTickEvent(TickEvent.ClientTickEvent event) {
         if (event.phase == TickEvent.Phase.START) {
-            World world = Minecraft.getInstance().level;
+            Level world = Minecraft.getInstance().level;
             if (world != null) {
-                for (PlayerEntity player : world.players()) {
+                for (Player player : world.players()) {
                     SkinProviderAPI.SKIN.getSkin(PlayerProfile.wrapGameProfile(player.getGameProfile()));
                     SkinProviderAPI.CAPE.getSkin(PlayerProfile.wrapGameProfile(player.getGameProfile()));
                 }

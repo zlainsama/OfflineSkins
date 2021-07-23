@@ -1,9 +1,9 @@
 package lain.mods.skins.impl.forge;
 
+import com.mojang.blaze3d.platform.NativeImage;
 import lain.lib.Retries;
 import lain.mods.skins.impl.Shared;
 import lain.mods.skins.impl.SkinData;
-import net.minecraft.client.renderer.texture.NativeImage;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;

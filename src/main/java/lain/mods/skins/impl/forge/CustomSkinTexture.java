@@ -1,11 +1,11 @@
 package lain.mods.skins.impl.forge;
 
+import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.blaze3d.platform.TextureUtil;
 import lain.mods.skins.api.interfaces.ISkinTexture;
-import net.minecraft.client.renderer.texture.NativeImage;
 import net.minecraft.client.renderer.texture.SimpleTexture;
-import net.minecraft.client.renderer.texture.TextureUtil;
-import net.minecraft.resources.IResourceManager;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -34,7 +34,7 @@ public class CustomSkinTexture extends SimpleTexture implements ISkinTexture {
     }
 
     @Override
-    public void load(IResourceManager resMan) throws IOException {
+    public void load(ResourceManager resMan) throws IOException {
         releaseId();
 
         ByteBuffer buf;
