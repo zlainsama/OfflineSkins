@@ -3,7 +3,7 @@
   "package": "lain.mods.skins.init.fabric.mixins",
   "compatibilityLevel": "JAVA_8",
   "client": [
-    "AbstractClientPlayerEntityMixin",
+    "PlayerListEntryMixin",
     "SkullBlockEntityRendererMixin",
     "PlayerListHudMixin"
   ],
