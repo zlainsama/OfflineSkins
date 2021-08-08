@@ -8,7 +8,9 @@
     "zlainsama"
   ],
   "contact": {
-    "sources": "https://github.com/zlainsama/OfflineSkins"
+    "homepage": "https://github.com/zlainsama/OfflineSkins",
+    "sources": "https://github.com/zlainsama/OfflineSkins",
+    "issues": "https://github.com/zlainsama/OfflineSkins/issues"
   },
   "license": "MIT",
   "environment": "*",
