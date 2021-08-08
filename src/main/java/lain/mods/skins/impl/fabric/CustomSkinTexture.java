@@ -1,13 +1,13 @@
 package lain.mods.skins.impl.fabric;
 
 import com.mojang.blaze3d.platform.TextureUtil;
+import com.mojang.blaze3d.systems.RenderSystem;
 import lain.mods.skins.api.interfaces.ISkinTexture;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.ResourceTexture;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
@@ -35,18 +35,19 @@ public class CustomSkinTexture extends ResourceTexture implements ISkinTexture {
 
     @Override
     public void load(ResourceManager manager) throws IOException {
-        clearGlId();
-
-        ByteBuffer buf;
-        if ((buf = _data.get()) == null) // gc
-            throw new FileNotFoundException(getLocation().toString());
-
-        try (NativeImage image = NativeImage.read(buf.duplicate())) {
-            synchronized (this) {
-                TextureUtil.prepareImage(getGlId(), 0, image.getWidth(), image.getHeight());
-                image.upload(0, 0, 0, false);
-            }
+        final ByteBuffer buffer = getData();
+        if (buffer != null) {
+            final NativeImage image = NativeImage.read(buffer.duplicate());
+            if (!RenderSystem.isOnRenderThreadOrInit())
+                RenderSystem.recordRenderCall(() -> upload(image));
+            else
+                upload(image);
         }
+    }
+
+    private void upload(NativeImage image) {
+        TextureUtil.prepareImage(getGlId(), 0, image.getWidth(), image.getHeight());
+        image.upload(0, 0, 0, true);
     }
 
 }
