@@ -14,7 +14,7 @@ import net.minecraftforge.gradle.common.tasks.SignJar
 
 import java.nio.file.Files
 
-version = "1.17.1-v1"
+version = "1.17.1-v2"
 group = "lain.mods.skins"
 archivesBaseName = "OfflineSkins"
 
