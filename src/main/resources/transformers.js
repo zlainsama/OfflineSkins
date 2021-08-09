@@ -1,7 +1,7 @@
 var ASMAPI = Java.type('net.minecraftforge.coremod.api.ASMAPI');
 var OPCODES = Java.type('org.objectweb.asm.Opcodes');
 
-// net/minecraft/client/player/AbstractClientPlayer/m_108561_ (getCloakTextureLocation)
+// net/minecraft/client/multiplayer/PlayerInfo/m_105337_ (getSkinLocation)
 function transformMethod001(node) {
     for (var i = 0; i < node.instructions.size(); i++) {
         var insn = node.instructions.get(i);
@@ -10,13 +10,13 @@ function transformMethod001(node) {
             tmp.visitVarInsn(OPCODES.ASTORE, 2);
             tmp.visitVarInsn(OPCODES.ALOAD, 0);
             tmp.visitVarInsn(OPCODES.ALOAD, 2);
-            tmp.visitMethodInsn(OPCODES.INVOKESTATIC, 'lain/mods/skins/init/forge/Hooks', 'getLocationCape', '(Lnet/minecraft/client/player/AbstractClientPlayer;Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/resources/ResourceLocation;', false);
+            tmp.visitMethodInsn(OPCODES.INVOKESTATIC, 'lain/mods/skins/init/forge/Hooks', 'getSkinLocation', '(Lnet/minecraft/client/multiplayer/PlayerInfo;Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/resources/ResourceLocation;', false);
             i += tmp.instructions.size();
             node.instructions.insertBefore(insn, tmp.instructions);
         }
     }
 }
-// net/minecraft/client/player/AbstractClientPlayer/m_108560_ (getSkinTextureLocation)
+// net/minecraft/client/multiplayer/PlayerInfo/m_105338_ (getCapeLocation)
 function transformMethod002(node) {
     for (var i = 0; i < node.instructions.size(); i++) {
         var insn = node.instructions.get(i);
@@ -25,13 +25,13 @@ function transformMethod002(node) {
             tmp.visitVarInsn(OPCODES.ASTORE, 2);
             tmp.visitVarInsn(OPCODES.ALOAD, 0);
             tmp.visitVarInsn(OPCODES.ALOAD, 2);
-            tmp.visitMethodInsn(OPCODES.INVOKESTATIC, 'lain/mods/skins/init/forge/Hooks', 'getLocationSkin', '(Lnet/minecraft/client/player/AbstractClientPlayer;Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/resources/ResourceLocation;', false);
+            tmp.visitMethodInsn(OPCODES.INVOKESTATIC, 'lain/mods/skins/init/forge/Hooks', 'getCapeLocation', '(Lnet/minecraft/client/multiplayer/PlayerInfo;Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/resources/ResourceLocation;', false);
             i += tmp.instructions.size();
             node.instructions.insertBefore(insn, tmp.instructions);
         }
     }
 }
-// net/minecraft/client/player/AbstractClientPlayer/m_108564_ (getModelName)
+// net/minecraft/client/multiplayer/PlayerInfo/m_105336_ (getModelName)
 function transformMethod003(node) {
     for (var i = 0; i < node.instructions.size(); i++) {
         var insn = node.instructions.get(i);
@@ -40,7 +40,7 @@ function transformMethod003(node) {
             tmp.visitVarInsn(OPCODES.ASTORE, 2);
             tmp.visitVarInsn(OPCODES.ALOAD, 0);
             tmp.visitVarInsn(OPCODES.ALOAD, 2);
-            tmp.visitMethodInsn(OPCODES.INVOKESTATIC, 'lain/mods/skins/init/forge/Hooks', 'getSkinType', '(Lnet/minecraft/client/player/AbstractClientPlayer;Ljava/lang/String;)Ljava/lang/String;', false);
+            tmp.visitMethodInsn(OPCODES.INVOKESTATIC, 'lain/mods/skins/init/forge/Hooks', 'getModelName', '(Lnet/minecraft/client/multiplayer/PlayerInfo;Ljava/lang/String;)Ljava/lang/String;', false);
             i += tmp.instructions.size();
             node.instructions.insertBefore(insn, tmp.instructions);
         }
@@ -56,7 +56,7 @@ function transformMethod004(node) {
             tmp.visitVarInsn(OPCODES.ALOAD, 0);
             tmp.visitVarInsn(OPCODES.ALOAD, 1);
             tmp.visitVarInsn(OPCODES.ALOAD, 2);
-            tmp.visitMethodInsn(OPCODES.INVOKESTATIC, 'lain/mods/skins/init/forge/Hooks', 'getLocationSkin_SkullRenderer', '(Lnet/minecraft/world/level/block/SkullBlock$Type;Lcom/mojang/authlib/GameProfile;Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/resources/ResourceLocation;', false);
+            tmp.visitMethodInsn(OPCODES.INVOKESTATIC, 'lain/mods/skins/init/forge/Hooks', 'getSkinLocation', '(Lnet/minecraft/world/level/block/SkullBlock$Type;Lcom/mojang/authlib/GameProfile;Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/resources/ResourceLocation;', false);
             i += tmp.instructions.size();
             node.instructions.insertBefore(insn, tmp.instructions);
         }
@@ -72,14 +72,6 @@ function transformMethod005(node) {
             tmp.visitInsn(OPCODES.ICONST_1);
             i += tmp.instructions.size();
             node.instructions.insertBefore(insn, tmp.instructions);
-        } else if (OPCODES.INVOKESTATIC === insn.getOpcode() && 'm_157456_' === insn.name) { // setShaderTexture
-            var tmp = ASMAPI.getMethodNode();
-            tmp.visitVarInsn(OPCODES.ASTORE, 34);
-            tmp.visitVarInsn(OPCODES.ALOAD, 27);
-            tmp.visitVarInsn(OPCODES.ALOAD, 34);
-            tmp.visitMethodInsn(OPCODES.INVOKESTATIC, 'lain/mods/skins/init/forge/Hooks', 'getLocationSkin_TabOverlay', '(Lcom/mojang/authlib/GameProfile;Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/resources/ResourceLocation;', false);
-            i += tmp.instructions.size();
-            node.instructions.insertBefore(insn, tmp.instructions);
         }
     }
 }
@@ -89,15 +81,15 @@ function initializeCoreMod() {
         'Transformer001': {
             'target': {
                 'type': 'CLASS',
-                'name': 'net/minecraft/client/player/AbstractClientPlayer'
+                'name': 'net/minecraft/client/multiplayer/PlayerInfo'
             },
             'transformer': function(node) {
                 node.methods.forEach(function(method) {
-                    if ('m_108561_' === method.name)
+                    if ('m_105337_' === method.name)
                         transformMethod001(method);
-                    else if ('m_108560_' === method.name)
+                    else if ('m_105338_' === method.name)
                         transformMethod002(method);
-                    else if ('m_108564_' === method.name)
+                    else if ('m_105336_' === method.name)
                         transformMethod003(method);
                 });
                 return node;
