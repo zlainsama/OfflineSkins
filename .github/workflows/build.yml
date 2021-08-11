@@ -25,7 +25,7 @@ jobs:
           chmod +x gradlew
           ./gradlew --no-daemon build
       - name: Release
-        uses: softprops/action-gh-release@v0.1.8
+        uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
