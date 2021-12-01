@@ -20,7 +20,7 @@ public class ImageUtils {
                 return "default"; // it's actually "legacy", but there will always be a filter to convert them into "default".
             if (w == h) {
                 int r = Math.max(w / 64, 1);
-                if (((image.getPixelColor(55 * r, 20 * r) & 0xFF000000) >>> 24) == 0)
+                if (((image.getColor(55 * r, 20 * r) & 0xFF000000) >>> 24) == 0)
                     return "slim";
                 return "default";
             }
@@ -59,7 +59,7 @@ public class ImageUtils {
 
             File tmp = null;
             try {
-                output.writeFile(tmp = Files.createTempFile(null, null).toFile());
+                output.writeTo(tmp = Files.createTempFile(null, null).toFile());
                 return SkinData.toBuffer(Shared.blockyReadFile(tmp, null, Retries::rethrow));
             } finally {
                 if (tmp != null && tmp.exists() && !tmp.delete())
@@ -73,18 +73,18 @@ public class ImageUtils {
     private static void setAreaOpaque(NativeImage image, int x, int y, int width, int height) {
         for (int i = x; i < width; ++i)
             for (int j = y; j < height; ++j)
-                image.setPixelColor(i, j, image.getPixelColor(i, j) | -16777216);
+                image.setColor(i, j, image.getColor(i, j) | -16777216);
     }
 
     private static void setAreaTransparent(NativeImage image, int x, int y, int width, int height) {
         for (int i = x; i < width; ++i)
             for (int j = y; j < height; ++j)
-                if ((image.getPixelColor(i, j) >> 24 & 255) < 128)
+                if ((image.getColor(i, j) >> 24 & 255) < 128)
                     return;
 
         for (int l = x; l < width; ++l)
             for (int i1 = y; i1 < height; ++i1)
-                image.setPixelColor(l, i1, image.getPixelColor(l, i1) & 16777215);
+                image.setColor(l, i1, image.getColor(l, i1) & 16777215);
     }
 
     public static boolean validateData(byte[] data) {
