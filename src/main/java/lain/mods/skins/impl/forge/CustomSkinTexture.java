@@ -4,20 +4,21 @@ import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.platform.TextureUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import lain.mods.skins.api.interfaces.ISkinTexture;
-import net.minecraft.client.renderer.texture.SimpleTexture;
+import net.minecraft.client.renderer.texture.HttpTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 
-public class CustomSkinTexture extends SimpleTexture implements ISkinTexture {
+public class CustomSkinTexture extends HttpTexture implements ISkinTexture {
 
     private final WeakReference<ByteBuffer> _data;
 
     public CustomSkinTexture(ResourceLocation location, ByteBuffer data) {
-        super(location);
+        super(null, null, location, false, null);
         if (data == null)
             throw new IllegalArgumentException("buffer must not be null");
 
@@ -33,16 +34,20 @@ public class CustomSkinTexture extends SimpleTexture implements ISkinTexture {
         return location;
     }
 
+    public NativeImage getImage() throws IOException {
+        ByteBuffer buffer = getData();
+        if (buffer == null)
+            throw new FileNotFoundException();
+        return NativeImage.read(buffer);
+    }
+
     @Override
     public void load(ResourceManager manager) throws IOException {
-        final ByteBuffer buffer = getData();
-        if (buffer != null) {
-            final NativeImage image = NativeImage.read(buffer.duplicate());
-            if (!RenderSystem.isOnRenderThreadOrInit())
-                RenderSystem.recordRenderCall(() -> upload(image));
-            else
-                upload(image);
-        }
+        NativeImage image = getImage();
+        if (!RenderSystem.isOnRenderThreadOrInit())
+            RenderSystem.recordRenderCall(() -> upload(image));
+        else
+            upload(image);
     }
 
     private void upload(NativeImage image) {
