@@ -1,14 +1,10 @@
 package lain.mods.skins.impl.forge;
 
 import com.mojang.blaze3d.platform.NativeImage;
-import lain.lib.Retries;
-import lain.mods.skins.impl.Shared;
 import lain.mods.skins.impl.SkinData;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.nio.ByteBuffer;
-import java.nio.file.Files;
 
 public class ImageUtils {
 
@@ -57,14 +53,7 @@ public class ImageUtils {
             setAreaOpaque(output, 0 * r, 16 * r, 64 * r, 32 * r);
             setAreaOpaque(output, 16 * r, 48 * r, 48 * r, 64 * r);
 
-            File tmp = null;
-            try {
-                output.writeToFile(tmp = Files.createTempFile(null, null).toFile());
-                return SkinData.toBuffer(Shared.blockyReadFile(tmp, null, Retries::rethrow));
-            } finally {
-                if (tmp != null && tmp.exists() && !tmp.delete())
-                    tmp.deleteOnExit();
-            }
+            return SkinData.toBuffer(output.asByteArray());
         } catch (Throwable t) {
             return buffer;
         }
