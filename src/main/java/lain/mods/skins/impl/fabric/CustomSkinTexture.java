@@ -4,20 +4,21 @@ import com.mojang.blaze3d.platform.TextureUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import lain.mods.skins.api.interfaces.ISkinTexture;
 import net.minecraft.client.texture.NativeImage;
-import net.minecraft.client.texture.ResourceTexture;
+import net.minecraft.client.texture.PlayerSkinTexture;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 
-public class CustomSkinTexture extends ResourceTexture implements ISkinTexture {
+public class CustomSkinTexture extends PlayerSkinTexture implements ISkinTexture {
 
     private final WeakReference<ByteBuffer> _data;
 
     public CustomSkinTexture(Identifier location, ByteBuffer data) {
-        super(location);
+        super(null, null, location, false, null);
         if (data == null)
             throw new IllegalArgumentException("buffer must not be null");
 
@@ -33,16 +34,20 @@ public class CustomSkinTexture extends ResourceTexture implements ISkinTexture {
         return location;
     }
 
+    public NativeImage getImage() throws IOException {
+        ByteBuffer buffer = getData();
+        if (buffer == null)
+            throw new FileNotFoundException();
+        return NativeImage.read(buffer);
+    }
+
     @Override
     public void load(ResourceManager manager) throws IOException {
-        final ByteBuffer buffer = getData();
-        if (buffer != null) {
-            final NativeImage image = NativeImage.read(buffer.duplicate());
-            if (!RenderSystem.isOnRenderThreadOrInit())
-                RenderSystem.recordRenderCall(() -> upload(image));
-            else
-                upload(image);
-        }
+        NativeImage image = getImage();
+        if (!RenderSystem.isOnRenderThreadOrInit())
+            RenderSystem.recordRenderCall(() -> upload(image));
+        else
+            upload(image);
     }
 
     private void upload(NativeImage image) {

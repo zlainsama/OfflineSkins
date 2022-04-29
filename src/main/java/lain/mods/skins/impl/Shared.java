@@ -38,64 +38,22 @@ public class Shared {
 
     private static final Cache<UUID, Boolean> offlines = CacheBuilder.newBuilder().weakKeys().build();
 
-    /**
-     * Call a possibly blocking task in a ManagedBlocker to allow current Thread adjust if it is a ForkJoinWorkerThread.
-     *
-     * @param callable     the task to call.
-     * @param defaultValue a default value to return if the task failed during the call.
-     * @param consumer     a consumer that will receive a Throwable if the task failed during the call, null is acceptable.
-     * @return the result of the task or defaultValue if it failed during the call.
-     */
-    public static <T> T blockyCall(Callable<T> callable, T defaultValue, Consumer<Throwable> consumer) {
+    public static <T> T call(Callable<T> callable, T defaultValue, Consumer<Throwable> consumer) {
         if (callable == null)
             return defaultValue;
-        return new SupplierBlocker<T>() {
-
-            T result;
-
-            @Override
-            public boolean block() throws InterruptedException {
-                try {
-                    result = callable.call();
-                } catch (Throwable t) {
-                    if (consumer != null)
-                        consumer.accept(t);
-                    result = defaultValue;
-                }
-                return true;
-            }
-
-            @Override
-            public T get() {
-                try {
-                    ForkJoinPool.managedBlock(this);
-                } catch (InterruptedException e) {
-                    if (consumer != null)
-                        consumer.accept(e);
-                }
-                return result;
-            }
-
-            @Override
-            public boolean isReleasable() {
-                return false;
-            }
-
-        }.get();
+        try {
+            return callable.call();
+        } catch (Throwable t) {
+            if (consumer != null)
+                consumer.accept(t);
+            return defaultValue;
+        }
     }
 
-    /**
-     * Completely read a file in a ManagedBlocker to allow current Thread adjust if it is a ForkJoinWorkerThread.
-     *
-     * @param file            the file to read.
-     * @param defaultContents a default value to return if failed during reading the file.
-     * @param consumer        a consumer that will receive a Throwable if failed during reading the file, null is acceptable.
-     * @return the contents of the file or defaultContents if failed during reading the file.
-     */
-    public static byte[] blockyReadFile(File file, byte[] defaultContents, Consumer<Throwable> consumer) {
+    public static byte[] readFile(File file, byte[] defaultContents, Consumer<Throwable> consumer) {
         if (file == null)
             return defaultContents;
-        return blockyCall(() -> {
+        return call(() -> {
             try (FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.READ); ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
                 channel.transferTo(0L, Long.MAX_VALUE, Channels.newChannel(baos));
                 return baos.toByteArray();

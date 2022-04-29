@@ -32,7 +32,7 @@ public class MojangService {
                 return Optional.empty();
             if (key.isComplete() && !key.getProperties().isEmpty()) // already filled
                 return Optional.of(key);
-            GameProfile filled = Shared.blockyCall(() -> {
+            GameProfile filled = Shared.call(() -> {
                 return MinecraftUtils.getSessionService().fillProfileProperties(key, false); // fill it
             }, key, null);
             if (filled == key) // failed
@@ -61,7 +61,7 @@ public class MojangService {
         public Optional<GameProfile> load(String key) throws Exception {
             if (Shared.isBlank(key)) // can't resolve this
                 return Optional.of(Shared.DUMMY);
-            return Optional.ofNullable(Shared.blockyCall(() -> {
+            return Optional.ofNullable(Shared.call(() -> {
                 return makeRequest(String.format("https://api.mojang.com/users/profiles/minecraft/%s", key)); // request it
             }, null, null));
         }
