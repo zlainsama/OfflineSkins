@@ -17,6 +17,6 @@ made it possible to cache your skins for offline use.
 [[dependencies.offlineskins]]
 modId="forge"
 mandatory=true
-versionRange="[39.0.0,)"
+versionRange="[41.0.99,)"
 ordering="NONE"
 side="CLIENT"
