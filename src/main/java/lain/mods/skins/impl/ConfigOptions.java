@@ -9,6 +9,7 @@ public class ConfigOptions {
     public boolean useCustomServer2;
     public String hostCustomServer2Skin;
     public String hostCustomServer2Cape;
+    public boolean forceResolveUsernames;
 
     /**
      * @return self with all options revert to default.
@@ -21,6 +22,7 @@ public class ConfigOptions {
         useCustomServer2 = false;
         hostCustomServer2Skin = "http://example.com/skins/%auto%";
         hostCustomServer2Cape = "http://example.com/capes/%auto%";
+        forceResolveUsernames = false;
         return this;
     }
 

@@ -158,6 +158,8 @@ public class FabricOfflineSkins implements ClientModInitializer {
             SkinProviderAPI.CAPE.registerProvider(new MojangCapeProvider());
         if (config.useCrafatar)
             SkinProviderAPI.CAPE.registerProvider(new CrafatarCapeProvider());
+
+        PlayerProfile.ForceResolveUsernames = config.forceResolveUsernames;
     }
 
 }

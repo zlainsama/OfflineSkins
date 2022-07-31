@@ -20,6 +20,8 @@ public class PlayerProfile implements IPlayerProfile {
 
     private static final PlayerProfile DUMMY = new PlayerProfile(Shared.DUMMY);
 
+    public static boolean ForceResolveUsernames = false;
+
     private static final LoadingCache<GameProfile, PlayerProfile> profiles = CacheBuilder.newBuilder().weakKeys().refreshAfterWrite(10, TimeUnit.MINUTES).build(new CacheLoader<GameProfile, PlayerProfile>() {
 
         @Override
@@ -48,7 +50,7 @@ public class PlayerProfile implements IPlayerProfile {
 
                     }, Runnable::run);
                 }
-            } else if (Shared.isOfflinePlayer(key.getId(), key.getName())) // an offline profile that needs resolving
+            } else if (ForceResolveUsernames || Shared.isOfflinePlayer(key.getId(), key.getName())) // an offline profile that needs resolving
             {
                 Futures.addCallback(MojangService.getProfile(key.getName()), new FutureCallback<GameProfile>() // resolve it
                 {
