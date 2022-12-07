@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 public class FabricOfflineSkins implements ClientModInitializer {
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    private static final Set<String> DefaultSkins = ImmutableSet.of("textures/entity/steve.png", "textures/entity/alex.png");
+    private static final Set<String> DefaultSkins = ImmutableSet.of("textures/entity/player/slim/alex.png", "textures/entity/player/slim/ari.png", "textures/entity/player/slim/efe.png", "textures/entity/player/slim/kai.png", "textures/entity/player/slim/makena.png", "textures/entity/player/slim/noor.png", "textures/entity/player/slim/steve.png", "textures/entity/player/slim/sunny.png", "textures/entity/player/slim/zuri.png", "textures/entity/player/wide/alex.png", "textures/entity/player/wide/ari.png", "textures/entity/player/wide/efe.png", "textures/entity/player/wide/kai.png", "textures/entity/player/wide/makena.png", "textures/entity/player/wide/noor.png", "textures/entity/player/wide/steve.png", "textures/entity/player/wide/sunny.png", "textures/entity/player/wide/zuri.png");
 
     private static final Map<ByteBuffer, CustomSkinTexture> textures = new WeakHashMap<>();
 
