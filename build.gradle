@@ -7,7 +7,7 @@ import net.minecraftforge.gradle.common.tasks.SignJar
 
 import java.nio.file.Files
 
-version = "1.19.3-v1"
+version = "1.19.4-v1"
 group = "lain.mods.skins"
 archivesBaseName = "OfflineSkins"
 
@@ -15,13 +15,13 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 minecraft {
-    mappings channel: 'official', version: '1.19.3'
+    mappings channel: 'official', version: '1.19.4'
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.19.3-44.0.0'
+    minecraft 'net.minecraftforge:forge:1.19.4-45.0.1'
 }
 
 processResources {
