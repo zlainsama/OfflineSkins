@@ -1,6 +1,5 @@
 package lain.mods.skins.init.fabric;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mojang.authlib.GameProfile;
@@ -24,46 +23,34 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.WeakHashMap;
 import java.util.stream.Collectors;
 
 public class FabricOfflineSkins implements ClientModInitializer {
 
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    private static final Set<String> DefaultSkins = ImmutableSet.of("textures/entity/player/slim/alex.png", "textures/entity/player/slim/ari.png", "textures/entity/player/slim/efe.png", "textures/entity/player/slim/kai.png", "textures/entity/player/slim/makena.png", "textures/entity/player/slim/noor.png", "textures/entity/player/slim/steve.png", "textures/entity/player/slim/sunny.png", "textures/entity/player/slim/zuri.png", "textures/entity/player/wide/alex.png", "textures/entity/player/wide/ari.png", "textures/entity/player/wide/efe.png", "textures/entity/player/wide/kai.png", "textures/entity/player/wide/makena.png", "textures/entity/player/wide/noor.png", "textures/entity/player/wide/steve.png", "textures/entity/player/wide/sunny.png", "textures/entity/player/wide/zuri.png");
-
     private static final Map<ByteBuffer, CustomSkinTexture> textures = new WeakHashMap<>();
-
-    private static final boolean skinPass = false;
-    private static final boolean capePass = false;
-    private static final boolean overwrite = true;
 
     private static Identifier generateRandomLocation() {
         return new Identifier("offlineskins", String.format("textures/generated/%s", UUID.randomUUID()));
     }
 
     public static Identifier getLocationCape(GameProfile profile, Identifier result) {
-        if (capePass)
-            return null;
-
-        if (overwrite || isDefaultSkin(result)) {
-            ISkin skin = SkinProviderAPI.CAPE.getSkin(PlayerProfile.wrapGameProfile(profile));
-            if (skin != null && skin.isDataReady())
-                return getOrCreateTexture(skin.getData(), skin).getLocation();
+        ISkin skin = SkinProviderAPI.CAPE.getSkin(PlayerProfile.wrapGameProfile(profile));
+        if (skin != null && skin.isDataReady()) {
+            ByteBuffer data = skin.getData();
+            if (data != null) // I don't know how this could happen, but it happens, apparently.
+                return getOrCreateTexture(data, skin).getLocation();
         }
         return null;
     }
 
     public static Identifier getLocationSkin(GameProfile profile, Identifier result) {
-        if (skinPass)
-            return null;
-
-        if (overwrite || isDefaultSkin(result)) {
-            ISkin skin = SkinProviderAPI.SKIN.getSkin(PlayerProfile.wrapGameProfile(profile));
-            if (skin != null && skin.isDataReady())
-                return getOrCreateTexture(skin.getData(), skin).getLocation();
+        ISkin skin = SkinProviderAPI.SKIN.getSkin(PlayerProfile.wrapGameProfile(profile));
+        if (skin != null && skin.isDataReady()) {
+            ByteBuffer data = skin.getData();
+            if (data != null) // I don't know how this could happen, but it happens, apparently.
+                return getOrCreateTexture(data, skin).getLocation();
         }
         return null;
     }
@@ -92,14 +79,13 @@ public class FabricOfflineSkins implements ClientModInitializer {
         Identifier location = getLocationSkin(profile, null);
         if (location != null) {
             ISkin skin = SkinProviderAPI.SKIN.getSkin(PlayerProfile.wrapGameProfile(profile));
-            if (skin != null && skin.isDataReady())
-                return skin.getSkinType();
+            if (skin != null && skin.isDataReady()) {
+                ByteBuffer data = skin.getData();
+                if (data != null) // I don't know how this could happen, but it happens, apparently.
+                    return skin.getSkinType();
+            }
         }
         return null;
-    }
-
-    private static boolean isDefaultSkin(Identifier id) {
-        return "minecraft".equals(id.getNamespace()) && DefaultSkins.contains(id.getPath());
     }
 
     @Override
@@ -117,6 +103,7 @@ public class FabricOfflineSkins implements ClientModInitializer {
     }
 
     public void reloadConfig() {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
         Path pathToConfig = Paths.get(".", "config", "offlineskins.json");
         pathToConfig.toFile().getParentFile().mkdirs();
         if (!pathToConfig.toFile().exists()) {
