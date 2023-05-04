@@ -42,15 +42,21 @@ enum Proxy {
 
     ResourceLocation getLocationCape(GameProfile profile) {
         ISkin skin = SkinProviderAPI.CAPE.getSkin(PlayerProfile.wrapGameProfile(profile));
-        if (skin != null && skin.isDataReady())
-            return getOrCreateTexture(skin.getData(), skin).getLocation();
+        if (skin != null && skin.isDataReady()) {
+            ByteBuffer data = skin.getData();
+            if (data != null) // I don't know how this could happen, but it happens, apparently.
+                return getOrCreateTexture(data, skin).getLocation();
+        }
         return null;
     }
 
     ResourceLocation getLocationSkin(GameProfile profile) {
         ISkin skin = SkinProviderAPI.SKIN.getSkin(PlayerProfile.wrapGameProfile(profile));
-        if (skin != null && skin.isDataReady())
-            return getOrCreateTexture(skin.getData(), skin).getLocation();
+        if (skin != null && skin.isDataReady()) {
+            ByteBuffer data = skin.getData();
+            if (data != null) // I don't know how this could happen, but it happens, apparently.
+                return getOrCreateTexture(data, skin).getLocation();
+        }
         return null;
     }
 
@@ -78,8 +84,11 @@ enum Proxy {
         ResourceLocation location = getLocationSkin(profile);
         if (location != null) {
             ISkin skin = SkinProviderAPI.SKIN.getSkin(PlayerProfile.wrapGameProfile(profile));
-            if (skin != null && skin.isDataReady())
-                return skin.getSkinType();
+            if (skin != null && skin.isDataReady()) {
+                ByteBuffer data = skin.getData();
+                if (data != null) // I don't know how this could happen, but it happens, apparently.
+                    return skin.getSkinType();
+            }
         }
         return null;
     }
