@@ -1,6 +1,8 @@
 {
-    "pack": {
-        "description": "OfflineSkins resource pack",
-        "pack_format": 4
-    }
+  "pack": {
+    "description": {
+      "text": "${mod_id} resources"
+    },
+    "pack_format": 15
+  }
 }

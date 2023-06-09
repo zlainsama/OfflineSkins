@@ -1,47 +1,67 @@
 plugins {
     id 'eclipse'
-    id 'net.minecraftforge.gradle' version '5.1.+'
+    id 'idea'
+    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
 }
 
 import net.minecraftforge.gradle.common.tasks.SignJar
 
 import java.nio.file.Files
 
-version = "1.19.4-v1a"
-group = "lain.mods.skins"
-archivesBaseName = "OfflineSkins"
+version = mod_version
+group = mod_group_id
+
+base {
+    archivesName = mod_id
+}
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
-println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
+println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 minecraft {
-    mappings channel: 'official', version: '1.19.4'
+    mappings channel: mapping_channel, version: mapping_version
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
-dependencies {
-    minecraft 'net.minecraftforge:forge:1.19.4-45.0.1'
+repositories {
 }
 
+dependencies {
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+}
+
+def resourceTargets = ['META-INF/mods.toml', 'pack.mcmeta']
+def replaceProperties = [
+        minecraft_version   : minecraft_version, minecraft_version_range: minecraft_version_range,
+        forge_version       : forge_version, forge_version_range: forge_version_range,
+        loader_version_range: loader_version_range,
+        mod_id              : mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
+        mod_authors         : mod_authors, mod_description: mod_description
+]
 processResources {
+    inputs.properties replaceProperties
+    replaceProperties.put 'project', project
+
+    filesMatching(resourceTargets) {
+        expand replaceProperties
+    }
+
     from 'LICENSE.txt'
 }
 
 jar {
     manifest {
-        attributes(["Specification-Title"     : "OfflineSkins",
-                    "Specification-Vendor"    : "zlainsama",
-                    "Specification-Version"   : "1",
-                    "Implementation-Title"    : project.name,
-                    "Implementation-Version"  : "${version}",
-                    "Implementation-Vendor"   : "zlainsama",
-                    "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")],)
+        attributes([
+                "Specification-Title"     : mod_id,
+                "Specification-Vendor"    : mod_authors,
+                "Specification-Version"   : "1", // We are version 1 of ourselves
+                "Implementation-Title"    : project.name,
+                "Implementation-Version"  : project.jar.archiveVersion,
+                "Implementation-Vendor"   : mod_authors,
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
     }
-}
-
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }
 
 jar.finalizedBy('reobfJar')
@@ -59,8 +79,8 @@ task signJar(type: SignJar, dependsOn: jar) {
         alias = System.getenv('SIGNJAR_ALIAS')
         storePass = System.getenv('SIGNJAR_STOREPASS')
         keyPass = System.getenv('SIGNJAR_KEYPASS')
-        inputFile = jar.archivePath
-        outputFile = jar.archivePath
+        inputFile = jar.archiveFile
+        outputFile = jar.archiveFile
     }
 
     doLast {
@@ -69,3 +89,7 @@ task signJar(type: SignJar, dependsOn: jar) {
 }
 
 build.dependsOn signJar
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}

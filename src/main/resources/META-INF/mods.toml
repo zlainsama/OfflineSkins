@@ -1,22 +1,18 @@
 modLoader = "javafml"
-loaderVersion = "[25,)"
-license = "MIT License"
-issueTrackerURL = "https://github.com/zlainsama/OfflineSkins/issues"
-displayURL = "https://github.com/zlainsama/OfflineSkins"
-#logoFile=""
-credits = ""
-authors = "zlainsama"
+loaderVersion = "${loader_version_range}"
+license = "${mod_license}"
 [[mods]]
-modId = "offlineskins"
-version = "${file.jarVersion}"
-displayName = "OfflineSkins"
-#updateJSONURL=""
-description = '''
-made it possible to cache your skins for offline use.
-'''
-[[dependencies.offlineskins]]
+modId = "${mod_id}"
+version = "${mod_version}"
+displayName = "${mod_name}"
+credits = ""
+authors = "${mod_authors}"
+displayTest = "IGNORE_ALL_VERSION"
+description = '''${mod_description}'''
+
+[[dependencies.${ mod_id }]]
 modId = "forge"
 mandatory = true
-versionRange = "[41.0.99,)"
+versionRange = "${forge_version_range}"
 ordering = "NONE"
-side = "CLIENT"
+side = "BOTH"
