@@ -10,5 +10,5 @@
   "injectors": {
     "defaultRequire": 1
   },
-  "refmap": "OfflineSkins-refmap.json"
+  "refmap": "offlineskins-refmap.json"
 }
