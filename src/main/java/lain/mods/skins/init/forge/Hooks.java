@@ -2,10 +2,22 @@ package lain.mods.skins.init.forge;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.multiplayer.PlayerInfo;
+import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.SkullBlock;
 
 public class Hooks {
+
+    public static PlayerSkin getSkin(GameProfile profile, PlayerSkin result) {
+        PlayerSkin skin = Proxy.INSTANCE.getSkin(profile);
+        if (skin != null)
+            return skin;
+        return result;
+    }
+
+    public static PlayerSkin getSkin(PlayerInfo info, PlayerSkin result) {
+        return getSkin(info.getProfile(), result);
+    }
 
     public static ResourceLocation getSkinLocation(GameProfile profile, ResourceLocation result) {
         ResourceLocation location = Proxy.INSTANCE.getLocationSkin(profile);

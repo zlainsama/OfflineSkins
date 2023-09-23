@@ -8,8 +8,6 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 public class ForgeOfflineSkins {
 
     public ForgeOfflineSkins() {
-//        ModLoadingContext.get().registerExtensionPoint(IExtensionPoint.DisplayTest.class, () -> new IExtensionPoint.DisplayTest(() -> "client-only", (v, n) -> n));
-
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setupClient);
     }
 

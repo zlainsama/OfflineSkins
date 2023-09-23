@@ -1,7 +1,7 @@
 var ASMAPI = Java.type('net.minecraftforge.coremod.api.ASMAPI');
 var OPCODES = Java.type('org.objectweb.asm.Opcodes');
 
-// net/minecraft/client/multiplayer/PlayerInfo/m_105337_ (getSkinLocation)
+// net/minecraft/client/multiplayer/PlayerInfo/m_293823_ (getSkin)
 function transformMethod001(node) {
     for (var i = 0; i < node.instructions.size(); i++) {
         var insn = node.instructions.get(i);
@@ -10,44 +10,14 @@ function transformMethod001(node) {
             tmp.visitVarInsn(OPCODES.ASTORE, 2);
             tmp.visitVarInsn(OPCODES.ALOAD, 0);
             tmp.visitVarInsn(OPCODES.ALOAD, 2);
-            tmp.visitMethodInsn(OPCODES.INVOKESTATIC, 'lain/mods/skins/init/forge/Hooks', 'getSkinLocation', '(Lnet/minecraft/client/multiplayer/PlayerInfo;Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/resources/ResourceLocation;', false);
-            i += tmp.instructions.size();
-            node.instructions.insertBefore(insn, tmp.instructions);
-        }
-    }
-}
-// net/minecraft/client/multiplayer/PlayerInfo/m_105338_ (getCapeLocation)
-function transformMethod002(node) {
-    for (var i = 0; i < node.instructions.size(); i++) {
-        var insn = node.instructions.get(i);
-        if (OPCODES.ARETURN === insn.getOpcode()) {
-            var tmp = ASMAPI.getMethodNode();
-            tmp.visitVarInsn(OPCODES.ASTORE, 2);
-            tmp.visitVarInsn(OPCODES.ALOAD, 0);
-            tmp.visitVarInsn(OPCODES.ALOAD, 2);
-            tmp.visitMethodInsn(OPCODES.INVOKESTATIC, 'lain/mods/skins/init/forge/Hooks', 'getCapeLocation', '(Lnet/minecraft/client/multiplayer/PlayerInfo;Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/resources/ResourceLocation;', false);
-            i += tmp.instructions.size();
-            node.instructions.insertBefore(insn, tmp.instructions);
-        }
-    }
-}
-// net/minecraft/client/multiplayer/PlayerInfo/m_105336_ (getModelName)
-function transformMethod003(node) {
-    for (var i = 0; i < node.instructions.size(); i++) {
-        var insn = node.instructions.get(i);
-        if (OPCODES.ARETURN === insn.getOpcode()) {
-            var tmp = ASMAPI.getMethodNode();
-            tmp.visitVarInsn(OPCODES.ASTORE, 2);
-            tmp.visitVarInsn(OPCODES.ALOAD, 0);
-            tmp.visitVarInsn(OPCODES.ALOAD, 2);
-            tmp.visitMethodInsn(OPCODES.INVOKESTATIC, 'lain/mods/skins/init/forge/Hooks', 'getModelName', '(Lnet/minecraft/client/multiplayer/PlayerInfo;Ljava/lang/String;)Ljava/lang/String;', false);
+            tmp.visitMethodInsn(OPCODES.INVOKESTATIC, 'lain/mods/skins/init/forge/Hooks', 'getSkin', '(Lnet/minecraft/client/multiplayer/PlayerInfo;Lnet/minecraft/client/resources/PlayerSkin;)Lnet/minecraft/client/resources/PlayerSkin;', false);
             i += tmp.instructions.size();
             node.instructions.insertBefore(insn, tmp.instructions);
         }
     }
 }
 // net/minecraft/client/renderer/blockentity/SkullBlockRenderer/m_112523_ (getRenderType)
-function transformMethod004(node) {
+function transformMethod002(node) {
     for (var i = 0; i < node.instructions.size(); i++) {
         var insn = node.instructions.get(i);
         if (OPCODES.INVOKESTATIC === insn.getOpcode() && ('m_110473_' === insn.name || 'm_110458_' === insn.name)) { // entityTranslucent | entityCutoutNoCull
@@ -63,7 +33,7 @@ function transformMethod004(node) {
     }
 }
 // net/minecraft/client/gui/components/PlayerTabOverlay/m_94544_ (render)
-function transformMethod005(node) {
+function transformMethod003(node) {
     for (var i = 0; i < node.instructions.size(); i++) {
         var insn = node.instructions.get(i);
         if (OPCODES.ISTORE === insn.getOpcode() && 12 === insn.var) {
@@ -85,12 +55,8 @@ function initializeCoreMod() {
             },
             'transformer': function(node) {
                 node.methods.forEach(function(method) {
-                    if ('m_105337_' === method.name)
+                    if ('m_293823_' === method.name)
                         transformMethod001(method);
-                    else if ('m_105338_' === method.name)
-                        transformMethod002(method);
-                    else if ('m_105336_' === method.name)
-                        transformMethod003(method);
                 });
                 return node;
             }
@@ -103,7 +69,7 @@ function initializeCoreMod() {
             'transformer': function(node) {
                 node.methods.forEach(function(method) {
                     if ('m_112523_' === method.name)
-                        transformMethod004(method);
+                        transformMethod002(method);
                 });
                 return node;
             }
@@ -116,7 +82,7 @@ function initializeCoreMod() {
             'transformer': function(node) {
                 node.methods.forEach(function(method) {
                     if ('m_94544_' === method.name)
-                        transformMethod005(method);
+                        transformMethod003(method);
                 });
                 return node;
             }

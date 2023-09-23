@@ -9,8 +9,10 @@ import lain.mods.skins.impl.ConfigOptions;
 import lain.mods.skins.impl.PlayerProfile;
 import lain.mods.skins.impl.forge.CustomSkinTexture;
 import lain.mods.skins.impl.forge.ImageUtils;
+import lain.mods.skins.impl.forge.SkinUtils;
 import lain.mods.skins.providers.*;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -78,6 +80,10 @@ enum Proxy {
             }
         }
         return textures.get(data);
+    }
+
+    PlayerSkin getSkin(GameProfile profile) {
+        return SkinUtils.skins(profile);
     }
 
     String getSkinType(GameProfile profile) {

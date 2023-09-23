@@ -30,14 +30,14 @@ public class MojangService {
         public Optional<GameProfile> load(GameProfile key) throws Exception {
             if (key.getId() == null || key.getProperties() == null || key == Shared.DUMMY) // bad profile
                 return Optional.empty();
-            if (key.isComplete() && !key.getProperties().isEmpty()) // already filled
+            if (!key.getProperties().isEmpty()) // already filled
                 return Optional.of(key);
             GameProfile filled = Shared.call(() -> {
-                return MinecraftUtils.getSessionService().fillProfileProperties(key, false); // fill it
+                return MinecraftUtils.getSessionService().fetchProfile(key.getId(), false).profile(); // fetch it
             }, key, null);
             if (filled == key) // failed
                 return Optional.empty();
-            if (!filled.isComplete() || filled.getProperties().isEmpty()) // partially filled, this won't happen in current implementation, it's here just in case.
+            if (filled.getProperties().isEmpty()) // partially filled, this won't happen in current implementation, it's here just in case.
                 return Optional.empty();
             return Optional.of(filled); // cache it
         }
@@ -81,8 +81,6 @@ public class MojangService {
                     StringBuilder buf = new StringBuilder();
                     readLines(in, buf);
                     GameProfile constructed = gson.fromJson(buf.toString(), GameProfile.class);
-                    if (!constructed.isComplete()) // why does the server return an incomplete profile? treat it as not found.
-                        return Shared.DUMMY;
                     if (Shared.isOfflinePlayer(constructed.getId(), constructed.getName())) // why does the server return an offline profile? treat it as not found.
                         return Shared.DUMMY;
                     return new GameProfile(constructed.getId(), constructed.getName()); // reconstruct it because default JsonDeserializer doesn't construct a GameProfile properly, can't use GameProfileSerializer because it's a private class.
