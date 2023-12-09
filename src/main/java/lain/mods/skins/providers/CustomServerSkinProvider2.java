@@ -6,7 +6,7 @@ import lain.mods.skins.api.interfaces.ISkin;
 import lain.mods.skins.api.interfaces.ISkinProvider;
 import lain.mods.skins.impl.Shared;
 import lain.mods.skins.impl.SkinData;
-import lain.mods.skins.impl.forge.ImageUtils;
+import lain.mods.skins.impl.neoforge.ImageUtils;
 
 import java.nio.ByteBuffer;
 import java.util.Optional;

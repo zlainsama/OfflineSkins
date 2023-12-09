@@ -1,4 +1,4 @@
-package lain.mods.skins.init.forge;
+package lain.mods.skins.init.neoforge;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.multiplayer.PlayerInfo;

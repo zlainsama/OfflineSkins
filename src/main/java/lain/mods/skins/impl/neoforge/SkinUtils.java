@@ -1,10 +1,10 @@
-package lain.mods.skins.impl.forge;
+package lain.mods.skins.impl.neoforge;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.mojang.authlib.GameProfile;
-import lain.mods.skins.init.forge.Hooks;
+import lain.mods.skins.init.neoforge.Hooks;
 import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.resources.ResourceLocation;
 

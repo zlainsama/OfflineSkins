@@ -1,4 +1,4 @@
-var ASMAPI = Java.type('net.minecraftforge.coremod.api.ASMAPI');
+var ASMAPI = Java.type('net.neoforged.coremod.api.ASMAPI');
 var OPCODES = Java.type('org.objectweb.asm.Opcodes');
 
 // net/minecraft/client/multiplayer/PlayerInfo/m_293823_ (getSkin)
@@ -10,7 +10,7 @@ function transformMethod001(node) {
             tmp.visitVarInsn(OPCODES.ASTORE, 2);
             tmp.visitVarInsn(OPCODES.ALOAD, 0);
             tmp.visitVarInsn(OPCODES.ALOAD, 2);
-            tmp.visitMethodInsn(OPCODES.INVOKESTATIC, 'lain/mods/skins/init/forge/Hooks', 'getSkin', '(Lnet/minecraft/client/multiplayer/PlayerInfo;Lnet/minecraft/client/resources/PlayerSkin;)Lnet/minecraft/client/resources/PlayerSkin;', false);
+            tmp.visitMethodInsn(OPCODES.INVOKESTATIC, 'lain/mods/skins/init/neoforge/Hooks', 'getSkin', '(Lnet/minecraft/client/multiplayer/PlayerInfo;Lnet/minecraft/client/resources/PlayerSkin;)Lnet/minecraft/client/resources/PlayerSkin;', false);
             i += tmp.instructions.size();
             node.instructions.insertBefore(insn, tmp.instructions);
         }
@@ -26,7 +26,7 @@ function transformMethod002(node) {
             tmp.visitVarInsn(OPCODES.ALOAD, 0);
             tmp.visitVarInsn(OPCODES.ALOAD, 1);
             tmp.visitVarInsn(OPCODES.ALOAD, 2);
-            tmp.visitMethodInsn(OPCODES.INVOKESTATIC, 'lain/mods/skins/init/forge/Hooks', 'getSkinLocation', '(Lnet/minecraft/world/level/block/SkullBlock$Type;Lcom/mojang/authlib/GameProfile;Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/resources/ResourceLocation;', false);
+            tmp.visitMethodInsn(OPCODES.INVOKESTATIC, 'lain/mods/skins/init/neoforge/Hooks', 'getSkinLocation', '(Lnet/minecraft/world/level/block/SkullBlock$Type;Lcom/mojang/authlib/GameProfile;Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/resources/ResourceLocation;', false);
             i += tmp.instructions.size();
             node.instructions.insertBefore(insn, tmp.instructions);
         }

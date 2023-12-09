@@ -1,4 +1,4 @@
-package lain.mods.skins.impl.forge;
+package lain.mods.skins.impl.neoforge;
 
 import com.mojang.authlib.minecraft.MinecraftSessionService;
 import net.minecraft.client.Minecraft;

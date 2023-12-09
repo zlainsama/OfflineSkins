@@ -1,4 +1,4 @@
-package lain.mods.skins.impl.forge;
+package lain.mods.skins.impl.neoforge;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import lain.mods.skins.impl.SkinData;

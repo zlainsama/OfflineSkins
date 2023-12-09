@@ -1,4 +1,4 @@
-package lain.mods.skins.init.forge;
+package lain.mods.skins.init.neoforge;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -7,17 +7,17 @@ import lain.mods.skins.api.SkinProviderAPI;
 import lain.mods.skins.api.interfaces.ISkin;
 import lain.mods.skins.impl.ConfigOptions;
 import lain.mods.skins.impl.PlayerProfile;
-import lain.mods.skins.impl.forge.CustomSkinTexture;
-import lain.mods.skins.impl.forge.ImageUtils;
-import lain.mods.skins.impl.forge.SkinUtils;
+import lain.mods.skins.impl.neoforge.CustomSkinTexture;
+import lain.mods.skins.impl.neoforge.ImageUtils;
+import lain.mods.skins.impl.neoforge.SkinUtils;
 import lain.mods.skins.providers.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.TickEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.TickEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -112,7 +112,7 @@ enum Proxy {
     }
 
     void init() {
-        Logger logger = LogManager.getLogger(ForgeOfflineSkins.class);
+        Logger logger = LogManager.getLogger(NeoForgeOfflineSkins.class);
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         Path pathToConfig = Paths.get(".", "config", "offlineskins.json");
         pathToConfig.toFile().getParentFile().mkdirs();
@@ -154,7 +154,7 @@ enum Proxy {
         if (config.useCrafatar)
             SkinProviderAPI.CAPE.registerProvider(new CrafatarCapeProvider());
 
-        MinecraftForge.EVENT_BUS.addListener(this::handleClientTickEvent);
+        NeoForge.EVENT_BUS.addListener(this::handleClientTickEvent);
     }
 
 }

@@ -9,7 +9,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mojang.authlib.GameProfile;
 import com.mojang.util.UUIDTypeAdapter;
-import lain.mods.skins.impl.forge.MinecraftUtils;
+import lain.mods.skins.impl.neoforge.MinecraftUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;

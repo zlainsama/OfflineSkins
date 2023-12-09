@@ -8,10 +8,11 @@ import lain.mods.skins.api.interfaces.ISkin;
 import lain.mods.skins.api.interfaces.ISkinProvider;
 import lain.mods.skins.impl.Shared;
 import lain.mods.skins.impl.SkinData;
-import lain.mods.skins.impl.forge.ImageUtils;
-import lain.mods.skins.impl.forge.MinecraftUtils;
+import lain.mods.skins.impl.neoforge.ImageUtils;
+import lain.mods.skins.impl.neoforge.MinecraftUtils;
 
 import java.nio.ByteBuffer;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -26,11 +27,12 @@ public class MojangSkinProvider implements ISkinProvider {
             skin.setSkinFilter(_filter);
         SharedPool.execute(() -> {
             if (!Shared.isOfflinePlayer(profile.getPlayerID(), profile.getPlayerName())) {
-                MinecraftProfileTexture texture = MinecraftUtils.getSessionService().getTextures((GameProfile) profile.getOriginal()).skin();
-                if (texture != null) {
-                    Shared.downloadSkin(texture.getUrl(), Runnable::run).thenApply(Optional::get).thenAccept(data -> {
+                Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> textures = MinecraftUtils.getSessionService().getTextures((GameProfile) profile.getOriginal(), false);
+                if (textures != null && textures.containsKey(MinecraftProfileTexture.Type.SKIN)) {
+                    MinecraftProfileTexture tex = textures.get(MinecraftProfileTexture.Type.SKIN);
+                    Shared.downloadSkin(tex.getUrl(), Runnable::run).thenApply(Optional::get).thenAccept(data -> {
                         if (ImageUtils.validateData(data))
-                            skin.put(data, "slim".equals(texture.getMetadata("model")) ? "slim" : "default");
+                            skin.put(data, "slim".equals(tex.getMetadata("model")) ? "slim" : "default");
                     });
                 }
             }

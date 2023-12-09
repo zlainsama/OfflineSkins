@@ -1,15 +1,15 @@
 plugins {
+    id 'java-library'
     id 'eclipse'
     id 'idea'
-    id 'net.minecraftforge.gradle' version '[6.0.16,6.2)'
+    id 'net.neoforged.gradle.userdev' version '7.0.57'
 }
-
-import net.minecraftforge.gradle.common.tasks.SignJar
-
-import java.nio.file.Files
 
 version = mod_version
 group = mod_group_id
+
+repositories {
+}
 
 base {
     archivesName = mod_id
@@ -17,27 +17,19 @@ base {
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
-println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
-minecraft {
-    mappings channel: mapping_channel, version: mapping_version
-}
-
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
-repositories {
-}
-
 dependencies {
-    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    implementation "net.neoforged:neoforge:${neo_version}"
 }
 
-tasks.named('processResources', ProcessResources).configure {
+tasks.withType(ProcessResources).configureEach {
     var replaceProperties = [
             minecraft_version   : minecraft_version, minecraft_version_range: minecraft_version_range,
-            forge_version       : forge_version, forge_version_range: forge_version_range,
+            neo_version         : neo_version, neo_version_range: neo_version_range,
             loader_version_range: loader_version_range,
             mod_id              : mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
-            mod_authors         : mod_authors, mod_description: mod_description,
+            mod_authors         : mod_authors, mod_description: mod_description, pack_format_number: pack_format_number,
     ]
     inputs.properties replaceProperties
 
@@ -49,51 +41,27 @@ processResources {
     from 'LICENSE.txt'
 }
 
-tasks.named('jar', Jar).configure {
-    manifest {
-        attributes([
-                'Specification-Title'   : mod_id,
-                'Specification-Vendor'  : mod_authors,
-                'Specification-Version' : '1', // We are version 1 of ourselves
-                'Implementation-Title'  : project.name,
-                'Implementation-Version': project.jar.archiveVersion,
-                'Implementation-Vendor' : mod_authors
-        ])
-    }
-
-    finalizedBy 'reobfJar'
-}
-
-task signJar(type: SignJar, dependsOn: jar) {
-    onlyIf {
-        System.getenv('SIGNJAR_KEYSTORE') != null
-    }
-
+jar.doLast {
     if (System.getenv('SIGNJAR_KEYSTORE') != null) {
-        keyStore = Files.createTempFile(getTemporaryDir().toPath(), 'keystore-', '.jks').toString()
-        file(keyStore).withOutputStream { output ->
+        def keystore = File.createTempFile('keystore-', '.jks', getTemporaryDir()).toString()
+
+        file(keystore).withOutputStream { output ->
             output.write(Base64.getDecoder().decode(System.getenv('SIGNJAR_KEYSTORE')))
         }
-        alias = System.getenv('SIGNJAR_ALIAS')
-        storePass = System.getenv('SIGNJAR_STOREPASS')
-        keyPass = System.getenv('SIGNJAR_KEYPASS')
-        inputFile = jar.archiveFile
-        outputFile = jar.archiveFile
-    }
+        ant.signjar(
+                jar: archiveFile.get(),
+                signedJar: archiveFile.get(),
+                keystore: keystore,
+                alias: System.getenv('SIGNJAR_ALIAS'),
+                storepass: System.getenv('SIGNJAR_STOREPASS'),
+                keypass: System.getenv('SIGNJAR_KEYPASS'),
+                preservelastmodified: "true"
+        )
 
-    doLast {
-        delete keyStore
+        delete keystore
     }
 }
-
-build.dependsOn signJar
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
-}
-
-sourceSets.each {
-    def dir = layout.buildDirectory.dir("sourcesSets/$it.name")
-    it.output.resourcesDir = dir
-    it.java.destinationDirectory = dir
 }

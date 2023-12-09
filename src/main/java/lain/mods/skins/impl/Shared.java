@@ -8,7 +8,7 @@ import com.mojang.authlib.GameProfile;
 import lain.lib.Retries;
 import lain.lib.SharedPool;
 import lain.lib.SimpleDownloader;
-import lain.mods.skins.impl.forge.MinecraftUtils;
+import lain.mods.skins.impl.neoforge.MinecraftUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
