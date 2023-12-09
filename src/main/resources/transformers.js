@@ -20,7 +20,7 @@ function transformMethod001(node) {
 function transformMethod002(node) {
     for (var i = 0; i < node.instructions.size(); i++) {
         var insn = node.instructions.get(i);
-        if (OPCODES.INVOKESTATIC === insn.getOpcode() && ('m_110473_' === insn.name || 'm_110458_' === insn.name)) { // entityTranslucent | entityCutoutNoCull
+        if (OPCODES.INVOKESTATIC === insn.getOpcode() && ('entityTranslucent' === insn.name || 'entityCutoutNoCull' === insn.name || 'm_110473_' === insn.name || 'm_110458_' === insn.name)) { // entityTranslucent | entityCutoutNoCull
             var tmp = ASMAPI.getMethodNode();
             tmp.visitVarInsn(OPCODES.ASTORE, 2);
             tmp.visitVarInsn(OPCODES.ALOAD, 0);
@@ -55,7 +55,7 @@ function initializeCoreMod() {
             },
             'transformer': function(node) {
                 node.methods.forEach(function(method) {
-                    if ('m_293823_' === method.name)
+                    if ('getSkin' === method.name || 'm_293823_' === method.name)
                         transformMethod001(method);
                 });
                 return node;
@@ -68,7 +68,7 @@ function initializeCoreMod() {
             },
             'transformer': function(node) {
                 node.methods.forEach(function(method) {
-                    if ('m_112523_' === method.name)
+                    if ('getRenderType' === method.name || 'm_112523_' === method.name)
                         transformMethod002(method);
                 });
                 return node;
@@ -81,7 +81,7 @@ function initializeCoreMod() {
             },
             'transformer': function(node) {
                 node.methods.forEach(function(method) {
-                    if ('m_94544_' === method.name)
+                    if ('render' === method.name || 'm_94544_' === method.name)
                         transformMethod003(method);
                 });
                 return node;
