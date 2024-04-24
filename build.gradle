@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.4-SNAPSHOT'
+    id 'fabric-loom' version '1.6-SNAPSHOT'
     id 'maven-publish'
 }
 
@@ -35,16 +35,37 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-    it.options.release = 17
+    it.options.release = 21
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 jar {
     from("LICENSE.txt") {
         rename { "${it}_${project.archivesBaseName}" }
+    }
+}
+
+jar.doLast {
+    if (System.getenv('SIGNJAR_KEYSTORE') != null) {
+        def keystore = File.createTempFile('keystore-', '.jks', getTemporaryDir()).toString()
+
+        file(keystore).withOutputStream { output ->
+            output.write(Base64.getDecoder().decode(System.getenv('SIGNJAR_KEYSTORE')))
+        }
+        ant.signjar(
+                jar: archiveFile.get(),
+                signedJar: archiveFile.get(),
+                keystore: keystore,
+                alias: System.getenv('SIGNJAR_ALIAS'),
+                storepass: System.getenv('SIGNJAR_STOREPASS'),
+                keypass: System.getenv('SIGNJAR_KEYPASS'),
+                preservelastmodified: "true"
+        )
+
+        delete keystore
     }
 }
