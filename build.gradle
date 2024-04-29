@@ -49,7 +49,7 @@ jar {
     }
 }
 
-jar.doLast {
+remapJar.doLast {
     if (System.getenv('SIGNJAR_KEYSTORE') != null) {
         def keystore = File.createTempFile('keystore-', '.jks', getTemporaryDir()).toString()
 
