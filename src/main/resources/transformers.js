@@ -20,19 +20,19 @@ function transformMethod001(node) {
 function transformMethod002(node) {
     for (var i = 0; i < node.instructions.size(); i++) {
         var insn = node.instructions.get(i);
-        if (OPCODES.INVOKESTATIC === insn.getOpcode() && ('m_110473_' === insn.name || 'm_110458_' === insn.name)) { // entityTranslucent | entityCutoutNoCull
+        if (OPCODES.INVOKESTATIC === insn.getOpcode() && ('entityTranslucent' === insn.name || 'm_110473_' === insn.name)) {
             var tmp = ASMAPI.getMethodNode();
             tmp.visitVarInsn(OPCODES.ASTORE, 2);
             tmp.visitVarInsn(OPCODES.ALOAD, 0);
             tmp.visitVarInsn(OPCODES.ALOAD, 1);
             tmp.visitVarInsn(OPCODES.ALOAD, 2);
-            tmp.visitMethodInsn(OPCODES.INVOKESTATIC, 'lain/mods/skins/init/forge/Hooks', 'getSkinLocation', '(Lnet/minecraft/world/level/block/SkullBlock$Type;Lcom/mojang/authlib/GameProfile;Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/resources/ResourceLocation;', false);
+            tmp.visitMethodInsn(OPCODES.INVOKESTATIC, 'lain/mods/skins/init/forge/Hooks', 'getSkinLocation', '(Lnet/minecraft/world/level/block/SkullBlock$Type;Lnet/minecraft/world/item/component/ResolvableProfile;Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/resources/ResourceLocation;', false);
             i += tmp.instructions.size();
             node.instructions.insertBefore(insn, tmp.instructions);
         }
     }
 }
-// net/minecraft/client/gui/components/PlayerTabOverlay/m_94544_ (render)
+// net/minecraft/client/gui/components/PlayerTabOverlay/m_280406_ (render)
 function transformMethod003(node) {
     for (var i = 0; i < node.instructions.size(); i++) {
         var insn = node.instructions.get(i);
@@ -55,7 +55,7 @@ function initializeCoreMod() {
             },
             'transformer': function(node) {
                 node.methods.forEach(function(method) {
-                    if ('m_293823_' === method.name)
+                    if ('getSkin' === method.name || 'm_293823_' === method.name)
                         transformMethod001(method);
                 });
                 return node;
@@ -68,7 +68,7 @@ function initializeCoreMod() {
             },
             'transformer': function(node) {
                 node.methods.forEach(function(method) {
-                    if ('m_112523_' === method.name)
+                    if ('getRenderType' === method.name || 'm_112523_' === method.name)
                         transformMethod002(method);
                 });
                 return node;
@@ -81,7 +81,7 @@ function initializeCoreMod() {
             },
             'transformer': function(node) {
                 node.methods.forEach(function(method) {
-                    if ('m_94544_' === method.name)
+                    if ('render' === method.name || 'm_280406_' === method.name)
                         transformMethod003(method);
                 });
                 return node;

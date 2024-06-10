@@ -4,6 +4,7 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.component.ResolvableProfile;
 import net.minecraft.world.level.block.SkullBlock;
 
 public class Hooks {
@@ -33,6 +34,12 @@ public class Hooks {
     public static ResourceLocation getSkinLocation(SkullBlock.Type type, GameProfile profile, ResourceLocation result) {
         if (type == SkullBlock.Types.PLAYER && profile != null)
             return getSkinLocation(profile, result);
+        return result;
+    }
+
+    public static ResourceLocation getSkinLocation(SkullBlock.Type type, ResolvableProfile profile, ResourceLocation result) {
+        if (type == SkullBlock.Types.PLAYER && profile != null && profile.gameProfile() != null)
+            return getSkinLocation(profile.gameProfile(), result);
         return result;
     }
 

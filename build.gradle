@@ -1,12 +1,8 @@
 plugins {
     id 'eclipse'
     id 'idea'
-    id 'net.minecraftforge.gradle' version '[6.0.16,6.2)'
+    id 'net.minecraftforge.gradle' version '[6.0.24,6.2)'
 }
-
-import net.minecraftforge.gradle.common.tasks.SignJar
-
-import java.nio.file.Files
 
 version = mod_version
 group = mod_group_id
@@ -15,11 +11,12 @@ base {
     archivesName = mod_id
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 minecraft {
     mappings channel: mapping_channel, version: mapping_version
+    reobf = false
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
@@ -60,33 +57,28 @@ tasks.named('jar', Jar).configure {
                 'Implementation-Vendor' : mod_authors
         ])
     }
-
-    finalizedBy 'reobfJar'
 }
 
-task signJar(type: SignJar, dependsOn: jar) {
-    onlyIf {
-        System.getenv('SIGNJAR_KEYSTORE') != null
-    }
-
+jar.doLast {
     if (System.getenv('SIGNJAR_KEYSTORE') != null) {
-        keyStore = Files.createTempFile(getTemporaryDir().toPath(), 'keystore-', '.jks').toString()
-        file(keyStore).withOutputStream { output ->
+        def keystore = File.createTempFile('keystore-', '.jks', getTemporaryDir()).toString()
+
+        file(keystore).withOutputStream { output ->
             output.write(Base64.getDecoder().decode(System.getenv('SIGNJAR_KEYSTORE')))
         }
-        alias = System.getenv('SIGNJAR_ALIAS')
-        storePass = System.getenv('SIGNJAR_STOREPASS')
-        keyPass = System.getenv('SIGNJAR_KEYPASS')
-        inputFile = jar.archiveFile
-        outputFile = jar.archiveFile
-    }
+        ant.signjar(
+                jar: archiveFile.get(),
+                signedJar: archiveFile.get(),
+                keystore: keystore,
+                alias: System.getenv('SIGNJAR_ALIAS'),
+                storepass: System.getenv('SIGNJAR_STOREPASS'),
+                keypass: System.getenv('SIGNJAR_KEYPASS'),
+                preservelastmodified: "true"
+        )
 
-    doLast {
-        delete keyStore
+        delete keystore
     }
 }
-
-build.dependsOn signJar
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
