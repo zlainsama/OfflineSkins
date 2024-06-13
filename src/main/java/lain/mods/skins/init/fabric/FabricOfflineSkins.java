@@ -32,7 +32,7 @@ public class FabricOfflineSkins implements ClientModInitializer {
     private static final Map<ByteBuffer, CustomSkinTexture> textures = new WeakHashMap<>();
 
     private static Identifier generateRandomLocation() {
-        return new Identifier("offlineskins", String.format("textures/generated/%s", UUID.randomUUID()));
+        return Identifier.of("offlineskins", String.format("textures/generated/%s", UUID.randomUUID()));
     }
 
     public static Identifier getLocationCape(GameProfile profile, Identifier result) {
