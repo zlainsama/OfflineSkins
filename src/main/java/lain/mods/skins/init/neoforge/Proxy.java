@@ -39,7 +39,7 @@ enum Proxy {
     Map<ByteBuffer, CustomSkinTexture> textures = new WeakHashMap<>();
 
     ResourceLocation generateRandomLocation() {
-        return new ResourceLocation("offlineskins", String.format("textures/generated/%s", UUID.randomUUID()));
+        return ResourceLocation.fromNamespaceAndPath("offlineskins", String.format("textures/generated/%s", UUID.randomUUID()));
     }
 
     ResourceLocation getLocationCape(GameProfile profile) {
