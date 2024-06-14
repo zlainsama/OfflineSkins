@@ -99,14 +99,12 @@ enum Proxy {
         return null;
     }
 
-    void handleClientTickEvent(TickEvent.ClientTickEvent event) {
-        if (event.phase == TickEvent.Phase.START) {
-            Level world = Minecraft.getInstance().level;
-            if (world != null) {
-                for (Player player : world.players()) {
-                    SkinProviderAPI.SKIN.getSkin(PlayerProfile.wrapGameProfile(player.getGameProfile()));
-                    SkinProviderAPI.CAPE.getSkin(PlayerProfile.wrapGameProfile(player.getGameProfile()));
-                }
+    void handleClientTickEvent(TickEvent.ClientTickEvent.Pre event) {
+        Level world = Minecraft.getInstance().level;
+        if (world != null) {
+            for (Player player : world.players()) {
+                SkinProviderAPI.SKIN.getSkin(PlayerProfile.wrapGameProfile(player.getGameProfile()));
+                SkinProviderAPI.CAPE.getSkin(PlayerProfile.wrapGameProfile(player.getGameProfile()));
             }
         }
     }
