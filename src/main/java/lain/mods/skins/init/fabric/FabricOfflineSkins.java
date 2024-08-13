@@ -29,6 +29,8 @@ import java.util.stream.Collectors;
 
 public class FabricOfflineSkins implements ClientModInitializer {
 
+    public static boolean PLAYERHEADS = true;
+
     private static final Map<ByteBuffer, CustomSkinTexture> textures = new WeakHashMap<>();
 
     private static Identifier generateRandomLocation() {
@@ -145,6 +147,8 @@ public class FabricOfflineSkins implements ClientModInitializer {
             SkinProviderAPI.CAPE.registerProvider(new MojangCapeProvider());
         if (config.useCrafatar)
             SkinProviderAPI.CAPE.registerProvider(new CrafatarCapeProvider());
+
+        PLAYERHEADS = !config.disablePlayerHeads;
     }
 
 }
