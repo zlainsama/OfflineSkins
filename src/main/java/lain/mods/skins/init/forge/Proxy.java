@@ -152,6 +152,8 @@ enum Proxy {
         if (config.useCrafatar)
             SkinProviderAPI.CAPE.registerProvider(new CrafatarCapeProvider());
 
+        Hooks.PLAYERHEADS = !config.disablePlayerHeads;
+
         MinecraftForge.EVENT_BUS.addListener(this::handleClientTickEvent);
     }
 
