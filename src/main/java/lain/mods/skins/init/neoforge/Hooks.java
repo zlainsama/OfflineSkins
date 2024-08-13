@@ -9,6 +9,8 @@ import net.minecraft.world.level.block.SkullBlock;
 
 public class Hooks {
 
+    public static boolean PLAYERHEADS = true;
+
     public static PlayerSkin getSkin(GameProfile profile, PlayerSkin result) {
         PlayerSkin skin = Proxy.INSTANCE.getSkin(profile);
         if (skin != null)
@@ -32,13 +34,13 @@ public class Hooks {
     }
 
     public static ResourceLocation getSkinLocation(SkullBlock.Type type, GameProfile profile, ResourceLocation result) {
-        if (type == SkullBlock.Types.PLAYER && profile != null)
+        if (PLAYERHEADS && type == SkullBlock.Types.PLAYER && profile != null)
             return getSkinLocation(profile, result);
         return result;
     }
 
     public static ResourceLocation getSkinLocation(SkullBlock.Type type, ResolvableProfile profile, ResourceLocation result) {
-        if (type == SkullBlock.Types.PLAYER && profile != null && profile.gameProfile() != null)
+        if (PLAYERHEADS && type == SkullBlock.Types.PLAYER && profile != null && profile.gameProfile() != null)
             return getSkinLocation(profile.gameProfile(), result);
         return result;
     }
