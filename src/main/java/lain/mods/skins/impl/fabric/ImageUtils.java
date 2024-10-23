@@ -4,7 +4,11 @@ import lain.mods.skins.impl.SkinData;
 import net.minecraft.client.texture.NativeImage;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class ImageUtils {
 
@@ -16,7 +20,7 @@ public class ImageUtils {
                 return "default"; // it's actually "legacy", but there will always be a filter to convert them into "default".
             if (w == h) {
                 int r = Math.max(w / 64, 1);
-                if (((image.getColor(55 * r, 20 * r) & 0xFF000000) >>> 24) == 0)
+                if (((image.getColorArgb(55 * r, 20 * r) & 0xFF000000) >>> 24) == 0)
                     return "slim";
                 return "default";
             }
@@ -53,27 +57,39 @@ public class ImageUtils {
             setAreaOpaque(output, 0 * r, 16 * r, 64 * r, 32 * r);
             setAreaOpaque(output, 16 * r, 48 * r, 48 * r, 64 * r);
 
-            return SkinData.toBuffer(output.getBytes());
+            return imageToBuffer(output);
         } catch (Throwable t) {
             return buffer;
+        }
+    }
+
+    private static ByteBuffer imageToBuffer(NativeImage image) throws IOException {
+        Path path = Files.createTempFile(null, null);
+        try {
+            image.writeTo(path);
+            return SkinData.toBuffer(Files.readAllBytes(path));
+        } finally {
+            File file = path.toFile();
+            if (file.exists() && !file.delete())
+                file.deleteOnExit();
         }
     }
 
     private static void setAreaOpaque(NativeImage image, int x, int y, int width, int height) {
         for (int i = x; i < width; ++i)
             for (int j = y; j < height; ++j)
-                image.setColor(i, j, image.getColor(i, j) | -16777216);
+                image.setColorArgb(i, j, image.getColorArgb(i, j) | -16777216);
     }
 
     private static void setAreaTransparent(NativeImage image, int x, int y, int width, int height) {
         for (int i = x; i < width; ++i)
             for (int j = y; j < height; ++j)
-                if ((image.getColor(i, j) >> 24 & 255) < 128)
+                if ((image.getColorArgb(i, j) >> 24 & 255) < 128)
                     return;
 
         for (int l = x; l < width; ++l)
             for (int i1 = y; i1 < height; ++i1)
-                image.setColor(l, i1, image.getColor(l, i1) & 16777215);
+                image.setColorArgb(l, i1, image.getColorArgb(l, i1) & 16777215);
     }
 
     public static boolean validateData(byte[] data) {
