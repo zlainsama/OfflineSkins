@@ -7,8 +7,8 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 @Mod("offlineskins")
 public class ForgeOfflineSkins {
 
-    public ForgeOfflineSkins() {
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setupClient);
+    public ForgeOfflineSkins(FMLJavaModLoadingContext context) {
+        context.getModEventBus().addListener(this::setupClient);
     }
 
     private void setupClient(FMLClientSetupEvent event) {
