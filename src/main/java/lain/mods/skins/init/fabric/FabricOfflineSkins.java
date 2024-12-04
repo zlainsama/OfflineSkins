@@ -7,15 +7,17 @@ import lain.mods.skins.api.SkinProviderAPI;
 import lain.mods.skins.api.interfaces.ISkin;
 import lain.mods.skins.impl.ConfigOptions;
 import lain.mods.skins.impl.PlayerProfile;
-import lain.mods.skins.impl.fabric.CustomSkinTexture;
 import lain.mods.skins.impl.fabric.ImageUtils;
 import lain.mods.skins.providers.*;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.texture.NativeImage;
+import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
 
+import java.io.IOException;
 import java.io.Writer;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -29,9 +31,9 @@ import java.util.stream.Collectors;
 
 public class FabricOfflineSkins implements ClientModInitializer {
 
-    public static boolean PLAYERHEADS = true;
+    private static final Map<ByteBuffer, Identifier> textures = new WeakHashMap<>();
 
-    private static final Map<ByteBuffer, CustomSkinTexture> textures = new WeakHashMap<>();
+    public static boolean PLAYERHEADS = true;
 
     private static Identifier generateRandomLocation() {
         return Identifier.of("offlineskins", String.format("textures/generated/%s", UUID.randomUUID()));
@@ -42,7 +44,7 @@ public class FabricOfflineSkins implements ClientModInitializer {
         if (skin != null && skin.isDataReady()) {
             ByteBuffer data = skin.getData();
             if (data != null) // I don't know how this could happen, but it happens, apparently.
-                return getOrCreateTexture(data, skin).getLocation();
+                return getOrCreateTextureNullable(data, skin);
         }
         return null;
     }
@@ -52,22 +54,22 @@ public class FabricOfflineSkins implements ClientModInitializer {
         if (skin != null && skin.isDataReady()) {
             ByteBuffer data = skin.getData();
             if (data != null) // I don't know how this could happen, but it happens, apparently.
-                return getOrCreateTexture(data, skin).getLocation();
+                return getOrCreateTextureNullable(data, skin);
         }
         return null;
     }
 
-    private static CustomSkinTexture getOrCreateTexture(ByteBuffer data, ISkin skin) {
+    private static Identifier getOrCreateTexture(ByteBuffer data, ISkin skin) throws IOException {
         if (!textures.containsKey(data)) {
-            CustomSkinTexture texture = new CustomSkinTexture(generateRandomLocation(), data);
-            MinecraftClient.getInstance().getTextureManager().registerTexture(texture.getLocation(), texture);
-            textures.put(data, texture);
+            Identifier location = generateRandomLocation();
+            MinecraftClient.getInstance().getTextureManager().registerTexture(location, new NativeImageBackedTexture(NativeImage.read(data)));
+            textures.put(data, location);
 
             if (skin != null) {
                 skin.setRemovalListener(s -> {
                     if (data == s.getData()) {
                         MinecraftClient.getInstance().execute(() -> {
-                            MinecraftClient.getInstance().getTextureManager().destroyTexture(texture.getLocation());
+                            MinecraftClient.getInstance().getTextureManager().destroyTexture(location);
                             textures.remove(data);
                         });
                     }
@@ -75,6 +77,14 @@ public class FabricOfflineSkins implements ClientModInitializer {
             }
         }
         return textures.get(data);
+    }
+
+    private static Identifier getOrCreateTextureNullable(ByteBuffer data, ISkin skin) {
+        try {
+            return getOrCreateTexture(data, skin);
+        } catch (IOException e) {
+            return null;
+        }
     }
 
     public static String getSkinType(GameProfile profile, String result) {
