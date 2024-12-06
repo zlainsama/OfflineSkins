@@ -3,15 +3,16 @@ package lain.mods.skins.init.forge;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mojang.authlib.GameProfile;
+import com.mojang.blaze3d.platform.NativeImage;
 import lain.mods.skins.api.SkinProviderAPI;
 import lain.mods.skins.api.interfaces.ISkin;
 import lain.mods.skins.impl.ConfigOptions;
 import lain.mods.skins.impl.PlayerProfile;
-import lain.mods.skins.impl.forge.CustomSkinTexture;
 import lain.mods.skins.impl.forge.ImageUtils;
 import lain.mods.skins.impl.forge.SkinUtils;
 import lain.mods.skins.providers.*;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
@@ -21,6 +22,7 @@ import net.minecraftforge.event.TickEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
 import java.io.Writer;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -36,7 +38,7 @@ enum Proxy {
 
     INSTANCE;
 
-    Map<ByteBuffer, CustomSkinTexture> textures = new WeakHashMap<>();
+    Map<ByteBuffer, ResourceLocation> textures = new WeakHashMap<>();
 
     ResourceLocation generateRandomLocation() {
         return ResourceLocation.fromNamespaceAndPath("offlineskins", String.format("textures/generated/%s", UUID.randomUUID()));
@@ -47,7 +49,7 @@ enum Proxy {
         if (skin != null && skin.isDataReady()) {
             ByteBuffer data = skin.getData();
             if (data != null) // I don't know how this could happen, but it happens, apparently.
-                return getOrCreateTexture(data, skin).getLocation();
+                return getOrCreateTextureNullable(data, skin);
         }
         return null;
     }
@@ -57,22 +59,22 @@ enum Proxy {
         if (skin != null && skin.isDataReady()) {
             ByteBuffer data = skin.getData();
             if (data != null) // I don't know how this could happen, but it happens, apparently.
-                return getOrCreateTexture(data, skin).getLocation();
+                return getOrCreateTextureNullable(data, skin);
         }
         return null;
     }
 
-    CustomSkinTexture getOrCreateTexture(ByteBuffer data, ISkin skin) {
+    ResourceLocation getOrCreateTexture(ByteBuffer data, ISkin skin) throws IOException {
         if (!textures.containsKey(data)) {
-            CustomSkinTexture texture = new CustomSkinTexture(generateRandomLocation(), data);
-            Minecraft.getInstance().getTextureManager().register(texture.getLocation(), texture);
-            textures.put(data, texture);
+            ResourceLocation location = generateRandomLocation();
+            Minecraft.getInstance().getTextureManager().register(location, new DynamicTexture(NativeImage.read(data)));
+            textures.put(data, location);
 
             if (skin != null) {
                 skin.setRemovalListener(s -> {
                     if (data == s.getData()) {
                         Minecraft.getInstance().execute(() -> {
-                            Minecraft.getInstance().getTextureManager().release(texture.getLocation());
+                            Minecraft.getInstance().getTextureManager().release(location);
                             textures.remove(data);
                         });
                     }
@@ -80,6 +82,14 @@ enum Proxy {
             }
         }
         return textures.get(data);
+    }
+
+    ResourceLocation getOrCreateTextureNullable(ByteBuffer data, ISkin skin) {
+        try {
+            return getOrCreateTexture(data, skin);
+        } catch (IOException e) {
+            return null;
+        }
     }
 
     PlayerSkin getSkin(GameProfile profile) {
