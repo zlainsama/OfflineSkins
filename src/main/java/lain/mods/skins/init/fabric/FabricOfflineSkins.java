@@ -62,7 +62,7 @@ public class FabricOfflineSkins implements ClientModInitializer {
     private static Identifier getOrCreateTexture(ByteBuffer data, ISkin skin) throws IOException {
         if (!textures.containsKey(data)) {
             Identifier location = generateRandomLocation();
-            MinecraftClient.getInstance().getTextureManager().registerTexture(location, new NativeImageBackedTexture(NativeImage.read(data)));
+            MinecraftClient.getInstance().getTextureManager().registerTexture(location, new NativeImageBackedTexture(location::toString, NativeImage.read(data)));
             textures.put(data, location);
 
             if (skin != null) {
