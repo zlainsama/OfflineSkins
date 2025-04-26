@@ -67,7 +67,7 @@ enum Proxy {
     ResourceLocation getOrCreateTexture(ByteBuffer data, ISkin skin) throws IOException {
         if (!textures.containsKey(data)) {
             ResourceLocation location = generateRandomLocation();
-            Minecraft.getInstance().getTextureManager().register(location, new DynamicTexture(NativeImage.read(data)));
+            Minecraft.getInstance().getTextureManager().register(location, new DynamicTexture(location::toString, NativeImage.read(data)));
             textures.put(data, location);
 
             if (skin != null) {
